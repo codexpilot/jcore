@@ -57,7 +57,6 @@ always a literal byte count.
 | UUID | 50000 | |
 | NUMERIC | 60000 | Unlimited |
 | TEXT | 70000 | Unlimited |
-| CUID | 70032 | 32-character Base-36 identifier |
 | JSON | 80000 | |
 | JSONB | 80001 | |
 

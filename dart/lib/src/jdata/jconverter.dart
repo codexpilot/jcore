@@ -178,7 +178,6 @@ class JConverter {
           if (error != null) return 'Row $rowIdx, column "$columnName": $error';
           break;
         case DataType.text:
-        case DataType.cuid:
         case DataType.uuid:
           if (value is! String) {
             return 'Row $rowIdx, column "$columnName": expected String, got ${value.runtimeType}';

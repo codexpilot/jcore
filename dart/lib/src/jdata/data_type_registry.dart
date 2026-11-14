@@ -34,9 +34,6 @@ enum DataType {
   /// Unlimited text.
   text(70000, 'TEXT', 'text'),
 
-  /// CUID - 32-character Base-36 identifier for offline ID generation.
-  cuid(70032, 'CUID', 'text'),
-
   /// JSON document.
   json(80000, 'JSON', 'json'),
 
