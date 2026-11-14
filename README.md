@@ -3,7 +3,7 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 jsonc, UI bindings, catalogs, and synchronization.
 
-**Current jcore version:** `v3.1.0`
+**Current jcore version:** `v3.1.1`
 
 ## Current implementation
 

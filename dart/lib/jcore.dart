@@ -1,12 +1,5 @@
-/// Dart implementation of the JCore jdata layer.
+/// Dart implementation of the jcore jdata layer.
 library;
 
-// Data type registry and exact decimal values.
-export 'src/jdata/data_type_registry.dart';
-export 'src/jdata/data_type_mapping.dart';
-export 'src/jdata/numeric.dart';
-
-// JSONC data interchange and schema registry.
-export 'src/jdata/jsonc.dart';
-export 'src/jdata/jconverter.dart';
-export 'src/jdata/jbase.dart';
+// Re-export jdata
+export 'jdata.dart';
