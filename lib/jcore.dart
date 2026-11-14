@@ -11,3 +11,8 @@ export 'src/data_type_validation.dart';
 export 'src/data_type_encoding.dart';
 export 'src/data_type_decoding.dart';
 export 'src/data_type_mapping.dart';
+
+// JSONC - JSON Custom format for AIX data interchange
+export 'src/jsonc.dart';
+export 'src/jsonc_converter.dart';
+export 'src/jbase.dart';
