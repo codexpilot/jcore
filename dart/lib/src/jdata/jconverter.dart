@@ -1,7 +1,4 @@
-import 'j_data_type.dart';
 import 'data_type_registry.dart';
-import 'data_type_validation.dart';
-import 'data_type_decoding.dart';
 import 'data_type_mapping.dart';
 import 'jsonc.dart';
 import 'numeric_value_validation.dart';
@@ -71,7 +68,7 @@ class JConverter {
       }
 
       // Validate data type ID
-      if (!isValidDataType(dataTypeId)) {
+      if (!DataTypeRegistry.isValid(dataTypeId)) {
         errors.add(
           'Invalid data type ID for column "$columnName": $dataTypeId',
         );
@@ -181,99 +178,37 @@ class JConverter {
           if (error != null) return 'Row $rowIdx, column "$columnName": $error';
           break;
         case DataType.text:
-        case DataType.text0z:
+        case DataType.cuid:
         case DataType.uuid:
           if (value is! String) {
             return 'Row $rowIdx, column "$columnName": expected String, got ${value.runtimeType}';
           }
           break;
+        case DataType.json:
         case DataType.jsonb:
-          // JSONB can be any JSON-serializable value.
+          // JSON/JSONB can be any JSON-serializable value.
           break;
       }
       return null;
     }
 
-    final baseType = JDataType.fromId(dataTypeId);
-
-    if (baseType != null) {
-      // Validate base types
-      switch (baseType) {
-        case JDataType.boolean:
-          if (value is! bool) {
-            return 'Row $rowIdx, column "$columnName": expected bool, got ${value.runtimeType}';
-          }
-          break;
-
-        case JDataType.int32:
-        case JDataType.int64:
-          final BigInt? integer;
-          if (value is int) {
-            integer = BigInt.from(value);
-          } else if (value is BigInt) {
-            integer = value;
-          } else if (value is String &&
-              RegExp(r'^[+-]?[0-9]+$').hasMatch(value)) {
-            integer = BigInt.tryParse(value);
-          } else {
-            integer = null;
-          }
-          if (integer == null) {
-            return 'Row $rowIdx, column "$columnName": expected integer or decimal integer string, got ${value.runtimeType}';
-          }
-          final bits = baseType == JDataType.int32 ? 32 : 64;
-          final limit = BigInt.one << (bits - 1);
-          if (integer < -limit || integer >= limit) {
-            return 'Row $rowIdx, column "$columnName": integer out of range for INT$bits';
-          }
-          break;
-
-        case JDataType.datetime:
-        case JDataType.time:
-          if (value is! int) {
-            return 'Row $rowIdx, column "$columnName": expected int (epoch millis), got ${value.runtimeType}';
-          }
-          break;
-
-        case JDataType.numeric:
-          final error = numericValueError(value);
-          if (error != null) return 'Row $rowIdx, column "$columnName": $error';
-          break;
-
-        case JDataType.text:
-        case JDataType.text0z:
-        case JDataType.uuid:
-          if (value is! String) {
-            return 'Row $rowIdx, column "$columnName": expected String, got ${value.runtimeType}';
-          }
-          break;
-
-        case JDataType.jsonb:
-          // JSONB can be any JSON-serializable type
-          break;
-      }
-    } else if (isValidNumericType(dataTypeId) ||
-        DataTypeRegistry.isValidNumeric(dataTypeId)) {
-      final params = DataTypeRegistry.isValidNumeric(dataTypeId)
-          ? DataTypeRegistry.decodeNumeric(dataTypeId)!
-          : decodeNumericType(dataTypeId)!;
+    // Check for parameterized types
+    if (DataTypeRegistry.isValidNumeric(dataTypeId)) {
+      final params = DataTypeRegistry.decodeNumeric(dataTypeId)!;
       final error = numericValueError(
         value,
         precision: params.precision,
         scale: params.scale,
       );
       if (error != null) return 'Row $rowIdx, column "$columnName": $error';
-    } else if (isValidTextType(dataTypeId) ||
-        DataTypeRegistry.isValidText(dataTypeId)) {
+    } else if (DataTypeRegistry.isValidText(dataTypeId)) {
       // Parameterized TEXT
       if (value is! String) {
         return 'Row $rowIdx, column "$columnName": expected String for TEXT type, got ${value.runtimeType}';
       }
 
       // Validate length
-      final maxLength = DataTypeRegistry.isValidText(dataTypeId)
-          ? DataTypeRegistry.decodeText(dataTypeId)
-          : decodeTextType(dataTypeId);
+      final maxLength = DataTypeRegistry.decodeText(dataTypeId);
       if (maxLength != null && value.length > maxLength) {
         return 'Row $rowIdx, column "$columnName": text length ${value.length} exceeds max $maxLength';
       }
@@ -285,7 +220,7 @@ class JConverter {
   /// Convert JSONC to list of maps (rows as objects)
   ///
   /// Example:
-  /// Schema: {"id": 300003, "name": 300008}
+  /// Schema: {"id": 40000, "name": 70000}
   /// Data: [[1, "John"], [2, "Jane"]]
   /// Result: [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
   static List<Map<String, dynamic>> toMaps(JsonC jsonc) {
@@ -312,7 +247,7 @@ class JConverter {
   ///
   /// Example:
   /// Maps: [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
-  /// Schema: {"id": 300003, "name": 300008}
+  /// Schema: {"id": 40000, "name": 70000}
   /// Result: JSONC with data [[1, "John"], [2, "Jane"]]
   static JsonC fromMaps(
     List<Map<String, dynamic>> maps,
@@ -441,17 +376,16 @@ class JConverter {
       final columnName = entry.key;
       final dataTypeId = entry.value;
       final pgType = getPostgresType(dataTypeId);
-      final baseType = JDataType.fromId(dataTypeId);
       final dataType = DataType.fromId(dataTypeId);
 
       result.add({
         'name': columnName,
         'dataTypeId': dataTypeId,
         'postgresType': pgType,
-        'typeName': dataType?.name ?? baseType?.name,
-        'isNumeric': isNumericDataType(dataTypeId),
-        'isText': isTextDataType(dataTypeId),
-        'isBase': dataType != null || baseType != null,
+        'typeName': dataType?.name,
+        'isNumeric': DataTypeRegistry.isValidNumeric(dataTypeId),
+        'isText': DataTypeRegistry.isValidText(dataTypeId),
+        'isBase': dataType != null,
       });
     }
 

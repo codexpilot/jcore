@@ -44,8 +44,7 @@ and preserve their dependency order.
 ## Data type registry
 
 The leading decimal digit identifies an ordered storage-size class. It is not
-always a literal byte count; the existing AIX catalog uses class 3 for
-four-byte values.
+always a literal byte count.
 
 | Type | ID | Notes |
 | --- | ---: | --- |
@@ -58,7 +57,8 @@ four-byte values.
 | UUID | 50000 | |
 | NUMERIC | 60000 | Unlimited |
 | TEXT | 70000 | Unlimited |
-| TEXT0Z | 80000 | |
+| CUID | 70032 | 32-character Base-36 identifier |
+| JSON | 80000 | |
 | JSONB | 80001 | |
 
 Parameterized IDs are:
@@ -69,7 +69,7 @@ Parameterized IDs are:
 The Dart entry points are `DataType`, `DataTypeRegistry`,
 `DataTypeRegistry.encodeNumeric`, `DataTypeRegistry.decodeNumeric`,
 `DataTypeRegistry.encodeText`, `DataTypeRegistry.decodeText`, and
-`isValidDataType`.
+`DataTypeRegistry.isValid`.
 
 ## Numeric and JSONC
 

@@ -16,7 +16,8 @@ void main() {
       expect(DataType.uuid.id, 50000);
       expect(DataType.numeric.id, 60000);
       expect(DataType.text.id, 70000);
-      expect(DataType.text0z.id, 80000);
+      expect(DataType.cuid.id, 70032);
+      expect(DataType.json.id, 80000);
       expect(DataType.jsonb.id, 80001);
       expect(DataTypeRegistry.fromName('int16'), DataType.smallint);
       expect(DataTypeRegistry.fromName('SMALLINT'), DataType.smallint);
@@ -60,11 +61,12 @@ void main() {
     });
 
     test('validates catalog IDs and maps registered types', () {
-      expect(isValidDataType(10000), isTrue);
-      expect(isValidDataType(61002), isTrue);
-      expect(isValidDataType(70100), isTrue);
-      expect(isValidDataType(60001), isFalse);
-      expect(isValidDataType(80002), isFalse);
+      expect(DataTypeRegistry.isValid(10000), isTrue);
+      expect(DataTypeRegistry.isValid(61002), isTrue);
+      expect(DataTypeRegistry.isValid(70100), isTrue);
+      expect(DataTypeRegistry.isValid(60001), isFalse);
+      expect(DataTypeRegistry.isValid(80002), isFalse);
+      expect(DataTypeRegistry.contains(80000), isTrue);
       expect(DataTypeRegistry.contains(80001), isTrue);
       expect(getPostgresType(30000), 'integer');
       expect(getPostgresType(61002), 'numeric(10,2)');

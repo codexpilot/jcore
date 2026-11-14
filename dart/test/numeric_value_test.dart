@@ -5,7 +5,7 @@ void main() {
   String? validate(Object value, int precision, int scale) =>
       JConverter.validateValue(
         value,
-        encodeNumericType(precision: precision, scale: scale),
+        DataTypeRegistry.encodeNumeric(precision: precision, scale: scale),
         0,
         'amount',
       );
@@ -62,7 +62,7 @@ void main() {
         true,
       ]) {
         expect(validate(value, 5, 2), isNotNull, reason: '$value');
-        expect(JConverter.validateValue(value, 300000, 0, 'amount'), isNotNull);
+        expect(JConverter.validateValue(value, 60000, 0, 'amount'), isNotNull);
       }
     });
 
@@ -70,13 +70,13 @@ void main() {
       expect(
         JConverter.validateValue(
           '12345678901234567890.123456789',
-          300000,
+          60000,
           0,
           'amount',
         ),
         isNull,
       );
-      expect(JConverter.validateValue('NaN', 300000, 0, 'amount'), isNotNull);
+      expect(JConverter.validateValue('NaN', 60000, 0, 'amount'), isNotNull);
     });
   });
 }

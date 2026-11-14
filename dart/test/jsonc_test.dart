@@ -7,7 +7,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
           [2, 'Jane'],
@@ -27,7 +27,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
       );
 
       expect(jsonc.hasSchema, isTrue);
@@ -56,7 +56,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
           [2, 'Jane'],
@@ -76,7 +76,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
           [2, 'Jane', 'Extra'], // Wrong length
@@ -92,7 +92,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
         ],
@@ -102,7 +102,7 @@ void main() {
 
       expect(json['jv'], equals(1));
       expect(json['jid'], equals(12345));
-      expect(json['schema'], equals({'id': 300003, 'name': 300008}));
+      expect(json['schema'], equals({'id': 40000, 'name': 70000}));
       expect(
         json['data'],
         equals([
@@ -115,7 +115,7 @@ void main() {
       final json = {
         'jv': 1,
         'jid': 12345,
-        'schema': {'id': 300003, 'name': 300008},
+        'schema': {'id': 40000, 'name': 70000},
         'data': [
           [1, 'John'],
         ],
@@ -125,7 +125,7 @@ void main() {
 
       expect(jsonc.jv, equals(1));
       expect(jsonc.jid, equals(12345));
-      expect(jsonc.schema, equals({'id': 300003, 'name': 300008}));
+      expect(jsonc.schema, equals({'id': 40000, 'name': 70000}));
       expect(
         jsonc.data,
         equals([
@@ -138,7 +138,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003},
+        schema: {'id': 40000},
         data: [
           [1],
         ],
@@ -152,7 +152,7 @@ void main() {
 
     test('parses from JSON string', () {
       final jsonString =
-          '{"jv":1,"jid":12345,"schema":{"id":300003},"data":[[1]]}';
+          '{"jv":1,"jid":12345,"schema":{"id":40000},"data":[[1]]}';
 
       final jsonc = JsonC.parse(jsonString);
 
@@ -166,7 +166,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008, 'price': 310020},
+        schema: {'id': 40000, 'name': 70000, 'price': 310020},
       );
 
       final names = jsonc.columnNames;
@@ -181,14 +181,14 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008, 'price': 310020},
+        schema: {'id': 40000, 'name': 70000, 'price': 310020},
       );
 
       final typeIds = jsonc.dataTypeIds;
 
       expect(typeIds, hasLength(3));
-      expect(typeIds, contains(300003));
-      expect(typeIds, contains(300008));
+      expect(typeIds, contains(40000));
+      expect(typeIds, contains(70000));
       expect(typeIds, contains(310020));
     });
   });
@@ -198,7 +198,7 @@ void main() {
       final jsonc1 = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003},
+        schema: {'id': 40000},
         data: [
           [1],
         ],
@@ -207,7 +207,7 @@ void main() {
       final jsonc2 = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003},
+        schema: {'id': 40000},
         data: [
           [1],
         ],
@@ -217,12 +217,12 @@ void main() {
     });
 
     test('different JSONC instances are not equal', () {
-      final jsonc1 = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final jsonc1 = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       final jsonc2 = JsonC(
         jv: 1,
         jid: 12346, // Different jid
-        schema: {'id': 300003},
+        schema: {'id': 40000},
       );
 
       expect(jsonc1, isNot(equals(jsonc2)));
@@ -235,10 +235,10 @@ void main() {
         jv: 1,
         jid: 1001,
         schema: {
-          'product_id': 300003, // INT64
-          'name': 300008, // TEXT
+          'product_id': 40000, // INT64
+          'name': 70000, // TEXT
           'price': 310020, // NUMERIC(10,2)
-          'created_at': 300004, // DATETIME
+          'created_at': 40001, // DATETIME
         },
         data: [
           [1, 'Laptop', 999.99, 1699123200000],
@@ -257,10 +257,10 @@ void main() {
         jv: 1,
         jid: 2001,
         schema: {
-          'user_id': 300003, // INT64
+          'user_id': 40000, // INT64
           'username': 301008, // TEXT(100)
           'email': 302558, // TEXT(255)
-          'is_active': 300001, // BOOLEAN
+          'is_active': 10000, // BOOLEAN
         },
         data: [
           [1, 'john_doe', 'john@example.com', true],

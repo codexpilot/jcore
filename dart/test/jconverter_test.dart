@@ -7,7 +7,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
           [2, 'Jane'],
@@ -36,7 +36,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John', 'Extra'], // Too many values
         ],
@@ -52,7 +52,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'is_active': 300001}, // BOOLEAN
+        schema: {'is_active': 10000}, // BOOLEAN
         data: [
           ['not a boolean'], // Wrong type
         ],
@@ -68,7 +68,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003}, // INT64
+        schema: {'id': 40000}, // INT64
         data: [
           ['not an int'], // Wrong type
         ],
@@ -102,7 +102,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008, 'age': 300002},
+        schema: {'id': 40000, 'name': 70000, 'age': 30000},
         data: [
           [1, 'John', 30],
           [2, 'Jane', 25],
@@ -129,7 +129,7 @@ void main() {
     });
 
     test('throws when JSONC lacks data', () {
-      final jsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final jsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       expect(() => JConverter.toMaps(jsonc), throwsArgumentError);
     });
@@ -142,7 +142,7 @@ void main() {
         {'id': 2, 'name': 'Jane'},
       ];
 
-      final schema = {'id': 300003, 'name': 300008};
+      final schema = {'id': 40000, 'name': 70000};
 
       final jsonc = JConverter.fromMaps(maps, schema, jv: 1, jid: 12345);
 
@@ -159,7 +159,7 @@ void main() {
     });
 
     test('handles empty maps list', () {
-      final jsonc = JConverter.fromMaps([], {'id': 300003}, jv: 1, jid: 12345);
+      final jsonc = JConverter.fromMaps([], {'id': 40000}, jv: 1, jid: 12345);
 
       expect(jsonc.data, isEmpty);
       expect(jsonc.hasSchema, isTrue);
@@ -172,8 +172,8 @@ void main() {
         jv: 1,
         jid: 12345,
         schema: {
-          'id': 300003, // INT64 -> bigint
-          'name': 300008, // TEXT -> text
+          'id': 40000, // INT64 -> bigint
+          'name': 70000, // TEXT -> text
           'price': 310020, // NUMERIC(10,2)
         },
       );
@@ -207,7 +207,7 @@ void main() {
       final schemaJsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
       );
 
       final dataJsonc = JsonC(
@@ -228,7 +228,7 @@ void main() {
     });
 
     test('throws on JID mismatch', () {
-      final schemaJsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final schemaJsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       final dataJsonc = JsonC(
         jv: 1,
@@ -250,7 +250,7 @@ void main() {
       final fullJsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
         ],
@@ -267,7 +267,7 @@ void main() {
       final fullJsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
         ],
@@ -287,7 +287,7 @@ void main() {
         jv: 1,
         jid: 12345,
         schema: {
-          'id': 300003, // INT64
+          'id': 40000, // INT64
           'price': 310020, // NUMERIC(10,2)
           'name': 301008, // TEXT(100)
         },
@@ -298,7 +298,7 @@ void main() {
       expect(metadata, hasLength(3));
 
       final idCol = metadata.firstWhere((m) => m['name'] == 'id');
-      expect(idCol['dataTypeId'], equals(300003));
+      expect(idCol['dataTypeId'], equals(40000));
       expect(idCol['postgresType'], equals('bigint'));
       expect(idCol['isBase'], isTrue);
 
@@ -319,10 +319,10 @@ void main() {
         'jv': 1,
         'jid': 5001,
         'schema': {
-          'user_id': 300003,
+          'user_id': 40000,
           'username': 301008,
           'email': 302558,
-          'created_at': 300004,
+          'created_at': 40001,
         },
         'data': [
           [1, 'alice', 'alice@example.com', 1699123200000],
@@ -348,12 +348,12 @@ void main() {
         jv: 1,
         jid: 6001,
         schema: {
-          'product_id': 300003,
+          'product_id': 40000,
           'sku': 300108, // TEXT(10)
           'name': 302008, // TEXT(200)
           'price': 310020, // NUMERIC(10,2)
-          'stock': 300002, // INT32
-          'is_active': 300001, // BOOLEAN
+          'stock': 30000, // INT32
+          'is_active': 10000, // BOOLEAN
         },
       );
 
@@ -370,7 +370,7 @@ void main() {
       final schemaJsonc = JsonC(
         jv: 1,
         jid: 7001,
-        schema: {'id': 300003, 'value': 300008},
+        schema: {'id': 40000, 'value': 70000},
       );
 
       // Later: Send data batches with same JID

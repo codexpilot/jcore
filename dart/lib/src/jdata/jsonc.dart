@@ -10,7 +10,7 @@ import 'dart:convert' as json;
 
 import 'numeric.dart';
 
-const _int64TypeIds = {40000, 300003};
+const _int64TypeIds = {40000};
 final _maxSafeInteger = BigInt.from(9007199254740991);
 const _isWeb = bool.fromEnvironment('dart.library.js_interop');
 
@@ -77,7 +77,7 @@ enum JsonCType {
 ///   "jv": 1731542400,
 ///   "jid": 12345,
 ///   "jnf": 3,
-///   "schema": {"id": 300003, "name": 300008},
+///   "schema": {"id": 40000, "name": 70000},
 ///   "data": [[1, "John"], [2, "Jane"]]
 /// }
 /// ```
@@ -105,8 +105,8 @@ class JsonC {
   /// - 5: JSONC format, both BigInt and Numeric as string (maximum safety)
   final int? jnf;
 
-  /// Column definitions: column_name -> JDataType ID
-  /// Example: {"id": 300003, "name": 300008, "price": 310020}
+  /// Column definitions: column_name -> DataType ID
+  /// Example: {"id": 40000, "name": 70000, "price": 61002}
   final Map<String, int>? schema;
 
   /// Data rows as arrays matching schema column order

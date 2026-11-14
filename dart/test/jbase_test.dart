@@ -26,7 +26,7 @@ void main() {
       final schema = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
       );
 
       JBase.instance.register(schema);
@@ -39,7 +39,7 @@ void main() {
       final full = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
         ],
@@ -64,12 +64,12 @@ void main() {
     });
 
     test('replaces existing schema with same JID', () {
-      final schema1 = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final schema1 = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       final schema2 = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008}, // More columns
+        schema: {'id': 40000, 'name': 70000}, // More columns
       );
 
       JBase.instance.register(schema1);
@@ -81,8 +81,8 @@ void main() {
 
     test('registers multiple schemas', () {
       final schemas = [
-        JsonC(jv: 1, jid: 1001, schema: {'id': 300003}),
-        JsonC(jv: 1, jid: 1002, schema: {'name': 300008}),
+        JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
+        JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
         JsonC(jv: 1, jid: 1003, schema: {'price': 310020}),
       ];
 
@@ -98,7 +98,7 @@ void main() {
       final schema = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
       );
 
       JBase.instance.register(schema);
@@ -122,7 +122,7 @@ void main() {
 
   group('JBase remove', () {
     test('removes schema', () {
-      final schema = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final schema = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       JBase.instance.register(schema);
       expect(JBase.instance.has(12345), isTrue);
@@ -143,8 +143,8 @@ void main() {
   group('JBase clear', () {
     test('clears all schemas', () {
       JBase.instance.registerAll([
-        JsonC(jv: 1, jid: 1001, schema: {'id': 300003}),
-        JsonC(jv: 1, jid: 1002, schema: {'name': 300008}),
+        JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
+        JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
       ]);
 
       expect(JBase.instance.count, equals(2));
@@ -161,7 +161,7 @@ void main() {
       final schema = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 300003, 'name': 300008},
+        schema: {'id': 40000, 'name': 70000},
       );
 
       JBase.instance.register(schema);
@@ -195,7 +195,7 @@ void main() {
     });
 
     test('throws when JSONC has no data', () {
-      final schemaOnly = JsonC(jv: 1, jid: 12345, schema: {'id': 300003});
+      final schemaOnly = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
 
       expect(
         () => JBase.instance.mergeWithSchema(schemaOnly),
@@ -207,8 +207,8 @@ void main() {
   group('JBase metadata', () {
     test('gets all JIDs', () {
       JBase.instance.registerAll([
-        JsonC(jv: 1, jid: 1001, schema: {'id': 300003}),
-        JsonC(jv: 1, jid: 1002, schema: {'name': 300008}),
+        JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
+        JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
         JsonC(jv: 1, jid: 1003, schema: {'price': 310020}),
       ]);
 
@@ -223,7 +223,7 @@ void main() {
         JsonC(
           jv: 1,
           jid: 12345,
-          schema: {'id': 300003, 'name': 300008, 'price': 310020},
+          schema: {'id': 40000, 'name': 70000, 'price': 310020},
         ),
       );
 
@@ -239,8 +239,8 @@ void main() {
   group('JBase export/import', () {
     test('exports schemas to JSON', () {
       JBase.instance.registerAll([
-        JsonC(jv: 1, jid: 1001, schema: {'id': 300003}),
-        JsonC(jv: 1, jid: 1002, schema: {'name': 300008}),
+        JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
+        JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
       ]);
 
       final exported = JBase.instance.export();
@@ -255,12 +255,12 @@ void main() {
         {
           'jv': 1,
           'jid': 1001,
-          'schema': {'id': 300003},
+          'schema': {'id': 40000},
         },
         {
           'jv': 1,
           'jid': 1002,
-          'schema': {'name': 300008},
+          'schema': {'name': 70000},
         },
       ];
 
@@ -276,7 +276,7 @@ void main() {
         {
           'jv': 1,
           'jid': 1001,
-          'schema': {'id': 300003},
+          'schema': {'id': 40000},
         }, // Valid
         {'jv': 1, 'jid': 1002}, // Invalid - no schema
         {'invalid': 'data'}, // Invalid - bad structure
@@ -291,16 +291,16 @@ void main() {
   group('JBase search', () {
     setUp(() {
       JBase.instance.registerAll([
-        JsonC(jv: 1, jid: 1001, schema: {'user_id': 300003, 'name': 300008}),
+        JsonC(jv: 1, jid: 1001, schema: {'user_id': 40000, 'name': 70000}),
         JsonC(
           jv: 1,
           jid: 1002,
-          schema: {'product_id': 300003, 'price': 310020},
+          schema: {'product_id': 40000, 'price': 310020},
         ),
         JsonC(
           jv: 1,
           jid: 1003,
-          schema: {'order_id': 300003, 'user_id': 300003},
+          schema: {'order_id': 40000, 'user_id': 40000},
         ),
       ]);
     });
@@ -313,7 +313,7 @@ void main() {
     });
 
     test('finds schemas by data type', () {
-      final jids = JBase.instance.findByDataType(300003); // INT64
+      final jids = JBase.instance.findByDataType(40000); // INT64
 
       expect(jids, hasLength(3)); // All have INT64
     });
@@ -332,10 +332,10 @@ void main() {
         'jv': 1,
         'jid': 5001,
         'schema': {
-          'user_id': 300003,
+          'user_id': 40000,
           'username': 301008,
           'email': 302558,
-          'is_active': 300001,
+          'is_active': 10000,
         },
       };
 

@@ -5,9 +5,9 @@ import 'package:test/test.dart';
 
 void main() {
   const schema = <String, int>{
-    'id': 300003,
-    'name': 300008,
-    'small': 300002,
+    'id': 40000,
+    'name': 70000,
+    'small': 30000,
     'amount': 310020,
   };
 
@@ -71,7 +71,7 @@ void main() {
         final stringInput = <String, dynamic>{
           'jv': 1,
           'jid': 1,
-          'schema': {'id': 300003},
+          'schema': {'id': 40000},
           'data': [
             ['123'],
           ],
@@ -96,7 +96,7 @@ void main() {
 
     test('never treats unsafe raw numbers as exact BigInt input', () {
       const raw =
-          '{"jv":1,"jid":1,"jnf":3,"schema":{"id":300003},'
+          '{"jv":1,"jid":1,"jnf":3,"schema":{"id":40000},'
           '"data":[[9007199254740992]]}';
       try {
         final jsonc = JsonC.parse(raw);
@@ -125,7 +125,7 @@ void main() {
         jv: 1,
         jid: 1,
         jnf: 3,
-        schema: {'id': 300003},
+        schema: {'id': 40000},
         data: data,
       );
       final encoded = jsonDecode(jsonc.encode()) as Map<String, dynamic>;
@@ -141,7 +141,7 @@ void main() {
         [
           {'id': 42},
         ],
-        {'id': 300003},
+        {'id': 40000},
         jv: 1,
         jid: 1,
         jnf: 3,
@@ -154,7 +154,7 @@ void main() {
         [
           {'id': BigInt.from(42)},
         ],
-        {'id': 300003},
+        {'id': 40000},
         jv: 1,
         jid: 1,
         jnf: 4,
@@ -169,7 +169,7 @@ void main() {
         [
           {'id': value},
         ],
-        {'id': 300003},
+        {'id': 40000},
         jv: 1,
         jid: 1,
         jnf: 3,
@@ -185,7 +185,7 @@ void main() {
         [
           {'id': BigInt.from(123)},
         ],
-        {'id': 300003},
+        {'id': 40000},
         jv: 1,
         jid: 1,
       );
@@ -216,7 +216,7 @@ void main() {
           jv: 1,
           jid: 1,
           jnf: 3,
-          schema: {'id': 300003},
+          schema: {'id': 40000},
           data: [
             [value],
           ],

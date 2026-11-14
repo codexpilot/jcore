@@ -11,8 +11,7 @@ planned. They do not have placeholder packages or APIs here.
 ## Data type registry
 
 The first decimal digit identifies an ordered storage-size class, not
-necessarily a literal byte count. The existing AIX catalog uses class 3 for
-four-byte values.
+necessarily a literal byte count.
 
 | Type | ID | Notes |
 | --- | ---: | --- |
@@ -25,7 +24,8 @@ four-byte values.
 | UUID | 50000 | |
 | NUMERIC | 60000 | Unlimited precision and scale |
 | TEXT | 70000 | Unlimited length |
-| TEXT0Z | 80000 | |
+| CUID | 70032 | 32-character Base-36 identifier |
+| JSON | 80000 | |
 | JSONB | 80001 | |
 
 Parameterized IDs:
@@ -60,13 +60,6 @@ When a Numeric is encoded by JSONC, numeric-string modes emit a decimal
 string. Plain-number modes emit a JSON number, which downstream runtimes may
 round. Choose a numeric-string mode when the decimal value must remain exact
 on the wire.
-
-## Existing Group 3 API
-
-The existing AIX Group 3 catalog (`JDataType`, `encodeNumericType`, and
-related APIs) remains available as a separate catalog surface. Its IDs are
-not translated to the current catalog. This work does not migrate stored
-schemas or add legacy-ID compatibility to the current registry.
 
 ## Install
 
