@@ -45,7 +45,7 @@ Successfully implemented AIX data type system for the jcore Dart package with fu
 ## Key Features Implemented
 
 ### 1. Base Types (JDataType Enum)
-- 10 base types: NUMERIC, BOOLEAN, INT32, INT64, DATETIME, TIME, UUID, CUID, TEXT, JSONB
+- 9 base types: NUMERIC, BOOLEAN, INT32, INT64, DATETIME, TIME, UUID, TEXT, JSONB
 - Catalog IDs: 300000-300009
 - Lookup by ID, name, or PostgreSQL type
 

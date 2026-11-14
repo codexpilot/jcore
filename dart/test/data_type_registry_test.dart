@@ -16,9 +16,10 @@ void main() {
       expect(DataType.uuid.id, 50000);
       expect(DataType.numeric.id, 60000);
       expect(DataType.text.id, 70000);
-      expect(DataType.cuid.id, 70032);
       expect(DataType.json.id, 80000);
       expect(DataType.jsonb.id, 80001);
+      expect(DataType.fromId(70032), isNull);
+      expect(DataType.fromName('CUID'), isNull);
       expect(DataTypeRegistry.fromName('int16'), DataType.smallint);
       expect(DataTypeRegistry.fromName('SMALLINT'), DataType.smallint);
       expect(DataType.fromPostgresType('int2'), DataType.smallint);

@@ -17,7 +17,6 @@ void main() {
         equals('bigint'),
       ); // TIME stored as bigint
       expect(getPostgresType(50000), equals('uuid'));
-      expect(getPostgresType(70032), equals('text')); // CUID stored as text
       expect(getPostgresType(70000), equals('text'));
       expect(getPostgresType(80001), equals('jsonb'));
     });
@@ -50,9 +49,9 @@ void main() {
       expect(parseDataTypeId('numeric'), equals(60000));
       expect(parseDataTypeId('uuid'), equals(50000));
       expect(parseDataTypeId('jsonb'), equals(80001));
-      // Note: 'text' maps to first match (70032 or 70000)
       final textId = parseDataTypeId('text');
-      expect(textId == 70032 || textId == 70000, isTrue);
+      expect(textId, equals(70000));
+      expect(parseDataTypeId('CUID'), isNull);
     });
 
     test('is case-insensitive', () {
@@ -63,9 +62,8 @@ void main() {
 
     test('handles whitespace', () {
       expect(parseDataTypeId(' integer '), equals(30000));
-      // Note: 'text' maps to first match (70032 or 70000)
       final textId = parseDataTypeId('\ttext\n');
-      expect(textId == 70032 || textId == 70000, isTrue);
+      expect(textId, equals(70000));
     });
 
     test('returns null for unknown types', () {
