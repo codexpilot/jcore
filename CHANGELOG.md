@@ -1,3 +1,7 @@
+## 3.1.0
+
+- Remove CUID from the data type registry and documentation.
+
 ## 3.0.9
 
 - Add the data type registry, SMALLINT validation, and parameterized

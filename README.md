@@ -3,6 +3,8 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 JSONC, UI bindings, catalogs, and synchronization.
 
+**Current Dart package version:** `3.1.0`
+
 ## Current implementation
 
 The Dart `jcore` package lives at [`dart`](dart). Its
