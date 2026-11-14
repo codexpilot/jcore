@@ -162,6 +162,19 @@ conversion applies only to INT64; NUMERIC string handling is unchanged.
 For PostgreSQL-generated responses forwarded by a pass-through API, see the
 [response flow and SQL example](JNF_ENCODING_SPEC.md#postgresql-responses-through-a-pass-through-api).
 
+## Version policy
+
+Versions use `x.y.z`:
+
+- For a new data type or conversion policy, increment `x` and reset `y` and
+  `z` to zero.
+- Otherwise, when a change introduces a Dart file or a class, increment `y`
+  and reset `z` to zero.
+- For other changes, increment `z`.
+
+If a release includes changes from more than one category, use the highest
+applicable increment.
+
 ## Testing
 
 ```bash
