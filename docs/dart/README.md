@@ -1,11 +1,11 @@
-# JCore for Dart
+# jcore for Dart
 
-This package implements the JCore jdata layer in Dart. The repository package
+This package implements the jcore jdata layer in Dart. The repository package
 root is dart; its package name remains jcore, and applications
 continue to import package:jcore/jcore.dart.
 
-JData provides the data type registry, exact Numeric values, JSONC,
-and data validation. JUX, JSYNC, and implementations in other languages are
+jdata provides the data type registry, exact Numeric values, jsonc,
+and data validation. jux, jsync, and implementations in other languages are
 planned. They do not have placeholder packages or APIs here.
 
 ## Data type registry
@@ -47,7 +47,7 @@ print(DataTypeRegistry.postgresType(decimalId)); // numeric(10,2)
 The registry API includes `DataType`, `DataTypeRegistry`, numeric and text ID
 encoders and decoders, validity checks, and PostgreSQL type mapping.
 
-## Numeric and JSONC
+## Numeric and jsonc
 
 Numeric stores a BigInt coefficient and decimal scale. It supports exact
 addition, subtraction, multiplication, and comparison. Its explicit
@@ -55,7 +55,7 @@ Numeric.fromString(value, scale) constructor preserves the requested scale;
 it pads shorter fractional parts and truncates excess digits to retain the
 existing AIX behavior.
 
-When a Numeric is encoded by JSONC, numeric-string modes emit a decimal
+When a Numeric is encoded by jsonc, numeric-string modes emit a decimal
 string. Plain-number modes emit a JSON number, which downstream runtimes may
 round. Choose a numeric-string mode when the decimal value must remain exact
 on the wire.
@@ -94,6 +94,6 @@ dart analyze --fatal-infos
 ~~~
 
 See the [architecture overview](../architecture/README.md) for the
-planned JData, JUX, and JSYNC boundaries, and the
+planned jdata, jux, and jsync boundaries, and the
 [registry adoption plan](../plan/data-type-registry-migration.md) for
 consumer schema work that remains separate.

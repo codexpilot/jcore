@@ -1,20 +1,20 @@
 # JCore
 
 JCore is a multi-language foundation for data types, exact numeric values,
-JSONC, UI bindings, catalogs, and synchronization.
+jsonc, UI bindings, catalogs, and synchronization.
 
-**Current Dart package version:** `3.1.0`
+**Current jcore version:** `v3.1.0`
 
 ## Current implementation
 
 The Dart `jcore` package lives at [`dart`](dart). Its
 public package name and import remain `jcore` and
-`package:jcore/jcore.dart`. JData is implemented there. JUX, JSYNC, and other
+`package:jcore/jcore.dart`. jdata is implemented there. jux, jsync, and other
 language implementations remain planned.
 
 ## Language folders
 
-- `dart` — current JData implementation.
+- `dart` — current jdata implementation.
 - `pgsql`, `javascript`, `java`, `swift`, `csharp`, `cplusplus`, and `go` —
   coming soon.
 

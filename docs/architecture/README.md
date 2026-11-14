@@ -1,14 +1,14 @@
-# JCore architecture
+# jcore architecture
 
-JCore is a shared, multi-language foundation. Its layers are intended to
+jcore is a shared, multi-language foundation. Its layers are intended to
 depend on the data model below them:
 
 ```text
-jdata  →  JUX  →  JSYNC
+jdata  →  jux  →  jsync
 ```
 
 This repository currently implements **jdata in Dart** through
-`package:jcore/jcore.dart`. JUX, JSYNC, other language implementations, and a
+`package:jcore/jcore.dart`. jux, jsync, other language implementations, and a
 repository or package split remain planned. The public Dart package name stays
 `jcore`.
 
@@ -16,12 +16,12 @@ repository or package split remain planned. The public Dart package name stays
 
 | Layer | Responsibility | Status in this repository |
 | --- | --- | --- |
-| jdata | Type IDs, `Numeric`, JSONC, and data validation | Implemented in Dart |
-| JUX | Portable UI definitions, bindings, and generic Catalog references | Planned |
-| JSYNC | Synchronization contracts, topology, and algorithms | Planned |
+| jdata | Type IDs, `Numeric`, jsonc, and data validation | Implemented in Dart |
+| jux | Portable UI definitions, bindings, and generic Catalog references | Planned |
+| jsync | Synchronization contracts, topology, and algorithms | Planned |
 
-JUX will build on jdata values and identifiers. JSYNC will build on jdata and
-JUX contracts. Transport, rendering, and storage integrations remain outside
+jux will build on jdata values and identifiers. jsync will build on jdata and
+jux contracts. Transport, rendering, and storage integrations remain outside
 the portable contracts until those designs are specified.
 
 ## Source organization
@@ -38,7 +38,7 @@ The Dart package is organized under its language root:
 Git consumers select `dart` as the package subdirectory; the package
 name and `package:jcore/jcore.dart` import remain stable. When a second language
 implementation is ready, give it a language-specific source root and native
-tests. Keep jdata, JUX, and JSYNC modules distinct within each implementation
+tests. Keep jdata, jux, and jsync modules distinct within each implementation
 and preserve their dependency order.
 
 ## Data type registry
@@ -70,7 +70,7 @@ The Dart entry points are `DataType`, `DataTypeRegistry`,
 `DataTypeRegistry.encodeText`, `DataTypeRegistry.decodeText`, and
 `DataTypeRegistry.isValid`.
 
-## Numeric and JSONC
+## Numeric and jsonc
 
 `Numeric` stores a `BigInt` coefficient and decimal scale. Addition and
 subtraction align operands to the greater scale; multiplication combines
@@ -78,20 +78,7 @@ scales. String formatting retains the result scale. Its explicit
 `Numeric.fromString(value, scale)` factory pads shorter fractions and
 truncates excess fractional digits to preserve the existing AIX behavior.
 
-JSONC supports numeric-string modes for exact wire values. Supplying a
-`Numeric` object causes JSONC to encode a decimal string in those modes and a
+jsonc supports numeric-string modes for exact wire values. Supplying a
+`Numeric` object causes jsonc to encode a decimal string in those modes and a
 JSON number in plain-number modes. Plain-number output may lose decimal
 precision in downstream runtimes.
-
-## Relationship to the existing Group 3 API
-
-JCore still contains the existing AIX Group 3 API (`JDataType`,
-`encodeNumericType`, and related functions). It is separate from the current
-catalog.
-There is no ID translation or stored-schema migration between the current and
-existing catalogs in this work. Consumer adoption and any data migration need
-their own design and
-must not be inferred from the presence of the data type registry.
-
-See [the registry adoption plan](../plan/data-type-registry-migration.md) for
-the deferred consumer work.
