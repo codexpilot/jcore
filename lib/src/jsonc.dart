@@ -27,11 +27,19 @@ enum JsonCType {
 /// {
 ///   "jv": 1731542400,
 ///   "jid": 12345,
-///   "jnf": 1,
+///   "jnf": 3,
 ///   "schema": {"id": 300003, "name": 300008},
 ///   "data": [[1, "John"], [2, "Jane"]]
 /// }
 /// ```
+///
+/// Encoding modes (jnf):
+/// - 0: Formal JSON array, both BigInt and Numeric as string (web-safe input)
+/// - 1: Formal JSON array, both as plain number (not web-safe)
+/// - 2: JSONC, both as plain number (default, best performance)
+/// - 3: JSONC, BigInt only as string (web-safe for large integers)
+/// - 4: JSONC, Numeric only as string (precision-safe for decimals)
+/// - 5: JSONC, both as string (maximum safety)
 class JsonC {
   /// Schema version - epoch seconds (timestamp when schema was created)
   final int jv;
@@ -39,10 +47,13 @@ class JsonC {
   /// Schema ID - unique identifier for this schema definition
   final int jid;
 
-  /// JSONC number format (optional, defaults to 0)
-  /// - 0: All numbers (default, best performance)
-  /// - 1: BigInt as string, numeric as number (JavaScript-safe)
-  /// - 2: All strings (maximum precision)
+  /// JSONC number format (optional, defaults to 2)
+  /// - 0: Formal JSON array, both BigInt and Numeric as string (web-safe input)
+  /// - 1: Formal JSON array, both as plain number (not web-safe)
+  /// - 2: JSONC format, both as plain number (default, not web-safe)
+  /// - 3: JSONC format, BigInt only as string (web-safe for large integers)
+  /// - 4: JSONC format, Numeric only as string (precision-safe for decimals)
+  /// - 5: JSONC format, both BigInt and Numeric as string (maximum safety)
   final int? jnf;
 
   /// Column definitions: column_name -> JDataType ID
@@ -61,14 +72,38 @@ class JsonC {
     this.data,
   });
 
-  /// Get encoding mode (0=all numbers, 1=BigInt string, 2=all strings)
-  int get encoding => jnf ?? 0;
+  /// Get encoding mode (0-5, defaults to 2)
+  int get encoding => jnf ?? 2;
+
+  /// Check if this is formal JSON array format (modes 0-1)
+  bool get isFormalJsonArray => encoding == 0 || encoding == 1;
+
+  /// Check if this is JSONC format (modes 2-5)
+  bool get isJsonCFormat => encoding >= 2 && encoding <= 5;
 
   /// Check if BigInt should be encoded as string
-  bool get useBigIntStrings => encoding == 1 || encoding == 2;
+  bool get useBigIntStrings {
+    switch (encoding) {
+      case 0: // Formal JSON: both string
+      case 3: // JSONC: BigInt string
+      case 5: // JSONC: both string
+        return true;
+      default:
+        return false;
+    }
+  }
 
-  /// Check if numeric should be encoded as string
-  bool get useNumericStrings => encoding == 2;
+  /// Check if Numeric should be encoded as string
+  bool get useNumericStrings {
+    switch (encoding) {
+      case 0: // Formal JSON: both string
+      case 4: // JSONC: Numeric string
+      case 5: // JSONC: both string
+        return true;
+      default:
+        return false;
+    }
+  }
 
   /// Determine JSONC type based on present fields
   JsonCType get type {

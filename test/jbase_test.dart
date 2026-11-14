@@ -362,8 +362,8 @@ void main() {
       expect(full2.rowCount, equals(1));
 
       // Step 4: Convert to maps for UI
-      final users1 = JsonCConverter.toMaps(full1);
-      final users2 = JsonCConverter.toMaps(full2);
+      final users1 = JConverter.toMaps(full1);
+      final users2 = JConverter.toMaps(full2);
 
       expect(users1[0]['username'], equals('alice'));
       expect(users2[0]['username'], equals('charlie'));

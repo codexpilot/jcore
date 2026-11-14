@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:jcore/jcore.dart';
 
 void main() {
-  group('JsonCConverter validation', () {
+  group('JConverter validation', () {
     test('validates correct JSONC', () {
       final jsonc = JsonC(
         jv: 1,
@@ -14,7 +14,7 @@ void main() {
         ],
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isEmpty);
     });
@@ -26,7 +26,7 @@ void main() {
         schema: {'id': 999999}, // Invalid type ID
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isNotEmpty);
       expect(errors.first, contains('Invalid data type'));
@@ -42,7 +42,7 @@ void main() {
         ],
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isNotEmpty);
       expect(errors.first, contains('has 3 values, expected 2'));
@@ -58,7 +58,7 @@ void main() {
         ],
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isNotEmpty);
       expect(errors.first, contains('expected bool'));
@@ -74,7 +74,7 @@ void main() {
         ],
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isNotEmpty);
       expect(errors.first, contains('expected int'));
@@ -90,14 +90,14 @@ void main() {
         ],
       );
 
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isNotEmpty);
       expect(errors.first, contains('exceeds max'));
     });
   });
 
-  group('JsonCConverter toMaps', () {
+  group('JConverter toMaps', () {
     test('converts JSONC data to list of maps', () {
       final jsonc = JsonC(
         jv: 1,
@@ -109,7 +109,7 @@ void main() {
         ],
       );
 
-      final maps = JsonCConverter.toMaps(jsonc);
+      final maps = JConverter.toMaps(jsonc);
 
       expect(maps, hasLength(2));
       expect(maps[0], equals({'id': 1, 'name': 'John', 'age': 30}));
@@ -123,7 +123,7 @@ void main() {
         data: [[1, 'John']],
       );
 
-      expect(() => JsonCConverter.toMaps(jsonc), throwsArgumentError);
+      expect(() => JConverter.toMaps(jsonc), throwsArgumentError);
     });
 
     test('throws when JSONC lacks data', () {
@@ -133,11 +133,11 @@ void main() {
         schema: {'id': 300003},
       );
 
-      expect(() => JsonCConverter.toMaps(jsonc), throwsArgumentError);
+      expect(() => JConverter.toMaps(jsonc), throwsArgumentError);
     });
   });
 
-  group('JsonCConverter fromMaps', () {
+  group('JConverter fromMaps', () {
     test('converts list of maps to JSONC', () {
       final maps = [
         {'id': 1, 'name': 'John'},
@@ -146,7 +146,7 @@ void main() {
 
       final schema = {'id': 300003, 'name': 300008};
 
-      final jsonc = JsonCConverter.fromMaps(maps, schema, jv: 1, jid: 12345);
+      final jsonc = JConverter.fromMaps(maps, schema, jv: 1, jid: 12345);
 
       expect(jsonc.jv, equals(1));
       expect(jsonc.jid, equals(12345));
@@ -158,7 +158,7 @@ void main() {
     });
 
     test('handles empty maps list', () {
-      final jsonc = JsonCConverter.fromMaps(
+      final jsonc = JConverter.fromMaps(
         [],
         {'id': 300003},
         jv: 1,
@@ -170,7 +170,7 @@ void main() {
     });
   });
 
-  group('JsonCConverter toCreateTableDDL', () {
+  group('JConverter toCreateTableDDL', () {
     test('generates PostgreSQL CREATE TABLE statement', () {
       final jsonc = JsonC(
         jv: 1,
@@ -182,7 +182,7 @@ void main() {
         },
       );
 
-      final ddl = JsonCConverter.toCreateTableDDL(jsonc, 'products');
+      final ddl = JConverter.toCreateTableDDL(jsonc, 'products');
 
       expect(ddl, contains('CREATE TABLE products'));
       expect(ddl, contains('id bigint'));
@@ -198,13 +198,13 @@ void main() {
       );
 
       expect(
-        () => JsonCConverter.toCreateTableDDL(jsonc, 'test'),
+        () => JConverter.toCreateTableDDL(jsonc, 'test'),
         throwsArgumentError,
       );
     });
   });
 
-  group('JsonCConverter merge', () {
+  group('JConverter merge', () {
     test('merges schema-only and data-only JSONC', () {
       final schemaJsonc = JsonC(
         jv: 1,
@@ -221,7 +221,7 @@ void main() {
         ],
       );
 
-      final merged = JsonCConverter.merge(schemaJsonc, dataJsonc);
+      final merged = JConverter.merge(schemaJsonc, dataJsonc);
 
       expect(merged.hasSchema, isTrue);
       expect(merged.hasData, isTrue);
@@ -243,13 +243,13 @@ void main() {
       );
 
       expect(
-        () => JsonCConverter.merge(schemaJsonc, dataJsonc),
+        () => JConverter.merge(schemaJsonc, dataJsonc),
         throwsArgumentError,
       );
     });
   });
 
-  group('JsonCConverter extract', () {
+  group('JConverter extract', () {
     test('extracts schema from full JSONC', () {
       final fullJsonc = JsonC(
         jv: 1,
@@ -258,7 +258,7 @@ void main() {
         data: [[1, 'John']],
       );
 
-      final schemaOnly = JsonCConverter.extractSchema(fullJsonc);
+      final schemaOnly = JConverter.extractSchema(fullJsonc);
 
       expect(schemaOnly.hasSchema, isTrue);
       expect(schemaOnly.hasData, isFalse);
@@ -273,7 +273,7 @@ void main() {
         data: [[1, 'John']],
       );
 
-      final dataOnly = JsonCConverter.extractData(fullJsonc);
+      final dataOnly = JConverter.extractData(fullJsonc);
 
       expect(dataOnly.hasSchema, isFalse);
       expect(dataOnly.hasData, isTrue);
@@ -281,7 +281,7 @@ void main() {
     });
   });
 
-  group('JsonCConverter getColumnMetadata', () {
+  group('JConverter getColumnMetadata', () {
     test('returns column metadata', () {
       final jsonc = JsonC(
         jv: 1,
@@ -293,7 +293,7 @@ void main() {
         },
       );
 
-      final metadata = JsonCConverter.getColumnMetadata(jsonc);
+      final metadata = JConverter.getColumnMetadata(jsonc);
 
       expect(metadata, hasLength(3));
 
@@ -331,13 +331,13 @@ void main() {
       };
 
       final jsonc = JsonC.fromJson(apiResponse);
-      final errors = JsonCConverter.validate(jsonc);
+      final errors = JConverter.validate(jsonc);
 
       expect(errors, isEmpty);
       expect(jsonc.rowCount, equals(2));
 
       // Convert to maps for UI
-      final users = JsonCConverter.toMaps(jsonc);
+      final users = JConverter.toMaps(jsonc);
       expect(users[0]['username'], equals('alice'));
       expect(users[1]['username'], equals('bob'));
     });
@@ -357,7 +357,7 @@ void main() {
         },
       );
 
-      final ddl = JsonCConverter.toCreateTableDDL(tableSchema, 'products');
+      final ddl = JConverter.toCreateTableDDL(tableSchema, 'products');
 
       expect(ddl, contains('CREATE TABLE products'));
       expect(ddl, contains('product_id bigint'));
@@ -393,8 +393,8 @@ void main() {
       );
 
       // Merge schema with each batch
-      final full1 = JsonCConverter.merge(schemaJsonc, batch1);
-      final full2 = JsonCConverter.merge(schemaJsonc, batch2);
+      final full1 = JConverter.merge(schemaJsonc, batch1);
+      final full2 = JConverter.merge(schemaJsonc, batch2);
 
       expect(full1.rowCount, equals(2));
       expect(full2.rowCount, equals(2));

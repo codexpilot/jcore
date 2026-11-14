@@ -131,7 +131,7 @@ for (final row in jsonc.data!) {
 }
 
 // Or convert to maps for easier access
-final maps = JsonCConverter.toMaps(jsonc);
+final maps = JConverter.toMaps(jsonc);
 for (final map in maps) {
   print(map['name']);  // Access by column name
 }

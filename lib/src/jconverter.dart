@@ -4,11 +4,11 @@ import 'data_type_decoding.dart';
 import 'data_type_mapping.dart';
 import 'jsonc.dart';
 
-/// JSONC Converter - utilities for working with JSONC format
+/// JConverter - utilities for working with JSONC format
 ///
 /// Provides validation, type checking, and conversion utilities
 /// for AIX JSONC data interchange format.
-class JsonCConverter {
+class JConverter {
   /// Validate JSONC structure and data types
   ///
   /// Returns list of validation errors, empty if valid
@@ -261,7 +261,7 @@ class JsonCConverter {
   ///
   /// Example:
   /// ```dart
-  /// final ddl = JsonCConverter.toCreateTableDDL(jsonc, 'products');
+  /// final ddl = JConverter.toCreateTableDDL(jsonc, 'products');
   /// // CREATE TABLE products (
   /// //   id integer,
   /// //   name text,

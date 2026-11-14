@@ -53,7 +53,7 @@ final dataOnly = JsonC(
 final fullData = JBase.instance.mergeWithSchema(dataOnly);
 
 // Now you have both schema and data
-final users = JsonCConverter.toMaps(fullData);
+final users = JConverter.toMaps(fullData);
 // [{'user_id': 1, 'username': 'alice', ...}, ...]
 ```
 
@@ -163,7 +163,7 @@ onDataReceived(json) {
   final full = JBase.instance.mergeWithSchema(dataOnly);
   
   // Display in UI
-  final users = JsonCConverter.toMaps(full);
+  final users = JConverter.toMaps(full);
   updateUI(users);
 }
 ```
@@ -353,7 +353,7 @@ void main() {
   final fullData = JBase.instance.mergeWithSchema(dataOnly);
   
   // 4. Convert to maps for UI
-  final users = JsonCConverter.toMaps(fullData);
+  final users = JConverter.toMaps(fullData);
   
   // 5. Display
   for (final user in users) {

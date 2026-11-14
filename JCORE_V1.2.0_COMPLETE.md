@@ -101,7 +101,7 @@ jcore/
 │       ├── data_type_decoding.dart     # Decoding
 │       ├── data_type_mapping.dart      # PostgreSQL mapping
 │       ├── jsonc.dart                  # JSONC format (with jnf)
-│       ├── jsonc_converter.dart        # JSONC utilities
+│       ├── jconverter.dart        # JSONC utilities
 │       ├── jbase.dart                  # Schema registry
 │       └── jcore_base.dart
 ├── test/
@@ -111,7 +111,7 @@ jcore/
 │   ├── data_type_decoding_test.dart    # 8 tests
 │   ├── data_type_mapping_test.dart     # 13 tests
 │   ├── jsonc_test.dart                 # 23 tests
-│   ├── jsonc_converter_test.dart       # 14 tests
+│   ├── jconverter_test.dart       # 14 tests
 │   ├── jbase_test.dart                 # 25 tests
 │   └── jcore_test.dart                 # 1 test
 ├── README.md
@@ -164,13 +164,13 @@ void main() {
   final fullData = JBase.instance.mergeWithSchema(dataOnly);
   
   // 5. Validate
-  final errors = JsonCConverter.validate(fullData);
+  final errors = JConverter.validate(fullData);
   if (errors.isEmpty) {
     print('✓ Data is valid');
   }
   
   // 6. Convert to maps for UI
-  final users = JsonCConverter.toMaps(fullData);
+  final users = JConverter.toMaps(fullData);
   
   // 7. Display
   for (final user in users) {
@@ -181,7 +181,7 @@ void main() {
   }
   
   // 8. Generate SQL DDL
-  final ddl = JsonCConverter.toCreateTableDDL(
+  final ddl = JConverter.toCreateTableDDL(
     JBase.instance.get(5001)!,
     'users',
   );
@@ -207,7 +207,7 @@ void initSchemas() {
 void onDataReceived(json) {
   final dataOnly = JsonC.fromJson(json);
   final full = JBase.instance.mergeWithSchema(dataOnly);
-  final items = JsonCConverter.toMaps(full);
+  final items = JConverter.toMaps(full);
   
   setState(() {
     this.items = items;
