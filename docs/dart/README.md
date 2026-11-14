@@ -94,6 +94,4 @@ dart analyze --fatal-infos
 ~~~
 
 See the [architecture overview](../architecture/README.md) for the
-planned jdata, jux, and jsync boundaries, and the
-[registry adoption plan](../plan/data-type-registry-migration.md) for
-consumer schema work that remains separate.
+planned jdata, jux, and jsync boundaries.

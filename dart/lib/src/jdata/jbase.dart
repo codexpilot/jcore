@@ -11,7 +11,7 @@ import 'jsonc.dart';
 /// final schema = JsonC(
 ///   jv: 1,
 ///   jid: 12345,
-///   schema: {'id': 300003, 'name': 300008},
+///   schema: {'id': 40000, 'name': 70000},
 /// );
 /// JBase.instance.register(schema);
 ///

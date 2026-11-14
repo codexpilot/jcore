@@ -64,5 +64,4 @@ dart analyze --fatal-infos
 ~~~
 
 The full package layout and module status are documented in the
-[architecture overview](architecture/README.md). The consumer adoption
-plan is in [data-type-registry-migration.md](plan/data-type-registry-migration.md).
+[architecture overview](architecture/README.md).

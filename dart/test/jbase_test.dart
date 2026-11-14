@@ -83,7 +83,7 @@ void main() {
       final schemas = [
         JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
         JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
-        JsonC(jv: 1, jid: 1003, schema: {'price': 310020}),
+        JsonC(jv: 1, jid: 1003, schema: {'price': 61002}),
       ];
 
       final count = JBase.instance.registerAll(schemas);
@@ -209,7 +209,7 @@ void main() {
       JBase.instance.registerAll([
         JsonC(jv: 1, jid: 1001, schema: {'id': 40000}),
         JsonC(jv: 1, jid: 1002, schema: {'name': 70000}),
-        JsonC(jv: 1, jid: 1003, schema: {'price': 310020}),
+        JsonC(jv: 1, jid: 1003, schema: {'price': 61002}),
       ]);
 
       final jids = JBase.instance.jids;
@@ -223,7 +223,7 @@ void main() {
         JsonC(
           jv: 1,
           jid: 12345,
-          schema: {'id': 40000, 'name': 70000, 'price': 310020},
+          schema: {'id': 40000, 'name': 70000, 'price': 61002},
         ),
       );
 
@@ -295,7 +295,7 @@ void main() {
         JsonC(
           jv: 1,
           jid: 1002,
-          schema: {'product_id': 40000, 'price': 310020},
+          schema: {'product_id': 40000, 'price': 61002},
         ),
         JsonC(
           jv: 1,
@@ -333,8 +333,8 @@ void main() {
         'jid': 5001,
         'schema': {
           'user_id': 40000,
-          'username': 301008,
-          'email': 302558,
+          'username': 70100,
+          'email': 70255, // TEXT(255)
           'is_active': 10000,
         },
       };

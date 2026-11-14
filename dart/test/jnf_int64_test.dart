@@ -8,7 +8,7 @@ void main() {
     'id': 40000,
     'name': 70000,
     'small': 30000,
-    'amount': 310020,
+    'amount': 61002,
   };
 
   group('jnf INT64 conversion', () {

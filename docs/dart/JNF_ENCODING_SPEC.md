@@ -124,7 +124,7 @@ final formalJson = JsonC.fromJson({
   'jv': 1737849600,
   'jid': 5001,
   'jnf': 0,
-  'schema': {'id': 300003, 'amount': 300000},
+  'schema': {'id': 40000, 'amount': 60000},
   'data': [["9007199254740992", "1234.56789"]]
 });
 
@@ -207,7 +207,7 @@ SELECT jsonb_build_object(
   'jv', 1,
   'jid', 1,
   'jnf', jnf,
-  'schema', jsonb_build_object('id', 300003, 'amount', 310020),
+  'schema', jsonb_build_object('id', 40000, 'amount', 61002),
   'data', jsonb_build_array(jsonb_build_array(
     CASE WHEN jnf IN (0, 3, 5)
       THEN to_jsonb(id::text) ELSE to_jsonb(id) END,
@@ -288,7 +288,7 @@ final incoming = JsonC.fromJson({
   'jv': 1737849600,
   'jid': 5001,
   'jnf': 0,
-  'schema': {'id': 300003, 'amount': 300000},
+  'schema': {'id': 40000, 'amount': 60000},
   'data': [["9007199254740992", "1234.56789"]]
 });
 
@@ -300,7 +300,7 @@ final outgoing = JsonC(
   jv: 1737849600,
   jid: 5001,
   jnf: 3,
-  schema: {'id': 300003, 'amount': 300000},
+  schema: {'id': 40000, 'amount': 60000},
   data: [[BigInt.parse('9007199254740992'), 1234.56789]],
 );
 ```
@@ -314,8 +314,8 @@ final transactions = JsonC(
   jid: 6001,
   jnf: 5,  // Both as string
   schema: {
-    'transaction_id': 300003,
-    'amount': 310020,
+    'transaction_id': 40000,
+    'amount': 61002,
   },
   data: [
     ["9007199254740992", "12345.67"],
@@ -333,8 +333,8 @@ final analytics = JsonC(
   jid: 7001,
   // jnf omitted = mode 2 (default)
   schema: {
-    'user_id': 300003,
-    'score': 310020,
+    'user_id': 40000,
+    'score': 61002,
   },
   data: [[1, 95.5], [2, 87.3]],
 );

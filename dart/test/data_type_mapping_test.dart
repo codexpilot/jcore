@@ -22,22 +22,22 @@ void main() {
     });
 
     test('maps sized NUMERIC to PostgreSQL declarations', () {
-      expect(getPostgresType(310020), equals('numeric(10,2)'));
-      expect(getPostgresType(301000), equals('numeric(1,0)'));
-      expect(getPostgresType(399990), equals('numeric(99,99)'));
-      expect(getPostgresType(350370), equals('numeric(50,37)'));
+      expect(getPostgresType(61002), equals('numeric(10,2)')); // 60000 + 10*100 + 2
+      expect(getPostgresType(60100), equals('numeric(1,0)')); // 60000 + 1*100 + 0
+      expect(getPostgresType(69999), equals('numeric(99,99)')); // 60000 + 99*100 + 99
+      expect(getPostgresType(65037), equals('numeric(50,37)')); // 60000 + 50*100 + 37
     });
 
     test('maps sized TEXT to declarations', () {
-      expect(getPostgresType(301008), equals('text(100)'));
-      expect(getPostgresType(300018), equals('text(1)'));
-      expect(getPostgresType(399998), equals('text(9999)'));
+      expect(getPostgresType(70100), equals('varchar(100)')); // 70000 + 100
+      expect(getPostgresType(70001), equals('varchar(1)')); // 70000 + 1
+      expect(getPostgresType(79999), equals('varchar(9999)')); // 70000 + 9999
     });
 
     test('returns null for invalid types', () {
       expect(getPostgresType(999999), isNull);
-      expect(getPostgresType(300010), isNull);
-      expect(getPostgresType(310025), isNull); // invalid NUMERIC
+      expect(getPostgresType(55555), isNull);
+      expect(getPostgresType(60025), isNull); // invalid NUMERIC (scale > precision)
     });
   });
 
@@ -140,12 +140,12 @@ void main() {
       expect(isValidColumnDataType(200001, 30000), isTrue); // id + INT32
       expect(isValidColumnDataType(200001, 40000), isTrue); // id + INT64
       expect(isValidColumnDataType(200005, 70000), isTrue); // name + TEXT
-      expect(isValidColumnDataType(200005, 301008), isTrue); // name + TEXT(100)
+      expect(isValidColumnDataType(200005, 70100), isTrue); // name + TEXT(100)
     });
 
     test('rejects invalid data types', () {
       expect(isValidColumnDataType(200005, 999999), isFalse);
-      expect(isValidColumnDataType(200005, 310025), isFalse); // invalid NUMERIC
+      expect(isValidColumnDataType(200005, 60025), isFalse); // invalid NUMERIC
     });
   });
 }

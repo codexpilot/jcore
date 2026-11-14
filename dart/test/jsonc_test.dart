@@ -166,7 +166,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 40000, 'name': 70000, 'price': 310020},
+        schema: {'id': 40000, 'name': 70000, 'price': 61002},
       );
 
       final names = jsonc.columnNames;
@@ -181,7 +181,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'id': 40000, 'name': 70000, 'price': 310020},
+        schema: {'id': 40000, 'name': 70000, 'price': 61002},
       );
 
       final typeIds = jsonc.dataTypeIds;
@@ -189,7 +189,7 @@ void main() {
       expect(typeIds, hasLength(3));
       expect(typeIds, contains(40000));
       expect(typeIds, contains(70000));
-      expect(typeIds, contains(310020));
+      expect(typeIds, contains(61002));
     });
   });
 
@@ -237,7 +237,7 @@ void main() {
         schema: {
           'product_id': 40000, // INT64
           'name': 70000, // TEXT
-          'price': 310020, // NUMERIC(10,2)
+          'price': 61002, // NUMERIC(10,2)
           'created_at': 40001, // DATETIME
         },
         data: [
@@ -258,8 +258,8 @@ void main() {
         jid: 2001,
         schema: {
           'user_id': 40000, // INT64
-          'username': 301008, // TEXT(100)
-          'email': 302558, // TEXT(255)
+          'username': 70100, // TEXT(100)
+          'email': 70255, // TEXT(255)
           'is_active': 10000, // BOOLEAN
         },
         data: [

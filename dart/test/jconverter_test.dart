@@ -84,7 +84,7 @@ void main() {
       final jsonc = JsonC(
         jv: 1,
         jid: 12345,
-        schema: {'code': 300028}, // TEXT(2) - only 2 characters allowed
+        schema: {'code': 70002}, // TEXT(2) - only 2 characters allowed (70000 + 2)
         data: [
           ['ABC'], // 3 characters - exceeds limit
         ],
@@ -174,7 +174,7 @@ void main() {
         schema: {
           'id': 40000, // INT64 -> bigint
           'name': 70000, // TEXT -> text
-          'price': 310020, // NUMERIC(10,2)
+          'price': 61002, // NUMERIC(10,2)
         },
       );
 
@@ -288,8 +288,8 @@ void main() {
         jid: 12345,
         schema: {
           'id': 40000, // INT64
-          'price': 310020, // NUMERIC(10,2)
-          'name': 301008, // TEXT(100)
+          'price': 61002, // NUMERIC(10,2)
+          'name': 70100, // TEXT(100)
         },
       );
 
@@ -307,7 +307,7 @@ void main() {
       expect(priceCol['isNumeric'], isTrue);
 
       final nameCol = metadata.firstWhere((m) => m['name'] == 'name');
-      expect(nameCol['postgresType'], equals('text(100)'));
+      expect(nameCol['postgresType'], equals('varchar(100)'));
       expect(nameCol['isText'], isTrue);
     });
   });
@@ -320,8 +320,8 @@ void main() {
         'jid': 5001,
         'schema': {
           'user_id': 40000,
-          'username': 301008,
-          'email': 302558,
+          'username': 70100,
+          'email': 70255, // TEXT(255)
           'created_at': 40001,
         },
         'data': [
@@ -349,9 +349,9 @@ void main() {
         jid: 6001,
         schema: {
           'product_id': 40000,
-          'sku': 300108, // TEXT(10)
-          'name': 302008, // TEXT(200)
-          'price': 310020, // NUMERIC(10,2)
+          'sku': 70010, // TEXT(10)
+          'name': 70200, // TEXT(200)
+          'price': 61002, // NUMERIC(10,2)
           'stock': 30000, // INT32
           'is_active': 10000, // BOOLEAN
         },

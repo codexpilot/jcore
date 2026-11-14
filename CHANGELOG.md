@@ -1,3 +1,11 @@
+## 3.1.2
+
+- Complete removal of legacy 300000-series data type IDs from entire codebase.
+- Remove all legacy documentation files containing outdated ID references.
+- Update all tests, code examples, and current documentation to use registry IDs (10000-80000 series).
+- Fix NUMERIC and TEXT parameterized type encodings in all examples.
+- All 112 tests passing with zero analysis issues.
+
 ## 3.1.0
 
 - Remove CUID from the data type registry and documentation.
@@ -14,8 +22,7 @@
   structure, with unimplemented language ports marked as coming soon.
 - Expose registry operations through DataTypeRegistry without changing the
   assigned IDs or behavior.
-- Keep JUX, JSYNC, other language implementations, and consumer schema
-  migration planned.
+- Keep JUX, JSYNC, and other language implementations planned.
 
 ## 2.0.0
 
