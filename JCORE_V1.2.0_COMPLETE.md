@@ -1,5 +1,9 @@
 # jcore v1.2.0 - Complete Implementation
 
+> Historical document: its `jnf` mode descriptions are obsolete. The current
+> specification is [JNF_ENCODING_SPEC.md](JNF_ENCODING_SPEC.md); modes 1, 2,
+> and 4 are not web-safe for INT64 values.
+
 ## ✅ Implementation Complete
 
 **Package**: jcore - AIX Data Types + JSONC + JBase  

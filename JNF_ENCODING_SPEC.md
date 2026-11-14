@@ -24,7 +24,7 @@ The `jnf` (JSON Number Format) field in JSONC provides backward compatibility wi
 }
 ```
 
-**Mode 1: Raw Numbers (Both Plain)**
+**Mode 1: Raw Numbers (Both Plain) — Not Web-Safe**
 - **BigInt**: Plain number
 - **Numeric**: Plain number
 - **Use case**: Internal systems, non-web environments
@@ -42,7 +42,7 @@ The `jnf` (JSON Number Format) field in JSONC provides backward compatibility wi
 
 ### JSONC Format (2-5)
 
-**Mode 2: JSONC Raw (Both Plain) - DEFAULT**
+**Mode 2: JSONC Raw (Both Plain) — Default, Not Web-Safe**
 - **BigInt**: Plain number
 - **Numeric**: Plain number
 - **Use case**: High-performance internal processing
@@ -74,11 +74,11 @@ The `jnf` (JSON Number Format) field in JSONC provides backward compatibility wi
 }
 ```
 
-**Mode 4: JSONC Numeric String**
+**Mode 4: JSONC Numeric String — Not Web-Safe for INT64**
 - **BigInt**: Plain number
 - **Numeric**: String
 - **Use case**: Financial/precise decimal calculations with safe integer IDs
-- **Safety**: Maximum decimal precision, BigInt within JS range
+- **Safety**: Decimal strings preserve decimal precision; not web-safe for INT64 values outside the JavaScript safe integer range
 - **Format**: JSONC compressed format
 
 ```json
@@ -118,10 +118,12 @@ final formalJson = JsonC.fromJson({
   'jv': 1737849600,
   'jid': 5001,
   'jnf': 0,
+  'schema': {'id': 300003, 'amount': 300000},
   'data': [["9007199254740992", "1234.56789"]]
 });
 
-// Automatically handles string to number conversion
+// The schema identifies id as INT64, which is read as a Dart BigInt.
+// The amount remains a string to preserve its decimal precision.
 ```
 
 ### Default Behavior
@@ -144,10 +146,10 @@ print(jsonc.encoding); // 2
 | Use Case | Mode | BigInt | Numeric | Format |
 |----------|------|--------|---------|--------|
 | Web API input | 0 | String | String | Formal JSON |
-| Internal non-web | 1 | Plain | Plain | Formal JSON |
-| High performance | 2 | Plain | Plain | JSONC (default) |
+| Internal non-web; not web-safe | 1 | Plain | Plain | Formal JSON |
+| High performance; not web-safe | 2 | Plain | Plain | JSONC (default) |
 | Large integer IDs | 3 | String | Plain | JSONC |
-| Financial decimals | 4 | Plain | String | JSONC |
+| Financial decimals; not web-safe for INT64 | 4 | Plain | String | JSONC |
 | Maximum safety | 5 | String | String | JSONC |
 
 ## JavaScript Safety Guide
@@ -161,7 +163,66 @@ JavaScript can safely represent integers up to `2^53 - 1` (9,007,199,254,740,991
 
 **Recommendation:**
 - Use mode 0 or 3 for BigInt values that may exceed JS safe range
-- Use mode 4 or 5 for high-precision decimal values
+- Use mode 4 or 5 for high-precision decimal values; choose mode 5 if INT64 values may exceed the JavaScript safe integer range
+
+## PostgreSQL responses through a pass-through API
+
+PostgreSQL can generate the JSON or JSONC response and the Web API can forward
+the HTTP body without converting it to an application model. This preserves
+integer and decimal values when the API and any intermediaries do not parse
+and reserialize the numbers through floating point. The same condition applies
+to request bodies on their way to PostgreSQL.
+
+Choose the representation for the **client that will parse the response**:
+
+| Client | INT64 wire form | Suitable modes | Dart representation |
+|--------|-----------------|----------------|---------------------|
+| Native Dart | JSON number | 1, 2, 4 | `int` |
+| Flutter web, full INT64 range | Decimal string | 0, 3, 5 | `BigInt` |
+
+PostgreSQL `bigint` and native Dart `int` have the same signed 64-bit range.
+Arithmetic on a native Dart `int` can still overflow that range.
+PostgreSQL `jsonb` represents JSON numbers as `numeric` and can preserve that
+entire range. JavaScript number parsing can lose integer precision above
+`2^53 - 1`, so a web client must receive INT64 as a string when the full range
+is needed. The API forwarding the body does not make raw numbers web-safe.
+
+For a schema containing INT64 and NUMERIC, the producer must independently
+apply each string-mode rule. The following example emits a full JSONC response;
+change `jnf` to the requested mode to select the wire representation:
+
+```sql
+WITH example AS (
+  SELECT 5 AS jnf,
+         9223372036854775807::bigint AS id,
+         1234.50::numeric AS amount
+)
+SELECT jsonb_build_object(
+  'jv', 1,
+  'jid', 1,
+  'jnf', jnf,
+  'schema', jsonb_build_object('id', 300003, 'amount', 310020),
+  'data', jsonb_build_array(jsonb_build_array(
+    CASE WHEN jnf IN (0, 3, 5)
+      THEN to_jsonb(id::text) ELSE to_jsonb(id) END,
+    CASE WHEN jnf IN (0, 4, 5)
+      THEN to_jsonb(amount::text) ELSE to_jsonb(amount) END
+  ))
+)
+FROM example;
+```
+
+Here mode 5 emits both values as strings. Mode 3 emits INT64 as a string but
+NUMERIC as a number; mode 4 does the reverse. Raw NUMERIC values can lose
+decimal precision when decoded into a `double`, including on native Dart.
+With a schema, `JsonC.parse` converts string-mode INT64 to `BigInt`; NUMERIC
+strings remain strings. Data-only responses must be joined with their schema
+before INT64 strings can be identified and converted. In a plain JSON response
+without `jnf`, the producer and consumer must agree on the representation.
+
+The row order in this example matches the serialized schema order. JSON object
+key order is not a portable contract, and PostgreSQL `jsonb` can reorder keys;
+producers and consumers must ensure that schema order and row positions agree.
 
 ## Implementation in JsonC
 
@@ -214,6 +275,7 @@ final incoming = JsonC.fromJson({
   'jv': 1737849600,
   'jid': 5001,
   'jnf': 0,
+  'schema': {'id': 300003, 'amount': 300000},
   'data': [["9007199254740992", "1234.56789"]]
 });
 
@@ -225,7 +287,8 @@ final outgoing = JsonC(
   jv: 1737849600,
   jid: 5001,
   jnf: 3,
-  data: [[9007199254740992, 1234.56789]],
+  schema: {'id': 300003, 'amount': 300000},
+  data: [[BigInt.parse('9007199254740992'), 1234.56789]],
 );
 ```
 

@@ -160,9 +160,10 @@ class JBase {
     return JsonC(
       jv: dataOnlyJsonc.jv,
       jid: dataOnlyJsonc.jid,
+      jnf: dataOnlyJsonc.jnf,
       schema: schema.schema,
       data: dataOnlyJsonc.data,
-    );
+    ).normalizeInt64();
   }
 
   /// Update schema version (jv) for a JID

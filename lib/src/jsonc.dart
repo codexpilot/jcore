@@ -8,6 +8,51 @@ library;
 
 import 'dart:convert' as json;
 
+const _int64TypeId = 300003;
+final _maxSafeInteger = BigInt.from(9007199254740991);
+const _isWeb = bool.fromEnvironment('dart.library.js_interop');
+
+bool _isInt64StringMode(int? jnf) => jnf == 0 || jnf == 3 || jnf == 5;
+
+BigInt _bigIntFromSafeInt(int value) {
+  final result = BigInt.from(value);
+  if (result.abs() > _maxSafeInteger) {
+    throw FormatException(
+      'INT64 values outside the JavaScript safe integer range must be '
+      'provided as decimal strings or BigInt in string modes',
+    );
+  }
+  return result;
+}
+
+int _exactInt(BigInt value) {
+  if (_isWeb && value.abs() > _maxSafeInteger) {
+    throw FormatException('INT64 cannot be represented safely as a web int');
+  }
+  final result = value.toInt();
+  if (BigInt.from(result) != value) {
+    throw FormatException('INT64 cannot be represented exactly as an int');
+  }
+  return result;
+}
+
+dynamic _normalizeInt64Cell(dynamic value, bool stringMode) {
+  if (stringMode) {
+    if (value is BigInt) return value;
+    if (value is int) return _bigIntFromSafeInt(value);
+    if (value is String && RegExp(r'^[+-]?[0-9]+$').hasMatch(value)) {
+      return BigInt.tryParse(value) ?? value;
+    }
+  } else {
+    if (value is BigInt) return _exactInt(value);
+    if (value is String && RegExp(r'^[+-]?[0-9]+$').hasMatch(value)) {
+      final integer = BigInt.tryParse(value);
+      if (integer != null) return _exactInt(integer);
+    }
+  }
+  return value;
+}
+
 /// JSONC format types
 enum JsonCType {
   /// Contains jv, jid, schema, and data
@@ -36,9 +81,9 @@ enum JsonCType {
 /// Encoding modes (jnf):
 /// - 0: Formal JSON array, both BigInt and Numeric as string (web-safe input)
 /// - 1: Formal JSON array, both as plain number (not web-safe)
-/// - 2: JSONC, both as plain number (default, best performance)
+/// - 2: JSONC, both as plain number (default, not web-safe for INT64)
 /// - 3: JSONC, BigInt only as string (web-safe for large integers)
-/// - 4: JSONC, Numeric only as string (precision-safe for decimals)
+/// - 4: JSONC, Numeric as string (not web-safe for INT64)
 /// - 5: JSONC, both as string (maximum safety)
 class JsonC {
   /// Schema version - epoch seconds (timestamp when schema was created)
@@ -52,7 +97,7 @@ class JsonC {
   /// - 1: Formal JSON array, both as plain number (not web-safe)
   /// - 2: JSONC format, both as plain number (default, not web-safe)
   /// - 3: JSONC format, BigInt only as string (web-safe for large integers)
-  /// - 4: JSONC format, Numeric only as string (precision-safe for decimals)
+  /// - 4: JSONC format, Numeric as string (not web-safe for INT64)
   /// - 5: JSONC format, both BigInt and Numeric as string (maximum safety)
   final int? jnf;
 
@@ -151,6 +196,24 @@ class JsonC {
     return true;
   }
 
+  /// Return a copy with schema-identified INT64 cells in their Dart form.
+  ///
+  /// Modes 0, 3 and 5 use [BigInt]; other modes use [int]. An optional schema
+  /// can be supplied for data-only payloads. Values that are not valid INT64
+  /// inputs remain unchanged so callers can report validation errors.
+  JsonC normalizeInt64({Map<String, int>? schema}) {
+    final effectiveSchema = schema ?? this.schema;
+    if (effectiveSchema == null || data == null) return this;
+    final types = effectiveSchema.values.toList();
+    final rows = data!.map((row) {
+      return List<dynamic>.generate(row.length, (i) {
+        if (i >= types.length || types[i] != _int64TypeId) return row[i];
+        return _normalizeInt64Cell(row[i], _isInt64StringMode(jnf));
+      });
+    }).toList();
+    return JsonC(jv: jv, jid: jid, jnf: jnf, schema: effectiveSchema, data: rows);
+  }
+
   /// Create from JSON map
   factory JsonC.fromJson(Map<String, dynamic> json) {
     return JsonC(
@@ -165,7 +228,7 @@ class JsonC {
               .map((row) => List<dynamic>.from(row as List))
               .toList()
           : null,
-    );
+    ).normalizeInt64();
   }
 
   /// Convert to JSON map
@@ -184,7 +247,21 @@ class JsonC {
     }
 
     if (data != null) {
-      result['data'] = data;
+      final types = schema?.values.toList();
+      final stringMode = _isInt64StringMode(jnf);
+      result['data'] = data!.map((row) {
+        return List<dynamic>.generate(row.length, (i) {
+          final value = row[i];
+          final isInt64 = types != null && i < types.length && types[i] == _int64TypeId;
+          if (stringMode && (isInt64 || types == null && value is BigInt)) {
+            if (value is BigInt) return value.toString();
+            if (value is int) return _bigIntFromSafeInt(value).toString();
+          } else if (!stringMode && isInt64) {
+            return _normalizeInt64Cell(value, false);
+          }
+          return value;
+        });
+      }).toList();
     }
 
     return result;

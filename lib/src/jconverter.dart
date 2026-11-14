@@ -3,6 +3,7 @@ import 'data_type_validation.dart';
 import 'data_type_decoding.dart';
 import 'data_type_mapping.dart';
 import 'jsonc.dart';
+import 'numeric_value_validation.dart';
 
 /// JConverter - utilities for working with JSONC format
 ///
@@ -145,8 +146,24 @@ class JConverter {
 
         case JDataType.int32:
         case JDataType.int64:
-          if (value is! int) {
-            return 'Row $rowIdx, column "$columnName": expected int, got ${value.runtimeType}';
+          final BigInt? integer;
+          if (value is int) {
+            integer = BigInt.from(value);
+          } else if (value is BigInt) {
+            integer = value;
+          } else if (value is String &&
+              RegExp(r'^[+-]?[0-9]+$').hasMatch(value)) {
+            integer = BigInt.tryParse(value);
+          } else {
+            integer = null;
+          }
+          if (integer == null) {
+            return 'Row $rowIdx, column "$columnName": expected integer or decimal integer string, got ${value.runtimeType}';
+          }
+          final bits = baseType == JDataType.int32 ? 32 : 64;
+          final limit = BigInt.one << (bits - 1);
+          if (integer < -limit || integer >= limit) {
+            return 'Row $rowIdx, column "$columnName": integer out of range for INT$bits';
           }
           break;
 
@@ -158,9 +175,8 @@ class JConverter {
           break;
 
         case JDataType.numeric:
-          if (value is! num) {
-            return 'Row $rowIdx, column "$columnName": expected num, got ${value.runtimeType}';
-          }
+          final error = numericValueError(value);
+          if (error != null) return 'Row $rowIdx, column "$columnName": $error';
           break;
 
         case JDataType.text:
@@ -176,16 +192,13 @@ class JConverter {
           break;
       }
     } else if (isValidNumericType(dataTypeId)) {
-      // Parameterized NUMERIC
-      if (value is! num) {
-        return 'Row $rowIdx, column "$columnName": expected num for NUMERIC type, got ${value.runtimeType}';
-      }
-
-      // Could add precision/scale validation here
-      final params = decodeNumericType(dataTypeId);
-      if (params != null && params.precision != null) {
-        // TODO: Validate precision and scale if needed
-      }
+      final params = decodeNumericType(dataTypeId)!;
+      final error = numericValueError(
+        value,
+        precision: params.precision,
+        scale: params.scale,
+      );
+      if (error != null) return 'Row $rowIdx, column "$columnName": $error';
     } else if (isValidTextType(dataTypeId)) {
       // Parameterized TEXT
       if (value is! String) {
@@ -213,10 +226,11 @@ class JConverter {
       throw ArgumentError('JSONC must have both schema and data');
     }
 
-    final columnNames = jsonc.columnNames;
+    final normalized = jsonc.normalizeInt64();
+    final columnNames = normalized.columnNames;
     final result = <Map<String, dynamic>>[];
 
-    for (final row in jsonc.data!) {
+    for (final row in normalized.data!) {
       final map = <String, dynamic>{};
       for (int i = 0; i < columnNames.length; i++) {
         map[columnNames[i]] = row[i];
@@ -238,9 +252,10 @@ class JConverter {
     Map<String, int> schema, {
     required int jv,
     required int jid,
+    int? jnf,
   }) {
     if (maps.isEmpty) {
-      return JsonC(jv: jv, jid: jid, schema: schema, data: []);
+      return JsonC(jv: jv, jid: jid, jnf: jnf, schema: schema, data: []);
     }
 
     final columnNames = schema.keys.toList();
@@ -254,7 +269,8 @@ class JConverter {
       data.add(row);
     }
 
-    return JsonC(jv: jv, jid: jid, schema: schema, data: data);
+    return JsonC(jv: jv, jid: jid, jnf: jnf, schema: schema, data: data)
+        .normalizeInt64();
   }
 
   /// Get PostgreSQL CREATE TABLE DDL from JSONC schema
@@ -312,9 +328,10 @@ class JConverter {
     return JsonC(
       jv: schemaJsonc.jv,
       jid: schemaJsonc.jid,
+      jnf: dataJsonc.jnf,
       schema: schemaJsonc.schema,
       data: dataJsonc.data,
-    );
+    ).normalizeInt64();
   }
 
   /// Extract schema from full JSONC (for sending schema separately)
@@ -339,6 +356,7 @@ class JConverter {
     return JsonC(
       jv: jsonc.jv,
       jid: jsonc.jid,
+      jnf: jsonc.jnf,
       data: jsonc.data,
     );
   }

@@ -117,6 +117,51 @@ This package exactly matches the PostgreSQL validation functions in `db/validati
 - TEXT length: 1-9999
 - Status (200008) and Version (200010) columns require INT32 (300002)
 
+### Numeric value validation
+
+`JConverter.validateValue` checks values as well as the type ID. INT32 and
+INT64 are limited to their signed 32-bit and 64-bit ranges. For exact large
+integers and decimals, pass a decimal string or a Dart `BigInt`; `double`
+values may already have lost precision before validation. This validation
+does not itself convert values for JSON.
+
+For `NUMERIC(p,s)`, validation is strict: the value must fit without rounding
+in at most `p - s` integer digits and `s` fractional digits. Insignificant
+leading integer zeros and trailing fractional zeros do not count. For example,
+`999.990` fits `NUMERIC(5,2)`, but `999.991` and `1000` do not. Unconstrained
+NUMERIC has no catalog precision or scale limit. Non-finite values are not
+accepted.
+
+These are value-validation rules, separate from the type-ID functions above.
+PostgreSQL normally rounds excess fractional digits when assigning to a
+`numeric(p,s)` column and checks overflow after rounding. To preserve the
+strict rule there, validate the original value before that assignment, so that
+rounding does not hide excess fractional digits.
+
+For a finite, unconstrained PostgreSQL `numeric` value `v`, the strict fit rule
+for `NUMERIC(p,s)` can be expressed as
+`v = trunc(v, s) AND abs(v) < power(10::numeric, p - s)`. Apply the catalog
+limits on `p` and `s` separately and reject non-finite values first.
+
+### INT64 and `jnf`
+
+With a schema, `JsonC.fromJson` and `JsonC.parse` read INT64 (type ID 300003)
+as Dart `BigInt` in string modes 0, 3, and 5. `JsonC.encode` writes those
+values as decimal strings. Modes 1, 2, and 4 use Dart `int` and are **not
+web-safe for INT64**; the default is 2.
+`JConverter.toMaps` also normalizes directly constructed `JsonC` instances.
+`JConverter.fromMaps` accepts an optional `jnf` argument.
+
+Data-only payloads retain their raw values until a schema is supplied through
+`JConverter.merge`, `JBase.mergeWithSchema`, or `normalizeInt64(schema: ...)`.
+String-mode INT64 numbers outside the JavaScript safe integer range must be
+provided as strings or `BigInt`: a number may already have lost precision.
+Number modes cannot guarantee web-safe integers beyond that range. This
+conversion applies only to INT64; NUMERIC string handling is unchanged.
+
+For PostgreSQL-generated responses forwarded by a pass-through API, see the
+[response flow and SQL example](JNF_ENCODING_SPEC.md#postgresql-responses-through-a-pass-through-api).
+
 ## Testing
 
 ```bash
