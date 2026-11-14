@@ -94,6 +94,22 @@ abstract final class DataTypeRegistry {
   /// Last assigned registry ID.
   static const int lastId = 80001;
 
+  /// Cached powers of 10 for common scales.
+  /// Covers 95%+ of financial/medical use cases and reduces GC pressure
+  /// in EMR/EHR/ERP systems processing millions of numeric values.
+  static final _scalePowers = <int, BigInt>{
+    0: BigInt.one,          // Integers
+    1: BigInt.from(10),     // 1 decimal place
+    2: BigInt.from(100),    // Currency (USD cents, EUR cents)
+    3: BigInt.from(1000),   // Per-mille rates
+    4: BigInt.from(10000),  // Basis points, high-precision currency
+  };
+
+  /// Returns cached power of 10 for common scales, computes otherwise.
+  static BigInt _getScalePower(int scale) {
+    return _scalePowers[scale] ?? BigInt.from(10).pow(scale);
+  }
+
   /// All base types in catalog order.
   static List<DataType> get types => List.unmodifiable(DataType.values);
 

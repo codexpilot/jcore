@@ -6,6 +6,22 @@
 final class Numeric implements Comparable<Numeric> {
   static const _maxExponentMagnitude = 100000;
 
+  /// Cached powers of 10 for common scales.
+  /// Reduces memory allocations and GC pressure in EMR/EHR/ERP systems
+  /// processing millions of numeric values.
+  static final _scalePowers = <int, BigInt>{
+    0: BigInt.one,
+    1: BigInt.from(10),
+    2: BigInt.from(100),
+    3: BigInt.from(1000),
+    4: BigInt.from(10000),
+  };
+
+  /// Returns cached power of 10 for common scales, computes otherwise.
+  static BigInt _getScalePower(int scale) {
+    return _scalePowers[scale] ?? BigInt.from(10).pow(scale);
+  }
+
   /// Parses an exact decimal string, preserving its fractional scale.
   factory Numeric(String value) => Numeric.parse(value);
 
@@ -34,7 +50,7 @@ final class Numeric implements Comparable<Numeric> {
     if (match.group(1) == '-') coefficient = -coefficient;
     var scale = fraction.length - exponent;
     if (scale < 0) {
-      coefficient *= BigInt.from(10).pow(-scale);
+      coefficient *= _getScalePower(-scale);
       scale = 0;
     }
     return Numeric._(coefficient, scale);
@@ -52,12 +68,12 @@ final class Numeric implements Comparable<Numeric> {
     if (parsed.scale == scale) return parsed;
     if (parsed.scale < scale) {
       return Numeric._(
-        parsed._scaled * BigInt.from(10).pow(scale - parsed.scale),
+        parsed._scaled * _getScalePower(scale - parsed.scale),
         scale,
       );
     }
     return Numeric._(
-      parsed._scaled ~/ BigInt.from(10).pow(parsed.scale - scale),
+      parsed._scaled ~/ _getScalePower(parsed.scale - scale),
       scale,
     );
   }
@@ -91,7 +107,7 @@ final class Numeric implements Comparable<Numeric> {
 
   /// Whether this value has no fractional part.
   bool get isInteger =>
-      scale == 0 || _scaled % BigInt.from(10).pow(scale) == BigInt.zero;
+      scale == 0 || _scaled % _getScalePower(scale) == BigInt.zero;
 
   /// Returns the signed scaled integer used by this value.
   BigInt get scaledValue => _scaled;
@@ -99,12 +115,12 @@ final class Numeric implements Comparable<Numeric> {
   /// Returns this value as an integer, throwing if it has a fractional part.
   BigInt toBigInt() {
     if (!isInteger) throw StateError('A fractional Numeric is not an integer');
-    return _scaled ~/ BigInt.from(10).pow(scale);
+    return _scaled ~/ _getScalePower(scale);
   }
 
   Numeric _expandToScale(int newScale) {
     if (newScale <= scale) return this;
-    return Numeric._(_scaled * BigInt.from(10).pow(newScale - scale), newScale);
+    return Numeric._(_scaled * _getScalePower(newScale - scale), newScale);
   }
 
   /// Adds two values using the greater operand scale.
