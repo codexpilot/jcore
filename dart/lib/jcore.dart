@@ -3,3 +3,6 @@ library;
 
 // Re-export jdata
 export 'jdata.dart';
+
+// Re-export metax
+export 'metax.dart';
