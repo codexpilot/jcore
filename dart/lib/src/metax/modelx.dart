@@ -27,9 +27,6 @@ class ModelX {
   /// Model type (TypeX Group 6: 300000-399999)
   final int mtx;
 
-  /// Model state: draft | ready
-  final String modelState;
-
   /// Optional recursive parent identifier; existence is not guaranteed.
   final int fp;
 
@@ -43,7 +40,6 @@ class ModelX {
     this.p = const [],
     required this.c,
     this.mtx = 320001,
-    this.modelState = 'draft',
     this.fp = 0,
   });
 
@@ -54,9 +50,6 @@ class ModelX {
     if (mtx >= 320001 && mtx <= 320004) return ModelTypeCategory.modelFirst;
     return ModelTypeCategory.unknown;
   }
-
-  /// Is model ready for operations?
-  bool get isReady => modelState == 'ready';
 
   factory ModelX.fromJson(Map<String, dynamic> json) {
     return ModelX(
@@ -69,7 +62,6 @@ class ModelX {
       p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
       mtx: json['mtx'] as int? ?? 320001,
-      modelState: json['model_state'] as String? ?? 'draft',
       fp: json['fp'] as int? ?? 0,
     );
   }
@@ -84,13 +76,12 @@ class ModelX {
     'p': p,
     'c': c,
     'mtx': mtx,
-    'model_state': modelState,
     'fp': fp,
   };
 
   @override
   String toString() =>
-      'ModelX(i=$i, n=$n, c=$c, category=$category, state=$modelState)';
+      'ModelX(i=$i, n=$n, c=$c, category=$category)';
 
   @override
   bool operator ==(Object other) =>

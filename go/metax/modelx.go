@@ -4,20 +4,19 @@ import "encoding/json"
 
 // ModelX represents a logical model record from mx.modelx
 type ModelX struct {
-	ID         int     `json:"i"`                     // Model ID
+	ID         int     `json:"i"`                    // Model ID
 	FP         int     `json:"fp,omitempty"`         // Optional recursive parent identifier
-	D          *int    `json:"d,omitempty"`           // Date of last edit
-	E          *int    `json:"e,omitempty"`           // Last editor user ID
-	A          *int    `json:"a,omitempty"`           // Active status
-	DXI        *int    `json:"dxi,omitempty"`         // Domain ID
-	N          *string `json:"n,omitempty"`           // Name
-	C          *string `json:"c,omitempty"`           // Code
-	P          []int   `json:"p,omitempty"`           // Parent model IDs
-	MTX        *int    `json:"mtx,omitempty"`         // Model type
-	ModelState *string `json:"model_state,omitempty"` // Model state (draft/ready)
+	D          *int    `json:"d,omitempty"`          // Date of last edit
+	E          *int    `json:"e,omitempty"`          // Last editor user ID
+	A          *int    `json:"a,omitempty"`          // Active status
+	DXI        *int    `json:"dxi,omitempty"`        // Domain ID
+	N          *string `json:"n,omitempty"`          // Name
+	C          *string `json:"c,omitempty"`          // Code
+	P          []int   `json:"p,omitempty"`          // Parent model IDs
+	MTX        *int    `json:"mtx,omitempty"`        // Model type
 }
 
-// Orientation returns the model orientation from MT field
+// Orientation returns the model orientation from MTX field
 // 0=independent, 1=model-after-table, 2=table-after-model
 func (m *ModelX) Orientation() int {
 	if m.MTX == nil {
@@ -29,16 +28,6 @@ func (m *ModelX) Orientation() int {
 // RequiresPhysicalBases returns whether the model requires physical bases
 func (m *ModelX) RequiresPhysicalBases() bool {
 	return m.Orientation() != 0
-}
-
-// IsReady returns whether the server has validated this model for publication
-func (m *ModelX) IsReady() bool {
-	return m.ModelState != nil && *m.ModelState == "ready"
-}
-
-// IsDraft returns whether this model is still being designed
-func (m *ModelX) IsDraft() bool {
-	return m.ModelState != nil && *m.ModelState == "draft"
 }
 
 // MarshalJSON implements custom JSON marshaling
@@ -61,9 +50,6 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	}
 	if mx.MTX != nil {
 		data["mtx"] = *mx.MTX
-	}
-	if mx.ModelState != nil {
-		data["model_state"] = *mx.ModelState
 	}
 	return json.Marshal(data)
 }

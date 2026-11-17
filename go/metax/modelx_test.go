@@ -39,24 +39,6 @@ func TestModelX_RequiresPhysicalBases(t *testing.T) {
 	}
 }
 
-func TestModelX_ModelState(t *testing.T) {
-	ready := &ModelX{ModelState: strPtr("ready")}
-	if !ready.IsReady() {
-		t.Error("IsReady() should be true")
-	}
-	if ready.IsDraft() {
-		t.Error("IsDraft() should be false")
-	}
-
-	draft := &ModelX{ModelState: strPtr("draft")}
-	if draft.IsReady() {
-		t.Error("IsReady() should be false")
-	}
-	if !draft.IsDraft() {
-		t.Error("IsDraft() should be true")
-	}
-}
-
 func TestModelX_JSON(t *testing.T) {
 	model := &ModelX{
 		ID:         1001,
@@ -66,7 +48,6 @@ func TestModelX_JSON(t *testing.T) {
 		C:          strPtr("user"),
 		P:          []int{10, 20},
 		MTX:        intPtr(10000),
-		ModelState: strPtr("ready"),
 	}
 
 	data, err := json.Marshal(model)
