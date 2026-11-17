@@ -1,56 +1,43 @@
-# MetaX ID Patterns
+# MetaX ID Reference Patterns
 
 **Source of Truth:** JCore taxonomy documentation  
-**Purpose:** Define singular/plural ID patterns for all MetaX tables
+**Purpose:** Define column naming patterns for foreign key references to MetaX tables
+
+**Scope:** These patterns apply to FOREIGN KEY columns that reference MetaX tables. Each MetaX table's own primary key is always named `i` (system column).
 
 ---
 
-## MetaX Table ID Patterns
+## MetaX Table ID Reference Patterns
 
-| Table | Singular | Plural | Usage |
-|-------|----------|--------|-------|
-| DomainX | dxi | dxis | Domain ID references |
-| TableX | txi | txis | Table ID references |
-| ColumnX | cxi | cxis | Column ID references |
-| ModelX | mxi | mxis | Model ID references |
-| FieldX | fxi | fxis | Field ID references |
-| QueryX | qxi | qxis | Query ID references |
-| ParamX | pxi | pxis | Parameter ID references |
-| SQLX | sxi | sxis | SQLX ID references |
-| RelationX | rxi | rxis | Relation ID references |
-| MapX | maxi | maxis | MapX ID references |
+**Purpose:** Define column names for FOREIGN KEY references to MetaX tables.
 
----
+**Note:** Each MetaX table uses `i` as its own primary key (system column). These patterns define the column name when OTHER tables reference that primary key.
 
-## Three-Level Naming Convention
+| Table | Singular Reference | Plural Array | Usage |
+|-------|-------------------|--------------|-------|
+| DomainX | dxi | dxis | Foreign key → domainx.i |
+| TableX | txi | txis | Foreign key → tablex.i |
+| ColumnX | cxi | cxis | Foreign key → columnx.i |
+| ModelX | mxi | mxis | Foreign key → modelx.i |
+| FieldX | fxi | fxis | Foreign key → fieldx.i |
+| QueryX | qxi | qxis | Foreign key → queryx.i |
+| ParamX | pxi | pxis | Foreign key → paramx.i |
+| SQLX | sxi | sxis | Foreign key → sqlx.i |
+| RelationX | rxi | rxis | Foreign key → relationx.i |
+| MapX | maxi | maxis | Foreign key → mapx.i |
 
-The taxonomy uses a three-level naming system:
-
-### 1. Database Column Level (Short Form)
+**Example:**
 ```sql
--- Use short column names
-di INT NOT NULL  -- Domain ID
-ti INT NOT NULL  -- Table ID  
-mi INT NOT NULL  -- Model ID
-```
+-- DomainX has its own primary key 'i'
+CREATE TABLE mx.domainx (
+    i SERIAL PRIMARY KEY    -- The domain's own ID
+);
 
-### 2. Variable Level (Taxonomy Pattern)
-```sql
--- Use taxonomy pattern in code
-DECLARE v_dxi INT;   -- Domain ID variable
-DECLARE v_txi INT;   -- Table ID variable
-DECLARE v_mxi INT;   -- Model ID variable
-DECLARE v_dxis INT[];  -- Domain ID array
-```
-
-### 3. API Level (Descriptive)
-```javascript
-// Use descriptive names in APIs
-{
-  domainId: 1,       // or domain_id in snake_case
-  tableId: 42,
-  modelId: 100
-}
+-- TableX REFERENCES DomainX using 'dxi'
+CREATE TABLE mx.tablex (
+    i BIGINT PRIMARY KEY,
+    dxi INT NOT NULL REFERENCES mx.domainx(i)  -- Foreign key reference
+);
 ```
 
 ---
@@ -60,53 +47,89 @@ DECLARE v_dxis INT[];  -- Domain ID array
 1. **Singular form** ends in `xi` (except MapX which uses `maxi`)
 2. **Plural form** adds `s` to singular: `xis` or `maxis`
 3. **Array types** always use plural form: `dxis INT[]`
-4. **Variable prefix** is `v_` followed by taxonomy pattern
-5. **API names** use full descriptive names (camelCase or snake_case)
+4. **Variable prefix** is `v_` followed by taxonomy pattern: `v_dxi`
+5. **JSON keys** use the taxonomy pattern: `"dxi"`, `"txi"`, `"mxi"`
 
 ---
 
 ## Examples
 
 ### Database Schema
+
 ```sql
 CREATE TABLE mx.tablex (
-    i INT PRIMARY KEY,
-    di INT NOT NULL,     -- Short form: domain ID
-    ti INT,              -- Short form: table ID (self-reference for parent)
+    i BIGINT PRIMARY KEY,
+    dxi INT NOT NULL REFERENCES mx.domainx(i),  -- Domain reference
+    txi BIGINT,                                  -- Table reference (self-reference)
+    n TEXT NOT NULL
+);
+
+CREATE TABLE mx.modelx (
+    i BIGINT PRIMARY KEY,
+    dxi INT NOT NULL REFERENCES mx.domainx(i),  -- Domain reference
+    mxis BIGINT[] NOT NULL DEFAULT '{}',        -- Model references (plural array)
     n TEXT NOT NULL
 );
 ```
 
 ### SQL Function
+
 ```sql
 CREATE FUNCTION settablex(input jsonb) RETURNS jsonb AS $$
 DECLARE
-    v_dxi INT;           -- Taxonomy pattern
-    v_txi INT;           -- Taxonomy pattern
-    v_mxis INT[];        -- Plural for array
+    v_dxi INT;           -- Domain ID variable
+    v_txi BIGINT;        -- Table ID variable
+    v_mxis BIGINT[];     -- Model ID array
 BEGIN
-    v_dxi := (input->>'di')::int;
-    v_txi := (input->>'ti')::int;
-    -- ...
+    v_dxi := (input->>'dxi')::int;
+    v_txi := (input->>'txi')::bigint;
+    v_mxis := CASE WHEN input ? 'mxis' 
+        THEN ARRAY(SELECT jsonb_array_elements_text(input->'mxis')::bigint)
+        ELSE '{}'::bigint[] END;
+    
+    INSERT INTO mx.tablex (i, dxi, txi, n)
+    VALUES (v_i, v_dxi, v_txi, v_n)
+    RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
 ```
 
-### API Response
+### JSON Input/Output
+
 ```json
+{
+  "i": 42,
+  "dxi": 1,
+  "txi": 100,
+  "mxis": [200, 201, 202],
+  "n": "Example Table"
+}
+```
+
+### API Layer
+
+For external APIs, use descriptive names:
+
+```javascript
+// API request/response
 {
   "tableId": 42,
   "domainId": 1,
-  "modelIds": [100, 101, 102]
+  "parentTableId": 100,
+  "modelIds": [200, 201, 202]
 }
 ```
+
+The API layer translates between descriptive names and taxonomy patterns.
 
 ---
 
 ## Special Cases
 
 ### MapX Uses `maxi/maxis`
+
 MapX is unique in using a four-letter base to avoid confusion with model IDs:
+
 ```sql
 -- Correct
 DECLARE v_maxi INT;      -- MapX ID
@@ -117,7 +140,9 @@ DECLARE v_mxi INT;       -- This is ModelX, not MapX!
 ```
 
 ### Self-Referential Columns
+
 When a table references its own ID, use the table-specific pattern:
+
 ```sql
 CREATE TABLE mx.domainx (
     i INT PRIMARY KEY,
@@ -127,3 +152,68 @@ CREATE TABLE mx.domainx (
 -- In function
 DECLARE v_p_dxi INT;     -- Parent domain ID variable
 ```
+
+### Parent Arrays
+
+For multiple parent references (composition patterns):
+
+```sql
+CREATE TABLE mx.modelx (
+    i BIGINT PRIMARY KEY,
+    p BIGINT[] NOT NULL DEFAULT '{}',  -- Parent model IDs (self-referential array)
+    dxi INT NOT NULL
+);
+
+-- In function
+DECLARE v_p BIGINT[];    -- Parent array uses simple 'p' column name
+```
+
+Note: `p` is a special system column for parent references and doesn't follow the `mxi/mxis` pattern.
+
+---
+
+## Variable Naming Examples
+
+```sql
+-- Domain references
+DECLARE v_dxi INT;
+DECLARE v_dxis INT[];
+
+-- Table references  
+DECLARE v_txi BIGINT;
+DECLARE v_txis BIGINT[];
+
+-- Model references
+DECLARE v_mxi BIGINT;
+DECLARE v_mxis BIGINT[];
+
+-- Field references
+DECLARE v_fxi BIGINT;
+DECLARE v_fxis BIGINT[];
+
+-- Query references
+DECLARE v_qxi BIGINT;
+DECLARE v_qxis BIGINT[];
+
+-- Parameter references
+DECLARE v_pxi BIGINT;
+DECLARE v_pxis BIGINT[];
+```
+
+---
+
+## Migration Note
+
+AIX schemas currently use `di` instead of `dxi`. This is incorrect and requires migration:
+
+**Current (incorrect):**
+```sql
+di INT NOT NULL  -- Wrong
+```
+
+**Correct (taxonomy compliant):**
+```sql
+dxi INT NOT NULL  -- Correct
+```
+
+All AIX schemas must be updated to follow the taxonomy pattern.
