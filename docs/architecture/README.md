@@ -5,9 +5,11 @@ depend on the data model below them:
 
 ```text
 jdata  →  jux  →  jsync
+     ↓
+   metax (AIX MetaX models)
 ```
 
-This repository currently implements **jdata in Dart** through
+This repository currently implements **jdata in Dart** and **metax models in Dart and Go** through
 `package:jcore/jcore.dart`. jux, jsync, other language implementations, and a
 repository or package split remain planned. The public Dart package name stays
 `jcore`.
@@ -17,12 +19,25 @@ repository or package split remain planned. The public Dart package name stays
 | Layer | Responsibility | Status in this repository |
 | --- | --- | --- |
 | jdata | Type IDs, `Numeric`, jsonc, and data validation | Implemented in Dart |
+| metax | MetaX metadata models (DomainX, TableX, ModelX, etc.) | Implemented in Dart and Go |
 | jux | Portable UI definitions, bindings, and generic Catalog references | Planned |
 | jsync | Synchronization contracts, topology, and algorithms | Planned |
 
 jux will build on jdata values and identifiers. jsync will build on jdata and
-jux contracts. Transport, rendering, and storage integrations remain outside
+jux contracts. metax models use jdata types. Transport, rendering, and storage integrations remain outside
 the portable contracts until those designs are specified.
+
+## MetaX Taxonomy
+
+JCore is the **source of truth** for AIX MetaX taxonomy. All AIX implementations must follow these definitions:
+
+- **[ID Patterns](../taxonomy/ID-PATTERNS.md)** - Singular/plural ID naming conventions
+- **[Type Patterns](../taxonomy/TYPE-PATTERNS.md)** - TypeX reference patterns (dtx, ttx, ctx, etc.)
+- **[System Columns](../taxonomy/SYSTEM-COLUMNS.md)** - Standard column definitions
+- **[Parent Rules](../taxonomy/PARENT-RULES.md)** - Self-referential p/ps constraints
+- **[DomainX Special](../taxonomy/DOMAINX-SPECIAL.md)** - Provenance tracking columns
+
+These rules ensure consistency across database schemas, API contracts, and code implementations.
 
 ## Source organization
 

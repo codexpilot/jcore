@@ -21,14 +21,14 @@ class QueryX {
   /// Code (operation identifier)
   final String c;
 
-  /// Target kind: system | table | entity
+  /// Target kind: system | table | model
   final String targetKind;
 
   /// Table ID (when targetKind='table')
   final int? tableId;
 
-  /// Entity ID (when targetKind='entity')
-  final int? entityId;
+  /// Model ID (when targetKind='model')
+  final int? modelId;
 
   /// Query type (TypeX Group 8: 500000-520001)
   final int qt;
@@ -53,9 +53,9 @@ class QueryX {
     required this.di,
     required this.n,
     required this.c,
-    this.targetKind = 'entity',
+    this.targetKind = 'model',
     this.tableId,
-    this.entityId,
+    this.modelId,
     required this.qt,
     this.f = 0,
     this.inputFields,
@@ -67,7 +67,7 @@ class QueryX {
   QueryTypeCategory get category {
     if (qt >= 500000 && qt <= 500001) return QueryTypeCategory.system;
     if (qt >= 510000 && qt <= 510001) return QueryTypeCategory.table;
-    if (qt >= 520000 && qt <= 520001) return QueryTypeCategory.entity;
+    if (qt >= 520000 && qt <= 520001) return QueryTypeCategory.model;
     return QueryTypeCategory.unknown;
   }
 
@@ -86,9 +86,9 @@ class QueryX {
       di: json['di'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
-      targetKind: json['target_kind'] as String? ?? 'entity',
+      targetKind: json['target_kind'] as String? ?? 'model',
       tableId: json['table_id'] as int?,
-      entityId: json['entity_id'] as int?,
+      modelId: json['model_id'] as int?,
       qt: json['qt'] as int,
       f: json['f'] as int? ?? 0,
       inputFields: (json['input_fields'] as List<dynamic>?)?.cast<int>(),
@@ -107,7 +107,7 @@ class QueryX {
     'c': c,
     'target_kind': targetKind,
     if (tableId != null) 'table_id': tableId,
-    if (entityId != null) 'entity_id': entityId,
+    if (modelId != null) 'model_id': modelId,
     'qt': qt,
     'f': f,
     if (inputFields != null) 'input_fields': inputFields,
@@ -130,6 +130,6 @@ class QueryX {
 enum QueryTypeCategory {
   system, // 500000-500001
   table, // 510000-510001
-  entity, // 520000-520001
+  model, // 520000-520001
   unknown,
 }

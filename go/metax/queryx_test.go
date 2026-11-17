@@ -30,8 +30,8 @@ func TestQueryTypeFromID(t *testing.T) {
 		{"SystemSet", 500001, &SystemSet},
 		{"TableGet", 510000, &TableGet},
 		{"TableSet", 510001, &TableSet},
-		{"EntityGet", 520000, &EntityGet},
-		{"EntitySet", 520001, &EntitySet},
+		{"ModelGet", 520000, &ModelGet},
+		{"ModelSet", 520001, &ModelSet},
 		{"Unknown", 999999, nil},
 	}
 

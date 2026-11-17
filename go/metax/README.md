@@ -11,7 +11,7 @@ This package provides Go structs for all AIX MetaX tables:
 | `DomainX` | `cox.domainx` | Domain hierarchy (Framework/Template/Solution) |
 | `TableX` | `mx.tablex` | Physical table metadata with table type decoding |
 | `ColumnX` | `mx.columnx` | Physical column metadata |
-| `EntityX` | `mx.entityx` | Logical entity metadata with orientation detection |
+| `ModelX` | `mx.modelx` | Logical model metadata with orientation detection |
 | `FieldX` | `mx.fieldx` | Logical field metadata with capability detection |
 | `QueryX` | `mx.queryx` | Query operation metadata |
 | `ParamX` | `mx.paramx` | Query parameter metadata |
@@ -20,9 +20,9 @@ This package provides Go structs for all AIX MetaX tables:
 ## Features
 
 - **JSON Serialization**: All models support `json.Marshal` and `json.Unmarshal`
-- **Type Detection**: Helper methods for domain types, entity orientation, field capabilities
+- **Type Detection**: Helper methods for domain types, model orientation, field capabilities
 - **Table Type Decoding**: Full table type validation and decoding (sync/log/algorithm/format)
-- **Query Types**: Enum-like constants for query operations (SystemGet, TableGet, etc.)
+- **Query Types**: Enum-like constants for query operations (SystemGet, TableGet, ModelGet)
 - **Field Capabilities**: Detection of input/output capabilities (Bidirectional, InputOnly, OutputOnly)
 
 ## Usage

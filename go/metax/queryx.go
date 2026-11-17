@@ -14,16 +14,16 @@ type QueryType struct {
 }
 
 var (
-	SystemGet  = QueryType{500000, "system_get", "System Get", "system"}
-	SystemSet  = QueryType{500001, "system_set", "System Set", "system"}
-	TableGet   = QueryType{510000, "table_get", "Table Get", "table"}
-	TableSet   = QueryType{510001, "table_set", "Table Set", "table"}
-	EntityGet  = QueryType{520000, "entity_get", "Entity Get", "entity"}
-	EntitySet  = QueryType{520001, "entity_set", "Entity Set", "entity"}
+	SystemGet = QueryType{500000, "system_get", "System Get", "system"}
+	SystemSet = QueryType{500001, "system_set", "System Set", "system"}
+	TableGet  = QueryType{510000, "table_get", "Table Get", "table"}
+	TableSet  = QueryType{510001, "table_set", "Table Set", "table"}
+	ModelGet  = QueryType{520000, "model_get", "Model Get", "model"}
+	ModelSet  = QueryType{520001, "model_set", "Model Set", "model"}
 )
 
 var queryTypes = []QueryType{
-	SystemGet, SystemSet, TableGet, TableSet, EntityGet, EntitySet,
+	SystemGet, SystemSet, TableGet, TableSet, ModelGet, ModelSet,
 }
 
 // IsGet returns whether this is a get operation
@@ -54,7 +54,7 @@ type QueryX struct {
 	QT           *int                   `json:"qt,omitempty"`           // Query type
 	TargetKind   *string                `json:"target_kind,omitempty"`  // Target kind
 	TableID      *int                   `json:"table_id,omitempty"`     // Table ID
-	EntityID     *int                   `json:"entity_id,omitempty"`    // Entity ID
+	ModelID      *int                   `json:"model_id,omitempty"`     // Model ID
 	Role         *string                `json:"role,omitempty"`         // Role
 	RelationIDs  []int                  `json:"relation_ids,omitempty"` // Relation IDs
 	IsSingle     *bool                  `json:"is_single,omitempty"`    // Single result flag
@@ -110,8 +110,8 @@ func (q *QueryX) MarshalJSON() ([]byte, error) {
 	if q.TableID != nil {
 		data["table_id"] = *q.TableID
 	}
-	if q.EntityID != nil {
-		data["entity_id"] = *q.EntityID
+	if q.ModelID != nil {
+		data["model_id"] = *q.ModelID
 	}
 	if q.Role != nil {
 		data["role"] = *q.Role

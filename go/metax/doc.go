@@ -6,7 +6,7 @@
 //   - DomainX: Domain hierarchy (cox.domainx)
 //   - TableX: Physical tables (mx.tablex)
 //   - ColumnX: Physical columns (mx.columnx)
-//   - EntityX: Logical entities (mx.entityx)
+//   - ModelX: Logical models (mx.modelx)
 //   - FieldX: Logical fields (mx.fieldx)
 //   - QueryX: Query operations (mx.queryx)
 //   - ParamX: Query parameters (mx.paramx)

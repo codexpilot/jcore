@@ -1,7 +1,7 @@
 # JCore
 
 JCore is a multi-language foundation for data types, exact numeric values,
-jsonc, UI bindings, catalogs, and synchronization.
+jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of truth** for AIX MetaX taxonomy and type definitions.
 
 **Current jcore version:** `v3.1.1`
 
@@ -36,6 +36,17 @@ future language organization, see the
 [architecture overview](docs/architecture/README.md).
 Browse the documentation index in [docs/README.md](docs/README.md).
 Contributor credit is listed in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+
+## MetaX Taxonomy
+
+JCore defines the canonical taxonomy for AIX MetaX systems:
+
+- **[ID Patterns](docs/taxonomy/ID-PATTERNS.md)** - Singular/plural ID naming (dxi/dxis, mxi/mxis, etc.)
+- **[System Columns](docs/taxonomy/SYSTEM-COLUMNS.md)** - Standard column definitions (i, d, e, a, etc.)
+- **[Parent Rules](docs/taxonomy/PARENT-RULES.md)** - Self-referential p/ps architectural rules
+- **[Type Patterns](docs/taxonomy/TYPE-PATTERNS.md)** - Type suffix patterns (dtx, ttx, ctx, etc.)
+
+These definitions are the **source of truth** for all AIX implementations.
 
 ## Verification
 
