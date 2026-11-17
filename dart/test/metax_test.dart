@@ -138,43 +138,21 @@ void main() {
       expect(decoded.format, 4); // BIGINT
     });
 
-    test('origin checks', () {
-      final native = TableX(
+    test('unique foreign-parent serialization', () {
+      final table = TableX(
         i: 1,
         d: 1700000000000,
         e: 1,
         a: 1,
         dxi: 1,
-        n: 'Native',
-        c: 'native',
-        f: 0,
+        n: 'Table',
+        c: 'table',
+        fp: 100,
       );
 
-      final copied = TableX(
-        i: 2,
-        d: 1700000000000,
-        e: 1,
-        a: 1,
-        dxi: 1,
-        n: 'Copied',
-        c: 'copied',
-        f: 100,
-      );
-
-      final imported = TableX(
-        i: 3,
-        d: 1700000000000,
-        e: 1,
-        a: 1,
-        dxi: 1,
-        n: 'Imported',
-        c: 'imported',
-        f: -100,
-      );
-
-      expect(native.isNative, true);
-      expect(copied.isCopied, true);
-      expect(imported.isImported, true);
+      final decoded = TableX.fromJson(table.toJson());
+      expect(decoded.fp, 100);
+      expect(decoded.toJson()['fp'], 100);
     });
   });
 }

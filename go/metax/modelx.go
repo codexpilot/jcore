@@ -4,17 +4,17 @@ import "encoding/json"
 
 // ModelX represents a logical model record from mx.modelx
 type ModelX struct {
-	ID         int     `json:"i"`                    // Model ID
-	F          int     `json:"f,omitempty"`          // Origin (default 0)
-	D          *int    `json:"d,omitempty"`          // Date of last edit
-	E          *int    `json:"e,omitempty"`          // Last editor user ID
-	A          *int    `json:"a,omitempty"`          // Active status
-	DXI        *int    `json:"dxi,omitempty"`        // Domain ID
-	N          *string `json:"n,omitempty"`          // Name
-	C          *string `json:"c,omitempty"`          // Code
-	P          []int   `json:"p,omitempty"`          // Parent model IDs
-	MTX        *int    `json:"mtx,omitempty"`        // Model type
-	ModelState *string `json:"model_state,omitempty"`// Model state (draft/ready)
+	ID         int     `json:"i"`                     // Model ID
+	FP         int     `json:"fp,omitempty"`         // Optional recursive parent identifier
+	D          *int    `json:"d,omitempty"`           // Date of last edit
+	E          *int    `json:"e,omitempty"`           // Last editor user ID
+	A          *int    `json:"a,omitempty"`           // Active status
+	DXI        *int    `json:"dxi,omitempty"`         // Domain ID
+	N          *string `json:"n,omitempty"`           // Name
+	C          *string `json:"c,omitempty"`           // Code
+	P          []int   `json:"p,omitempty"`           // Parent model IDs
+	MTX        *int    `json:"mtx,omitempty"`         // Model type
+	ModelState *string `json:"model_state,omitempty"` // Model state (draft/ready)
 }
 
 // Orientation returns the model orientation from MT field

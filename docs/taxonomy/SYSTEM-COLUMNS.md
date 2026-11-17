@@ -5,7 +5,7 @@
 
 ---
 
-## Core System Columns (i,d,e,a,f,s,t,n,g,v)
+## Core System Columns (i,d,e,a,fp,s,t,n,g,v)
 
 | Column | Name | Type | Type Flexibility | Description |
 |--------|------|------|------------------|-------------|
@@ -13,7 +13,7 @@
 | d | Date | BIGINT | Fixed | Last edit timestamp (epoch ms UTC) |
 | e | Editor | INT/BIGINT/UUID | ✓ Flexible | Last editor user ID |
 | a | Active | SMALLINT | Fixed | Binary status (0=inactive, 1=active) |
-| f | Foreign | Varies | ✓ Flexible | Foreign key with unique constraint (JDB only) |
+| fp | Foreign parent | Varies | ✓ Flexible | Optional recursive parent identifier; existence is not guaranteed |
 | s | Status | INT | Fixed | Workflow state (generated tables only) |
 | t | Type | INT | Fixed | Type reference (legacy, replaced by group-specific patterns) |
 | n | Name | TEXT | Fixed | Display name or description |
@@ -87,7 +87,7 @@ CREATE TABLE [schema].[tablename] (
     v INT NOT NULL DEFAULT 1,
     -- Optional standard columns
     c TEXT,
-    f INT,
+    fp INT,
     p BIGINT,
     o INT,
     -- Custom business columns from ColumnX
@@ -97,7 +97,7 @@ CREATE TABLE [schema].[tablename] (
 ```
 
 **Fixed seven:** i, d, e, a, n, s, v  
-**Optional standard:** c, f, p, o  
+**Optional standard:** c, fp, p, o
 **Custom:** Defined via ColumnX metadata
 
 ---
@@ -129,10 +129,11 @@ CREATE TABLE [schema].[tablename] (
 - Workflow states (use `s` column instead)
 - Multi-value statuses
 
-### f (Foreign Key)
-- JDB-specific unique foreign key
-- Used for one-to-one relationships
-- Has unique constraint (unlike regular foreign keys)
+### fp (Foreign Parent)
+- Optional recursive parent identifier.
+- Indicates a parent relationship within the same entity type.
+- A nonzero value does not guarantee that the referenced key exists.
+- Referential integrity is not implied or enforced by the MetaX model.
 
 ### s (Status)
 - Workflow state for generated business tables

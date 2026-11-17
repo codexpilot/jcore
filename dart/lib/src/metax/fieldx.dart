@@ -37,8 +37,8 @@ class FieldX {
   /// 400000=Bidirectional, 400001=Input-only, 400002=Output-only
   final int ftx;
 
-  /// Origin
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   const FieldX({
     required this.i,
@@ -53,7 +53,7 @@ class FieldX {
     required this.dtx,
     required this.c,
     this.ftx = 400000,
-    this.f = 0,
+    this.fp = 0,
   });
 
   /// Field capabilities based on type
@@ -90,7 +90,7 @@ class FieldX {
       dtx: json['dtx'] as int,
       c: json['c'] as String,
       ftx: json['ftx'] as int? ?? 400000,
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
     );
   }
 
@@ -107,7 +107,7 @@ class FieldX {
     'dtx': dtx,
     'c': c,
     'ftx': ftx,
-    'f': f,
+    'fp': fp,
   };
 
   @override

@@ -14,7 +14,7 @@ type ParamX struct {
 	C   string `json:"c"`   // Code (unique within query)
 	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
 	Req bool   `json:"req"` // Required flag
-	F   int    `json:"f"`   // Origin
+	FP  int    `json:"fp"`  // Optional recursive parent identifier
 }
 
 // String returns a string representation of the parameter

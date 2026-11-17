@@ -30,8 +30,8 @@ class ModelX {
   /// Model state: draft | ready
   final String modelState;
 
-  /// Origin
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   const ModelX({
     required this.i,
@@ -44,7 +44,7 @@ class ModelX {
     required this.c,
     this.mtx = 320001,
     this.modelState = 'draft',
-    this.f = 0,
+    this.fp = 0,
   });
 
   /// Model type category
@@ -70,7 +70,7 @@ class ModelX {
       c: json['c'] as String,
       mtx: json['mtx'] as int? ?? 320001,
       modelState: json['model_state'] as String? ?? 'draft',
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
     );
   }
 
@@ -85,7 +85,7 @@ class ModelX {
     'c': c,
     'mtx': mtx,
     'model_state': modelState,
-    'f': f,
+    'fp': fp,
   };
 
   @override

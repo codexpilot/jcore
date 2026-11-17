@@ -43,32 +43,32 @@ func QueryTypeFromID(id int) *QueryType {
 
 // QueryX represents a query operation record from mx.queryx
 type QueryX struct {
-	ID           int                    `json:"i"`                      // Query ID
-	F            int                    `json:"f,omitempty"`            // Origin (default 0)
-	D            *int                   `json:"d,omitempty"`            // Date of last edit
-	E            *int                   `json:"e,omitempty"`            // Last editor user ID
-	A            *int                   `json:"a,omitempty"`            // Active status
-	DXI          *int                   `json:"dxi,omitempty"`          // Domain ID
-	N            *string                `json:"n,omitempty"`            // Name
-	C            *string                `json:"c,omitempty"`            // Code
-	QTX          *int                   `json:"qtx,omitempty"`          // Query type
-	TargetKind   *string                `json:"target_kind,omitempty"`  // Target kind
-	TableID      *int                   `json:"table_id,omitempty"`     // Table ID
-	ModelID      *int                   `json:"model_id,omitempty"`     // Model ID
-	Role         *string                `json:"role,omitempty"`         // Role
-	RelationIDs  []int                  `json:"relation_ids,omitempty"` // Relation IDs
-	IsSingle     *bool                  `json:"is_single,omitempty"`    // Single result flag
-	IsPaged      *bool                  `json:"is_paged,omitempty"`     // Paged result flag
-	RequiresID   *bool                  `json:"requires_id,omitempty"`  // Requires ID flag
-	InputFields  []int                  `json:"input_fields,omitempty"` // Input field IDs
-	OutputFields []int                  `json:"output_fields,omitempty"`// Output field IDs
-	SqlxID       *int                   `json:"sqlx_id,omitempty"`      // SQL implementation ID
-	CustomSQL    *string                `json:"custom_sql,omitempty"`   // Custom SQL
-	TS           []int                  `json:"ts,omitempty"`           // Legacy: timestamps
-	OES          []int                  `json:"oes,omitempty"`          // Legacy: output entities
-	QS           map[string]interface{} `json:"qs,omitempty"`           // Legacy: query state
-	CTX          map[string]interface{} `json:"ctx,omitempty"`          // Legacy: context
-	DefaultF     *int                   `json:"default_f,omitempty"`    // Legacy: default origin
+	ID           int                    `json:"i"`                       // Query ID
+	FP           int                    `json:"fp,omitempty"`           // Optional recursive parent identifier
+	D            *int                   `json:"d,omitempty"`             // Date of last edit
+	E            *int                   `json:"e,omitempty"`             // Last editor user ID
+	A            *int                   `json:"a,omitempty"`             // Active status
+	DXI          *int                   `json:"dxi,omitempty"`           // Domain ID
+	N            *string                `json:"n,omitempty"`             // Name
+	C            *string                `json:"c,omitempty"`             // Code
+	QTX          *int                   `json:"qtx,omitempty"`           // Query type
+	TargetKind   *string                `json:"target_kind,omitempty"`   // Target kind
+	TableID      *int                   `json:"table_id,omitempty"`      // Table ID
+	ModelID      *int                   `json:"model_id,omitempty"`      // Model ID
+	Role         *string                `json:"role,omitempty"`          // Role
+	RelationIDs  []int                  `json:"relation_ids,omitempty"`  // Relation IDs
+	IsSingle     *bool                  `json:"is_single,omitempty"`     // Single result flag
+	IsPaged      *bool                  `json:"is_paged,omitempty"`      // Paged result flag
+	RequiresID   *bool                  `json:"requires_id,omitempty"`   // Requires ID flag
+	InputFields  []int                  `json:"input_fields,omitempty"`  // Input field IDs
+	OutputFields []int                  `json:"output_fields,omitempty"` // Output field IDs
+	SqlxID       *int                   `json:"sqlx_id,omitempty"`       // SQL implementation ID
+	CustomSQL    *string                `json:"custom_sql,omitempty"`    // Custom SQL
+	TS           []int                  `json:"ts,omitempty"`            // Legacy: timestamps
+	OES          []int                  `json:"oes,omitempty"`           // Legacy: output entities
+	QS           map[string]interface{} `json:"qs,omitempty"`            // Legacy: query state
+	CTX          map[string]interface{} `json:"ctx,omitempty"`           // Legacy: context
+	DefaultF     *int                   `json:"default_f,omitempty"`     // Legacy: default origin
 }
 
 // QueryTypeLabel returns a human-readable label for a query type

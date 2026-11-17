@@ -33,8 +33,8 @@ class QueryX {
   /// Query type (TypeX Group 8: 500000-520001)
   final int qtx;
 
-  /// Origin
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   /// Input field IDs (P1 extension)
   final List<int>? inputFields;
@@ -57,7 +57,7 @@ class QueryX {
     this.tableId,
     this.modelId,
     required this.qtx,
-    this.f = 0,
+    this.fp = 0,
     this.inputFields,
     this.outputFields,
     this.operationRole,
@@ -90,7 +90,7 @@ class QueryX {
       tableId: json['table_id'] as int?,
       modelId: json['model_id'] as int?,
       qtx: json['qtx'] as int,
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
       inputFields: (json['input_fields'] as List<dynamic>?)?.cast<int>(),
       outputFields: (json['output_fields'] as List<dynamic>?)?.cast<int>(),
       operationRole: json['operation_role'] as String?,
@@ -109,7 +109,7 @@ class QueryX {
     if (tableId != null) 'table_id': tableId,
     if (modelId != null) 'model_id': modelId,
     'qtx': qtx,
-    'f': f,
+    'fp': fp,
     if (inputFields != null) 'input_fields': inputFields,
     if (outputFields != null) 'output_fields': outputFields,
     if (operationRole != null) 'operation_role': operationRole,

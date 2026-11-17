@@ -28,8 +28,8 @@ class TableX {
   /// Partition width for Algorithm 1 sync (0 = unset)
   final int px;
 
-  /// Origin: 0=native, >0=copied from, <0=imported from
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   const TableX({
     required this.i,
@@ -41,20 +41,11 @@ class TableX {
     this.ttx = 100014,
     required this.c,
     this.px = 0,
-    this.f = 0,
+    this.fp = 0,
   });
 
   /// Decode table type into components
   TableTypeDecoded get tableType => TableTypeDecoded.decode(ttx);
-
-  /// Is this table native to this domain?
-  bool get isNative => f == 0;
-
-  /// Is this table copied from another domain?
-  bool get isCopied => f > 0;
-
-  /// Is this table imported from another domain?
-  bool get isImported => f < 0;
 
   factory TableX.fromJson(Map<String, dynamic> json) {
     return TableX(
@@ -67,7 +58,7 @@ class TableX {
       ttx: json['ttx'] as int? ?? 100014,
       c: json['c'] as String,
       px: json['px'] as int? ?? 0,
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
     );
   }
 
@@ -81,7 +72,7 @@ class TableX {
     'ttx': ttx,
     'c': c,
     'px': px,
-    'f': f,
+    'fp': fp,
   };
 
   @override

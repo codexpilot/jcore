@@ -7,16 +7,16 @@ import (
 
 // TableX represents a physical table record from mx.tablex
 type TableX struct {
-	ID  int     `json:"i"`            // Table ID
-	F   int     `json:"f,omitempty"`  // Origin (default 0)
-	D   *int    `json:"d,omitempty"`  // Date of last edit
-	E   *int    `json:"e,omitempty"`  // Last editor user ID
-	A   *int    `json:"a,omitempty"`  // Active status
-	DXI *int    `json:"dxi,omitempty"`// Domain ID
-	N   *string `json:"n,omitempty"`  // Name
-	C   *string `json:"c,omitempty"`  // Code
-	TTX *int    `json:"ttx,omitempty"`// Table type
-	PX  *int    `json:"px,omitempty"` // Partition index
+	ID  int     `json:"i"`             // Table ID
+	FP  int     `json:"fp,omitempty"` // Optional recursive parent identifier
+	D   *int    `json:"d,omitempty"`   // Date of last edit
+	E   *int    `json:"e,omitempty"`   // Last editor user ID
+	A   *int    `json:"a,omitempty"`   // Active status
+	DXI *int    `json:"dxi,omitempty"` // Domain ID
+	N   *string `json:"n,omitempty"`   // Name
+	C   *string `json:"c,omitempty"`   // Code
+	TTX *int    `json:"ttx,omitempty"` // Table type
+	PX  *int    `json:"px,omitempty"`  // Partition index
 }
 
 // TableType represents a decoded table type
@@ -41,7 +41,7 @@ func DecodeTableType(tt int) (*TableType, error) {
 	key := tt - 100000
 	format := key % 10
 	algorithm := (key / 10) % 10
-	logEnabled := (key / 100) % 10 == 1
+	logEnabled := (key/100)%10 == 1
 	policy := (key / 1000) % 10
 
 	var algorithmName string

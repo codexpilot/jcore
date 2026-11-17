@@ -7,8 +7,8 @@ type FieldCapabilities int
 
 const (
 	Bidirectional FieldCapabilities = iota // Can be used for input and output
-	InputOnly                               // Only for input (e.g., passwords)
-	OutputOnly                              // Only for output (e.g., computed fields)
+	InputOnly                              // Only for input (e.g., passwords)
+	OutputOnly                             // Only for output (e.g., computed fields)
 )
 
 func (fc FieldCapabilities) String() string {
@@ -38,7 +38,7 @@ type FieldX struct {
 	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
 	C   string `json:"c"`   // Code (unique)
 	FTX int    `json:"ftx"` // Field type (TypeX Group 7: 400000-400002)
-	F   int    `json:"f"`   // Origin
+	FP  int    `json:"fp"`  // Optional recursive parent identifier
 }
 
 // Capabilities returns the field capabilities based on type
