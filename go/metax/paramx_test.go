@@ -11,13 +11,13 @@ func TestParamX_JSON(t *testing.T) {
 		D:   1700000000000,
 		E:   42,
 		A:   1,
-		DXI:  100,
+		DXI: 100,
 		Q:   500,
 		N:   "User ID",
 		C:   "user_id",
-		DTX:  300004,
+		DTX: 300004,
 		Req: true,
-		F:   0,
+		FP:  0,
 	}
 
 	data, err := json.Marshal(param)

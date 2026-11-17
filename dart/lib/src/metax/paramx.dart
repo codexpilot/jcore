@@ -30,8 +30,8 @@ class ParamX {
   /// Required flag
   final bool req;
 
-  /// Origin
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   const ParamX({
     required this.i,
@@ -44,7 +44,7 @@ class ParamX {
     required this.c,
     required this.dt,
     this.req = false,
-    this.f = 0,
+    this.fp = 0,
   });
 
   factory ParamX.fromJson(Map<String, dynamic> json) {
@@ -59,7 +59,7 @@ class ParamX {
       c: json['c'] as String,
       dt: json['dt'] as int,
       req: json['req'] as bool? ?? false,
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
     );
   }
 
@@ -74,7 +74,7 @@ class ParamX {
     'c': c,
     'dt': dt,
     'req': req,
-    'f': f,
+    'fp': fp,
   };
 
   @override

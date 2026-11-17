@@ -75,15 +75,15 @@ func TestFieldX_JSON(t *testing.T) {
 		D:   1700000000000,
 		E:   42,
 		A:   1,
-		DXI:  100,
+		DXI: 100,
 		N:   "Username",
 		Ent: 500,
 		P:   []int{10, 20},
-		CTX:  200001,
-		DTX:  300001,
+		CTX: 200001,
+		DTX: 300001,
 		C:   "username",
-		FTX:  400000,
-		F:   0,
+		FTX: 400000,
+		FP:  0,
 	}
 
 	// Marshal to JSON

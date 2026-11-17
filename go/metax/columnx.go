@@ -4,17 +4,17 @@ import "encoding/json"
 
 // ColumnX represents a physical column record from mx.columnx
 type ColumnX struct {
-	ID  int     `json:"i"`            // Column ID
-	F   int     `json:"f,omitempty"`  // Origin (default 0)
-	D   *int    `json:"d,omitempty"`  // Date of last edit
-	E   *int    `json:"e,omitempty"`  // Last editor user ID
-	A   *int    `json:"a,omitempty"`  // Active status
-	DXI *int    `json:"dxi,omitempty"`// Domain ID
-	N   *string `json:"n,omitempty"`  // Name
-	C   *string `json:"c,omitempty"`  // Code
-	T   *int    `json:"t,omitempty"`  // Table ID
-	CTX *int    `json:"ctx,omitempty"`// Column type (TypeX Group 5)
-	DTX *int    `json:"dtx,omitempty"`// Data type (TypeX Group 3)
+	ID  int     `json:"i"`             // Column ID
+	FP  int     `json:"fp,omitempty"` // Optional recursive parent identifier
+	D   *int    `json:"d,omitempty"`   // Date of last edit
+	E   *int    `json:"e,omitempty"`   // Last editor user ID
+	A   *int    `json:"a,omitempty"`   // Active status
+	DXI *int    `json:"dxi,omitempty"` // Domain ID
+	N   *string `json:"n,omitempty"`   // Name
+	C   *string `json:"c,omitempty"`   // Code
+	T   *int    `json:"t,omitempty"`   // Table ID
+	CTX *int    `json:"ctx,omitempty"` // Column type (TypeX Group 5)
+	DTX *int    `json:"dtx,omitempty"` // Data type (TypeX Group 3)
 }
 
 // MarshalJSON implements custom JSON marshaling

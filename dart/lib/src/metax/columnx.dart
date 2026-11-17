@@ -31,8 +31,8 @@ class ColumnX {
   /// Data type (TypeX Group 3: JCore types)
   final int dtx;
 
-  /// Origin
-  final int f;
+  /// Optional recursive parent identifier; existence is not guaranteed.
+  final int fp;
 
   const ColumnX({
     required this.i,
@@ -45,7 +45,7 @@ class ColumnX {
     required this.t,
     required this.ctx,
     required this.dtx,
-    this.f = 0,
+    this.fp = 0,
   });
 
   /// Column type role name
@@ -97,7 +97,7 @@ class ColumnX {
       t: json['t'] as int,
       ctx: json['ctx'] as int,
       dtx: json['dtx'] as int,
-      f: json['f'] as int? ?? 0,
+      fp: json['fp'] as int? ?? 0,
     );
   }
 
@@ -112,7 +112,7 @@ class ColumnX {
     't': t,
     'ctx': ctx,
     'dtx': dtx,
-    'f': f,
+    'fp': fp,
   };
 
   @override
