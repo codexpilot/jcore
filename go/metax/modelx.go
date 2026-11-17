@@ -14,7 +14,6 @@ type ModelX struct {
 	C          *string `json:"c,omitempty"`          // Code
 	P          []int   `json:"p,omitempty"`          // Parent model IDs
 	MTX        *int    `json:"mtx,omitempty"`        // Model type
-	Tables     []int   `json:"tables"`               // Associated table IDs
 	ModelState *string `json:"model_state,omitempty"`// Model state (draft/ready)
 }
 
@@ -66,6 +65,5 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	if mx.ModelState != nil {
 		data["model_state"] = *mx.ModelState
 	}
-	data["tables"] = mx.Tables
 	return json.Marshal(data)
 }

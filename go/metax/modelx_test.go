@@ -61,12 +61,11 @@ func TestModelX_JSON(t *testing.T) {
 	model := &ModelX{
 		ID:         1001,
 		A:          intPtr(1),
-		DXI:         intPtr(100),
+		DXI:        intPtr(100),
 		N:          strPtr("User Model"),
 		C:          strPtr("user"),
 		P:          []int{10, 20},
-		MTX:         intPtr(10000),
-		Tables:     []int{500, 501},
+		MTX:        intPtr(10000),
 		ModelState: strPtr("ready"),
 	}
 
@@ -80,7 +79,7 @@ func TestModelX_JSON(t *testing.T) {
 		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
-	if decoded.ID != model.ID || len(decoded.Tables) != len(model.Tables) {
+	if decoded.ID != model.ID || *decoded.DXI != *model.DXI {
 		t.Errorf("JSON roundtrip failed")
 	}
 }
