@@ -7,16 +7,18 @@ jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of 
 
 ## Current implementation
 
-The Dart `jcore` package lives at [`dart`](dart). Its
-public package name and import remain `jcore` and
-`package:jcore/jcore.dart`. jdata is implemented there. jux, jsync, and other
-language implementations remain planned.
+The Dart `jcore` package lives at [`dart`](dart). Its public package name and
+import remain `jcore` and `package:jcore/jcore.dart`; jdata is implemented
+there. The Go MetaX models live at [`go/metax`](go/metax) and are published
+through the [`go`](go) module. jux, jsync, and other language implementations
+remain planned.
 
 ## Language folders
 
 - `dart` — current jdata implementation.
-- `pgsql`, `javascript`, `java`, `swift`, `csharp`, `cplusplus`, and `go` —
-  coming soon.
+- `go` — current MetaX model implementation.
+- `pgsql`, `javascript`, `java`, `swift`, `csharp`, and `cplusplus` — coming
+  soon.
 
 Consumers that depend on JCore through Git should select the Dart package
 subdirectory:
@@ -33,7 +35,8 @@ dependencies:
 For the data type registry, package APIs, and Numeric behavior, see the
 [Dart package README](docs/dart/README.md). For module boundaries and
 future language organization, see the
-[architecture overview](docs/architecture/README.md).
+[architecture overview](docs/architecture/README.md). For the Go MetaX
+models, see the [Go package README](go/metax/README.md).
 Browse the documentation index in [docs/README.md](docs/README.md).
 Contributor credit is listed in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
