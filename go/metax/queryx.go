@@ -48,10 +48,10 @@ type QueryX struct {
 	D            *int                   `json:"d,omitempty"`            // Date of last edit
 	E            *int                   `json:"e,omitempty"`            // Last editor user ID
 	A            *int                   `json:"a,omitempty"`            // Active status
-	DI           *int                   `json:"di,omitempty"`           // Domain ID
+	DXI          *int                   `json:"dxi,omitempty"`          // Domain ID
 	N            *string                `json:"n,omitempty"`            // Name
 	C            *string                `json:"c,omitempty"`            // Code
-	QT           *int                   `json:"qt,omitempty"`           // Query type
+	QTX          *int                   `json:"qtx,omitempty"`          // Query type
 	TargetKind   *string                `json:"target_kind,omitempty"`  // Target kind
 	TableID      *int                   `json:"table_id,omitempty"`     // Table ID
 	ModelID      *int                   `json:"model_id,omitempty"`     // Model ID
@@ -92,8 +92,8 @@ func (q *QueryX) MarshalJSON() ([]byte, error) {
 	if q.A != nil {
 		data["a"] = *q.A
 	}
-	if q.DI != nil {
-		data["di"] = *q.DI
+	if q.DXI != nil {
+		data["dxi"] = *q.DXI
 	}
 	if q.N != nil {
 		data["n"] = *q.N
@@ -101,8 +101,8 @@ func (q *QueryX) MarshalJSON() ([]byte, error) {
 	if q.C != nil {
 		data["c"] = *q.C
 	}
-	if q.QT != nil {
-		data["qt"] = *q.QT
+	if q.QTX != nil {
+		data["qtx"] = *q.QTX
 	}
 	if q.TargetKind != nil {
 		data["target_kind"] = *q.TargetKind

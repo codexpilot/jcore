@@ -19,7 +19,7 @@ func TestModelX_Orientation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &ModelX{MT: tt.mt}
+			m := &ModelX{MTX: tt.mt}
 			if got := m.Orientation(); got != tt.want {
 				t.Errorf("Orientation() = %v, want %v", got, tt.want)
 			}
@@ -28,12 +28,12 @@ func TestModelX_Orientation(t *testing.T) {
 }
 
 func TestModelX_RequiresPhysicalBases(t *testing.T) {
-	independent := &ModelX{MT: intPtr(0)}
+	independent := &ModelX{MTX: intPtr(0)}
 	if independent.RequiresPhysicalBases() {
 		t.Error("Independent model should not require physical bases")
 	}
 
-	dependent := &ModelX{MT: intPtr(10000)}
+	dependent := &ModelX{MTX: intPtr(10000)}
 	if !dependent.RequiresPhysicalBases() {
 		t.Error("Dependent model should require physical bases")
 	}
@@ -61,11 +61,11 @@ func TestModelX_JSON(t *testing.T) {
 	model := &ModelX{
 		ID:         1001,
 		A:          intPtr(1),
-		DI:         intPtr(100),
+		DXI:         intPtr(100),
 		N:          strPtr("User Model"),
 		C:          strPtr("user"),
 		P:          []int{10, 20},
-		MT:         intPtr(10000),
+		MTX:         intPtr(10000),
 		Tables:     []int{500, 501},
 		ModelState: strPtr("ready"),
 	}

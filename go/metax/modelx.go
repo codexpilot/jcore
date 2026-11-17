@@ -9,11 +9,11 @@ type ModelX struct {
 	D          *int    `json:"d,omitempty"`          // Date of last edit
 	E          *int    `json:"e,omitempty"`          // Last editor user ID
 	A          *int    `json:"a,omitempty"`          // Active status
-	DI         *int    `json:"di,omitempty"`         // Domain ID
+	DXI        *int    `json:"dxi,omitempty"`        // Domain ID
 	N          *string `json:"n,omitempty"`          // Name
 	C          *string `json:"c,omitempty"`          // Code
 	P          []int   `json:"p,omitempty"`          // Parent model IDs
-	MT         *int    `json:"mt,omitempty"`         // Model type
+	MTX        *int    `json:"mtx,omitempty"`        // Model type
 	Tables     []int   `json:"tables"`               // Associated table IDs
 	ModelState *string `json:"model_state,omitempty"`// Model state (draft/ready)
 }
@@ -21,10 +21,10 @@ type ModelX struct {
 // Orientation returns the model orientation from MT field
 // 0=independent, 1=model-after-table, 2=table-after-model
 func (m *ModelX) Orientation() int {
-	if m.MT == nil {
+	if m.MTX == nil {
 		return 1
 	}
-	return (*m.MT / 10000) % 10
+	return (*m.MTX / 10000) % 10
 }
 
 // RequiresPhysicalBases returns whether the model requires physical bases
@@ -51,8 +51,8 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	if mx.A != nil {
 		data["a"] = *mx.A
 	}
-	if mx.DI != nil {
-		data["di"] = *mx.DI
+	if mx.DXI != nil {
+		data["dxi"] = *mx.DXI
 	}
 	if mx.N != nil {
 		data["n"] = *mx.N
@@ -60,8 +60,8 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	if mx.P != nil {
 		data["p"] = mx.P
 	}
-	if mx.MT != nil {
-		data["mt"] = *mx.MT
+	if mx.MTX != nil {
+		data["mtx"] = *mx.MTX
 	}
 	if mx.ModelState != nil {
 		data["model_state"] = *mx.ModelState

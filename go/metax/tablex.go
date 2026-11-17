@@ -7,16 +7,16 @@ import (
 
 // TableX represents a physical table record from mx.tablex
 type TableX struct {
-	ID int     `json:"i"`           // Table ID
-	F  int     `json:"f,omitempty"` // Origin (default 0)
-	D  *int    `json:"d,omitempty"` // Date of last edit
-	E  *int    `json:"e,omitempty"` // Last editor user ID
-	A  *int    `json:"a,omitempty"` // Active status
-	DI *int    `json:"di,omitempty"`// Domain ID
-	N  *string `json:"n,omitempty"` // Name
-	C  *string `json:"c,omitempty"` // Code
-	TT *int    `json:"tt,omitempty"`// Table type
-	PX *int    `json:"px,omitempty"`// Partition index
+	ID  int     `json:"i"`            // Table ID
+	F   int     `json:"f,omitempty"`  // Origin (default 0)
+	D   *int    `json:"d,omitempty"`  // Date of last edit
+	E   *int    `json:"e,omitempty"`  // Last editor user ID
+	A   *int    `json:"a,omitempty"`  // Active status
+	DXI *int    `json:"dxi,omitempty"`// Domain ID
+	N   *string `json:"n,omitempty"`  // Name
+	C   *string `json:"c,omitempty"`  // Code
+	TTX *int    `json:"ttx,omitempty"`// Table type
+	PX  *int    `json:"px,omitempty"` // Partition index
 }
 
 // TableType represents a decoded table type
@@ -179,14 +179,14 @@ func (t *TableX) MarshalJSON() ([]byte, error) {
 	if t.A != nil {
 		data["a"] = *t.A
 	}
-	if t.DI != nil {
-		data["di"] = *t.DI
+	if t.DXI != nil {
+		data["dxi"] = *t.DXI
 	}
 	if t.N != nil {
 		data["n"] = *t.N
 	}
-	if t.TT != nil {
-		data["tt"] = *t.TT
+	if t.TTX != nil {
+		data["ttx"] = *t.TTX
 	}
 	if t.PX != nil {
 		data["px"] = *t.PX

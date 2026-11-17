@@ -8,11 +8,11 @@ type ParamX struct {
 	D   int    `json:"d"`   // Last edit timestamp
 	E   int    `json:"e"`   // Editor user ID
 	A   int    `json:"a"`   // Active status
-	DI  int    `json:"di"`  // Domain ID
+	DXI int    `json:"dxi"` // Domain ID
 	Q   int    `json:"q"`   // Query ID
 	N   string `json:"n"`   // Display name
 	C   string `json:"c"`   // Code (unique within query)
-	DT  int    `json:"dt"`  // Data type (TypeX Group 3)
+	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
 	Req bool   `json:"req"` // Required flag
 	F   int    `json:"f"`   // Origin
 }

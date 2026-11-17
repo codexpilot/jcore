@@ -19,7 +19,7 @@ func TestFieldX_Capabilities(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &FieldX{FT: tt.ft}
+			f := &FieldX{FTX: tt.ft}
 			if got := f.Capabilities(); got != tt.want {
 				t.Errorf("Capabilities() = %v, want %v", got, tt.want)
 			}
@@ -40,7 +40,7 @@ func TestFieldX_CanInput(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &FieldX{FT: tt.ft}
+			f := &FieldX{FTX: tt.ft}
 			if got := f.CanInput(); got != tt.want {
 				t.Errorf("CanInput() = %v, want %v", got, tt.want)
 			}
@@ -61,7 +61,7 @@ func TestFieldX_CanOutput(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &FieldX{FT: tt.ft}
+			f := &FieldX{FTX: tt.ft}
 			if got := f.CanOutput(); got != tt.want {
 				t.Errorf("CanOutput() = %v, want %v", got, tt.want)
 			}
@@ -75,14 +75,14 @@ func TestFieldX_JSON(t *testing.T) {
 		D:   1700000000000,
 		E:   42,
 		A:   1,
-		DI:  100,
+		DXI:  100,
 		N:   "Username",
 		Ent: 500,
 		P:   []int{10, 20},
-		CT:  200001,
-		DT:  300001,
+		CTX:  200001,
+		DTX:  300001,
 		C:   "username",
-		FT:  400000,
+		FTX:  400000,
 		F:   0,
 	}
 

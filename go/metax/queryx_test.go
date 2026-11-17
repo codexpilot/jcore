@@ -68,10 +68,10 @@ func TestQueryX_JSON(t *testing.T) {
 	query := &QueryX{
 		ID:           1001,
 		A:            intPtr(1),
-		DI:           intPtr(100),
+		DXI:           intPtr(100),
 		N:            strPtr("Get User"),
 		C:            strPtr("get_user"),
-		QT:           &qt,
+		QTX:           &qt,
 		TargetKind:   strPtr("table"),
 		TableID:      intPtr(500),
 		InputFields:  []int{10, 20},
@@ -88,7 +88,7 @@ func TestQueryX_JSON(t *testing.T) {
 		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
-	if decoded.ID != query.ID || *decoded.QT != *query.QT {
+	if decoded.ID != query.ID || *decoded.QTX != *query.QTX {
 		t.Errorf("JSON roundtrip failed")
 	}
 }

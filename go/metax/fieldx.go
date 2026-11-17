@@ -30,20 +30,20 @@ type FieldX struct {
 	D   int    `json:"d"`   // Last edit timestamp
 	E   int    `json:"e"`   // Editor user ID
 	A   int    `json:"a"`   // Active status
-	DI  int    `json:"di"`  // Domain ID
+	DXI int    `json:"dxi"` // Domain ID
 	N   string `json:"n"`   // Display name
 	Ent int    `json:"ent"` // Parent entity ID
 	P   []int  `json:"p"`   // Parent column IDs (storage binding)
-	CT  int    `json:"ct"`  // Column type (TypeX Group 5)
-	DT  int    `json:"dt"`  // Data type (TypeX Group 3)
+	CTX int    `json:"ctx"` // Column type (TypeX Group 5)
+	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
 	C   string `json:"c"`   // Code (unique)
-	FT  int    `json:"ft"`  // Field type (TypeX Group 7: 400000-400002)
+	FTX int    `json:"ftx"` // Field type (TypeX Group 7: 400000-400002)
 	F   int    `json:"f"`   // Origin
 }
 
 // Capabilities returns the field capabilities based on type
 func (f *FieldX) Capabilities() FieldCapabilities {
-	switch f.FT {
+	switch f.FTX {
 	case 400000:
 		return Bidirectional
 	case 400001:
@@ -57,12 +57,12 @@ func (f *FieldX) Capabilities() FieldCapabilities {
 
 // CanInput returns whether this field can be used for input
 func (f *FieldX) CanInput() bool {
-	return f.FT == 400000 || f.FT == 400001
+	return f.FTX == 400000 || f.FTX == 400001
 }
 
 // CanOutput returns whether this field can be used for output
 func (f *FieldX) CanOutput() bool {
-	return f.FT == 400000 || f.FT == 400002
+	return f.FTX == 400000 || f.FTX == 400002
 }
 
 // String returns a string representation of the field

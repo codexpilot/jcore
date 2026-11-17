@@ -8,7 +8,7 @@ import (
 func TestSqlX_JSON(t *testing.T) {
 	sqlx := &SqlX{
 		ID:  1001,
-		DI:  intPtr(100),
+		DXI:  intPtr(100),
 		Q:   intPtr(500),
 		N:   strPtr("Get User SQL"),
 		C:   strPtr("get_user_pg"),

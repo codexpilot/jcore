@@ -9,12 +9,12 @@ func TestColumnX_JSON(t *testing.T) {
 	column := &ColumnX{
 		ID: 1001,
 		A:  intPtr(1),
-		DI: intPtr(100),
+		DXI: intPtr(100),
 		N:  strPtr("id"),
 		C:  strPtr("i"),
 		T:  intPtr(500),
-		CT: intPtr(200001),
-		DT: intPtr(300004),
+		CTX: intPtr(200001),
+		DTX: intPtr(300004),
 	}
 
 	data, err := json.Marshal(column)
@@ -27,7 +27,7 @@ func TestColumnX_JSON(t *testing.T) {
 		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
-	if decoded.ID != column.ID || *decoded.CT != *column.CT || *decoded.DT != *column.DT {
+	if decoded.ID != column.ID || *decoded.CTX != *column.CTX || *decoded.DTX != *column.DTX {
 		t.Errorf("JSON roundtrip failed")
 	}
 }

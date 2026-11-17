@@ -11,11 +11,11 @@ func TestParamX_JSON(t *testing.T) {
 		D:   1700000000000,
 		E:   42,
 		A:   1,
-		DI:  100,
+		DXI:  100,
 		Q:   500,
 		N:   "User ID",
 		C:   "user_id",
-		DT:  300004,
+		DTX:  300004,
 		Req: true,
 		F:   0,
 	}

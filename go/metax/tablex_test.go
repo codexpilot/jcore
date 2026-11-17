@@ -105,9 +105,9 @@ func TestTableX_JSON(t *testing.T) {
 	table := &TableX{
 		ID: 1001,
 		A:  intPtr(1),
-		DI: intPtr(100),
+		DXI: intPtr(100),
 		N:  strPtr("Users Table"),
-		TT: &tt,
+		TTX: &tt,
 	}
 
 	data, err := json.Marshal(table)
@@ -120,7 +120,7 @@ func TestTableX_JSON(t *testing.T) {
 		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
-	if decoded.ID != table.ID || *decoded.TT != *table.TT {
+	if decoded.ID != table.ID || *decoded.TTX != *table.TTX {
 		t.Errorf("JSON roundtrip failed")
 	}
 }
