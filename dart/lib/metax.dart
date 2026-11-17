@@ -4,7 +4,7 @@
 /// - DomainX: Domain hierarchy (cox.domainx)
 /// - TableX: Physical tables (mx.tablex)
 /// - ColumnX: Physical columns (mx.columnx)
-/// - EntityX: Logical entities (mx.entityx)
+/// - ModelX: Logical models (mx.modelx)
 /// - FieldX: Logical fields (mx.fieldx)
 /// - QueryX: Query operations (mx.queryx)
 /// - ParamX: Query parameters (mx.paramx)
@@ -14,7 +14,7 @@ library metax;
 export 'src/metax/domainx.dart';
 export 'src/metax/tablex.dart';
 export 'src/metax/columnx.dart';
-export 'src/metax/entityx.dart';
+export 'src/metax/modelx.dart';
 export 'src/metax/fieldx.dart';
 export 'src/metax/queryx.dart';
 export 'src/metax/paramx.dart';
