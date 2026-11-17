@@ -12,8 +12,8 @@ class ModelX {
   /// Active status
   final int a;
 
-  /// Domain ID
-  final int di;
+  /// Domain ID reference
+  final int dxi;
 
   /// Display name
   final String n;
@@ -25,7 +25,7 @@ class ModelX {
   final String c;
 
   /// Model type (TypeX Group 6: 300000-399999)
-  final int mt;
+  final int mtx;
 
   /// Model state: draft | ready
   final String modelState;
@@ -38,20 +38,20 @@ class ModelX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.n,
     this.p = const [],
     required this.c,
-    this.mt = 320001,
+    this.mtx = 320001,
     this.modelState = 'draft',
     this.f = 0,
   });
 
   /// Model type category
   ModelTypeCategory get category {
-    if (mt >= 300000 && mt <= 300004) return ModelTypeCategory.operationOnly;
-    if (mt >= 310001 && mt <= 310004) return ModelTypeCategory.storageMapped;
-    if (mt >= 320001 && mt <= 320004) return ModelTypeCategory.modelFirst;
+    if (mtx >= 300000 && mtx <= 300004) return ModelTypeCategory.operationOnly;
+    if (mtx >= 310001 && mtx <= 310004) return ModelTypeCategory.storageMapped;
+    if (mtx >= 320001 && mtx <= 320004) return ModelTypeCategory.modelFirst;
     return ModelTypeCategory.unknown;
   }
 
@@ -64,11 +64,11 @@ class ModelX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       n: json['n'] as String,
       p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
-      mt: json['mt'] as int? ?? 320001,
+      mtx: json['mtx'] as int? ?? 320001,
       modelState: json['model_state'] as String? ?? 'draft',
       f: json['f'] as int? ?? 0,
     );
@@ -79,11 +79,11 @@ class ModelX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'n': n,
     'p': p,
     'c': c,
-    'mt': mt,
+    'mtx': mtx,
     'model_state': modelState,
     'f': f,
   };

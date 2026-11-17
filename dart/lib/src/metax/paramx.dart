@@ -13,7 +13,7 @@ class ParamX {
   final int a;
 
   /// Domain ID
-  final int di;
+  final int dxi;
 
   /// Query ID
   final int q;
@@ -38,7 +38,7 @@ class ParamX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.q,
     required this.n,
     required this.c,
@@ -53,7 +53,7 @@ class ParamX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       q: json['q'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
@@ -68,7 +68,7 @@ class ParamX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'q': q,
     'n': n,
     'c': c,

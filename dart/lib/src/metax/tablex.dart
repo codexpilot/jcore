@@ -12,15 +12,15 @@ class TableX {
   /// Active status
   final int a;
 
-  /// Domain ID
-  final int di;
+  /// Domain ID reference
+  final int dxi;
 
   /// Display name
   final String n;
 
   /// Table type (TypeX Group 4 catalog ID)
   /// Default: 100014 (Private · Log Off · Auto Increment · BIGINT)
-  final int tt;
+  final int ttx;
 
   /// Code (unique within domain)
   final String c;
@@ -36,16 +36,16 @@ class TableX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.n,
-    this.tt = 100014,
+    this.ttx = 100014,
     required this.c,
     this.px = 0,
     this.f = 0,
   });
 
   /// Decode table type into components
-  TableTypeDecoded get tableType => TableTypeDecoded.decode(tt);
+  TableTypeDecoded get tableType => TableTypeDecoded.decode(ttx);
 
   /// Is this table native to this domain?
   bool get isNative => f == 0;
@@ -62,9 +62,9 @@ class TableX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       n: json['n'] as String,
-      tt: json['tt'] as int? ?? 100014,
+      ttx: json['ttx'] as int? ?? 100014,
       c: json['c'] as String,
       px: json['px'] as int? ?? 0,
       f: json['f'] as int? ?? 0,
@@ -76,16 +76,16 @@ class TableX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'n': n,
-    'tt': tt,
+    'ttx': ttx,
     'c': c,
     'px': px,
     'f': f,
   };
 
   @override
-  String toString() => 'TableX(i=$i, n=$n, c=$c, tt=$tt)';
+  String toString() => 'TableX(i=$i, n=$n, c=$c, ttx=$ttx)';
 
   @override
   bool operator ==(Object other) =>

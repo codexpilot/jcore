@@ -13,7 +13,7 @@ class FieldX {
   final int a;
 
   /// Domain ID
-  final int di;
+  final int dxi;
 
   /// Display name
   final String n;
@@ -25,17 +25,17 @@ class FieldX {
   final List<int> p;
 
   /// Column type (TypeX Group 5)
-  final int ct;
+  final int ctx;
 
   /// Data type (TypeX Group 3)
-  final int dt;
+  final int dtx;
 
   /// Code (unique)
   final String c;
 
   /// Field type (TypeX Group 7: 400000-400002)
   /// 400000=Bidirectional, 400001=Input-only, 400002=Output-only
-  final int ft;
+  final int ftx;
 
   /// Origin
   final int f;
@@ -45,20 +45,20 @@ class FieldX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.n,
     required this.ent,
     this.p = const [],
-    required this.ct,
-    required this.dt,
+    required this.ctx,
+    required this.dtx,
     required this.c,
-    this.ft = 400000,
+    this.ftx = 400000,
     this.f = 0,
   });
 
   /// Field capabilities based on type
   FieldCapabilities get capabilities {
-    switch (ft) {
+    switch (ftx) {
       case 400000:
         return FieldCapabilities.bidirectional;
       case 400001:
@@ -71,10 +71,10 @@ class FieldX {
   }
 
   /// Can this field be used for input?
-  bool get canInput => ft == 400000 || ft == 400001;
+  bool get canInput => ftx == 400000 || ftx == 400001;
 
   /// Can this field be used for output?
-  bool get canOutput => ft == 400000 || ft == 400002;
+  bool get canOutput => ftx == 400000 || ftx == 400002;
 
   factory FieldX.fromJson(Map<String, dynamic> json) {
     return FieldX(
@@ -82,14 +82,14 @@ class FieldX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       n: json['n'] as String,
       ent: json['ent'] as int,
       p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
-      ct: json['ct'] as int,
-      dt: json['dt'] as int,
+      ctx: json['ctx'] as int,
+      dtx: json['dtx'] as int,
       c: json['c'] as String,
-      ft: json['ft'] as int? ?? 400000,
+      ftx: json['ftx'] as int? ?? 400000,
       f: json['f'] as int? ?? 0,
     );
   }
@@ -99,14 +99,14 @@ class FieldX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'n': n,
     'ent': ent,
     'p': p,
-    'ct': ct,
-    'dt': dt,
+    'ctx': ctx,
+    'dtx': dtx,
     'c': c,
-    'ft': ft,
+    'ftx': ftx,
     'f': f,
   };
 

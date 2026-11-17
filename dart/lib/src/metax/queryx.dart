@@ -13,7 +13,7 @@ class QueryX {
   final int a;
 
   /// Domain ID
-  final int di;
+  final int dxi;
 
   /// Display name
   final String n;
@@ -31,7 +31,7 @@ class QueryX {
   final int? modelId;
 
   /// Query type (TypeX Group 8: 500000-520001)
-  final int qt;
+  final int qtx;
 
   /// Origin
   final int f;
@@ -50,13 +50,13 @@ class QueryX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.n,
     required this.c,
     this.targetKind = 'model',
     this.tableId,
     this.modelId,
-    required this.qt,
+    required this.qtx,
     this.f = 0,
     this.inputFields,
     this.outputFields,
@@ -65,17 +65,17 @@ class QueryX {
 
   /// Query type category
   QueryTypeCategory get category {
-    if (qt >= 500000 && qt <= 500001) return QueryTypeCategory.system;
-    if (qt >= 510000 && qt <= 510001) return QueryTypeCategory.table;
-    if (qt >= 520000 && qt <= 520001) return QueryTypeCategory.model;
+    if (qtx >= 500000 && qtx <= 500001) return QueryTypeCategory.system;
+    if (qtx >= 510000 && qtx <= 510001) return QueryTypeCategory.table;
+    if (qtx >= 520000 && qtx <= 520001) return QueryTypeCategory.model;
     return QueryTypeCategory.unknown;
   }
 
   /// Is this a Get operation?
-  bool get isGet => qt % 2 == 0;
+  bool get isGet => qtx % 2 == 0;
 
   /// Is this a Set operation?
-  bool get isSet => qt % 2 == 1;
+  bool get isSet => qtx % 2 == 1;
 
   factory QueryX.fromJson(Map<String, dynamic> json) {
     return QueryX(
@@ -83,13 +83,13 @@ class QueryX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
       targetKind: json['target_kind'] as String? ?? 'model',
       tableId: json['table_id'] as int?,
       modelId: json['model_id'] as int?,
-      qt: json['qt'] as int,
+      qtx: json['qtx'] as int,
       f: json['f'] as int? ?? 0,
       inputFields: (json['input_fields'] as List<dynamic>?)?.cast<int>(),
       outputFields: (json['output_fields'] as List<dynamic>?)?.cast<int>(),
@@ -102,13 +102,13 @@ class QueryX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'n': n,
     'c': c,
     'target_kind': targetKind,
     if (tableId != null) 'table_id': tableId,
     if (modelId != null) 'model_id': modelId,
-    'qt': qt,
+    'qtx': qtx,
     'f': f,
     if (inputFields != null) 'input_fields': inputFields,
     if (outputFields != null) 'output_fields': outputFields,

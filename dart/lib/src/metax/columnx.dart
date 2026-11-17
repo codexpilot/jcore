@@ -12,8 +12,8 @@ class ColumnX {
   /// Active status
   final int a;
 
-  /// Domain ID
-  final int di;
+  /// Domain ID reference
+  final int dxi;
 
   /// Display name
   final String n;
@@ -26,10 +26,10 @@ class ColumnX {
 
   /// Column type (TypeX Group 5: 200000-200012)
   /// 200000=User-defined, 200001=i, 200002=d, 200003=e, 200004=a, etc.
-  final int ct;
+  final int ctx;
 
   /// Data type (TypeX Group 3: JCore types)
-  final int dt;
+  final int dtx;
 
   /// Origin
   final int f;
@@ -39,18 +39,18 @@ class ColumnX {
     required this.d,
     required this.e,
     required this.a,
-    required this.di,
+    required this.dxi,
     required this.n,
     required this.c,
     required this.t,
-    required this.ct,
-    required this.dt,
+    required this.ctx,
+    required this.dtx,
     this.f = 0,
   });
 
   /// Column type role name
   String get columnTypeRole {
-    switch (ct) {
+    switch (ctx) {
       case 200000:
         return 'user-defined';
       case 200001:
@@ -83,7 +83,7 @@ class ColumnX {
   }
 
   /// Is this a system role column (not user-defined)?
-  bool get isSystemRole => ct != 200000;
+  bool get isSystemRole => ctx != 200000;
 
   factory ColumnX.fromJson(Map<String, dynamic> json) {
     return ColumnX(
@@ -91,12 +91,12 @@ class ColumnX {
       d: json['d'] as int,
       e: json['e'] as int,
       a: json['a'] as int,
-      di: json['di'] as int,
+      dxi: json['dxi'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
       t: json['t'] as int,
-      ct: json['ct'] as int,
-      dt: json['dt'] as int,
+      ctx: json['ctx'] as int,
+      dtx: json['dtx'] as int,
       f: json['f'] as int? ?? 0,
     );
   }
@@ -106,12 +106,12 @@ class ColumnX {
     'd': d,
     'e': e,
     'a': a,
-    'di': di,
+    'dxi': dxi,
     'n': n,
     'c': c,
     't': t,
-    'ct': ct,
-    'dt': dt,
+    'ctx': ctx,
+    'dtx': dtx,
     'f': f,
   };
 

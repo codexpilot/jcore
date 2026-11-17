@@ -125,9 +125,9 @@ void main() {
         d: 1700000000000,
         e: 1,
         a: 1,
-        di: 1,
+        dxi: 1,
         n: 'Test Table',
-        tt: 100014, // Private, Log Off, Auto Increment, BIGINT
+        ttx: 100014, // Private, Log Off, Auto Increment, BIGINT
         c: 'test_table',
       );
 
@@ -144,7 +144,7 @@ void main() {
         d: 1700000000000,
         e: 1,
         a: 1,
-        di: 1,
+        dxi: 1,
         n: 'Native',
         c: 'native',
         f: 0,
@@ -155,7 +155,7 @@ void main() {
         d: 1700000000000,
         e: 1,
         a: 1,
-        di: 1,
+        dxi: 1,
         n: 'Copied',
         c: 'copied',
         f: 100,
@@ -166,7 +166,7 @@ void main() {
         d: 1700000000000,
         e: 1,
         a: 1,
-        di: 1,
+        dxi: 1,
         n: 'Imported',
         c: 'imported',
         f: -100,
