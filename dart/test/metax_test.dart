@@ -127,6 +127,7 @@ void main() {
         a: 1,
         dxi: 1,
         n: 'Test Table',
+        f: 0,
         ttx: 100014, // Private, Log Off, Auto Increment, BIGINT
         c: 'test_table',
       );
@@ -146,6 +147,7 @@ void main() {
         a: 1,
         dxi: 1,
         n: 'Table',
+        f: 0,
         c: 'table',
         fp: 100,
       );

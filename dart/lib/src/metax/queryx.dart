@@ -18,6 +18,9 @@ class QueryX {
   /// Display name
   final String n;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Code (operation identifier)
   final String c;
 
@@ -52,6 +55,7 @@ class QueryX {
     required this.a,
     required this.dxi,
     required this.n,
+    required this.f,
     required this.c,
     this.targetKind = 'model',
     this.tableId,
@@ -85,6 +89,7 @@ class QueryX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       n: json['n'] as String,
+      f: json['f'] as int,
       c: json['c'] as String,
       targetKind: json['target_kind'] as String? ?? 'model',
       tableId: json['table_id'] as int?,
@@ -104,6 +109,7 @@ class QueryX {
     'a': a,
     'dxi': dxi,
     'n': n,
+    'f': f,
     'c': c,
     'target_kind': targetKind,
     if (tableId != null) 'table_id': tableId,

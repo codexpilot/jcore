@@ -14,6 +14,7 @@ type TableX struct {
 	A   *int    `json:"a,omitempty"`   // Active status
 	DXI *int    `json:"dxi,omitempty"` // Domain ID
 	N   *string `json:"n,omitempty"`   // Name
+	F   *int    `json:"f,omitempty"`   // Provenance: 0=native, >0=copied, <0=imported
 	C   *string `json:"c,omitempty"`   // Code
 	TTX *int    `json:"ttx,omitempty"` // Table type
 	PX  *int    `json:"px,omitempty"`  // Partition index
@@ -184,6 +185,9 @@ func (t *TableX) MarshalJSON() ([]byte, error) {
 	}
 	if t.N != nil {
 		data["n"] = *t.N
+	}
+	if t.F != nil {
+		data["f"] = *t.F
 	}
 	if t.TTX != nil {
 		data["ttx"] = *t.TTX

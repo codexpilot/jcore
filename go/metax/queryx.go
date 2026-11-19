@@ -50,6 +50,7 @@ type QueryX struct {
 	A            *int                   `json:"a,omitempty"`             // Active status
 	DXI          *int                   `json:"dxi,omitempty"`           // Domain ID
 	N            *string                `json:"n,omitempty"`             // Name
+	F            *int                   `json:"f,omitempty"`             // Provenance: 0=native, >0=copied, <0=imported
 	C            *string                `json:"c,omitempty"`             // Code
 	QTX          *int                   `json:"qtx,omitempty"`           // Query type
 	TargetKind   *string                `json:"target_kind,omitempty"`   // Target kind
@@ -97,6 +98,9 @@ func (q *QueryX) MarshalJSON() ([]byte, error) {
 	}
 	if q.N != nil {
 		data["n"] = *q.N
+	}
+	if q.F != nil {
+		data["f"] = *q.F
 	}
 	if q.C != nil {
 		data["c"] = *q.C

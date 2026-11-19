@@ -11,8 +11,9 @@ type ModelX struct {
 	A          *int    `json:"a,omitempty"`          // Active status
 	DXI        *int    `json:"dxi,omitempty"`        // Domain ID
 	N          *string `json:"n,omitempty"`          // Name
+	F          *int    `json:"f,omitempty"`          // Provenance: 0=native, >0=copied, <0=imported
 	C          *string `json:"c,omitempty"`          // Code
-	P          []int   `json:"p,omitempty"`          // Parent model IDs
+	Ps         []int   `json:"ps,omitempty"`         // Parent model IDs
 	MTX        *int    `json:"mtx,omitempty"`        // Model type
 }
 
@@ -45,8 +46,11 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	if mx.N != nil {
 		data["n"] = *mx.N
 	}
-	if mx.P != nil {
-		data["p"] = mx.P
+	if mx.F != nil {
+		data["f"] = *mx.F
+	}
+	if mx.Ps != nil {
+		data["ps"] = mx.Ps
 	}
 	if mx.MTX != nil {
 		data["mtx"] = *mx.MTX

@@ -18,6 +18,9 @@ class TableX {
   /// Display name
   final String n;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Table type (TypeX Group 4 catalog ID)
   /// Default: 100014 (Private · Log Off · Auto Increment · BIGINT)
   final int ttx;
@@ -38,6 +41,7 @@ class TableX {
     required this.a,
     required this.dxi,
     required this.n,
+    required this.f,
     this.ttx = 100014,
     required this.c,
     this.px = 0,
@@ -55,6 +59,7 @@ class TableX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       n: json['n'] as String,
+      f: json['f'] as int,
       ttx: json['ttx'] as int? ?? 100014,
       c: json['c'] as String,
       px: json['px'] as int? ?? 0,
@@ -69,6 +74,7 @@ class TableX {
     'a': a,
     'dxi': dxi,
     'n': n,
+    'f': f,
     'ttx': ttx,
     'c': c,
     'px': px,

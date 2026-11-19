@@ -18,8 +18,11 @@ class ModelX {
   /// Display name
   final String n;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Parent model IDs
-  final List<int> p;
+  final List<int> ps;
 
   /// Code (unique)
   final String c;
@@ -37,7 +40,8 @@ class ModelX {
     required this.a,
     required this.dxi,
     required this.n,
-    this.p = const [],
+    required this.f,
+    this.ps = const [],
     required this.c,
     this.mtx = 320001,
     this.fp = 0,
@@ -59,7 +63,8 @@ class ModelX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       n: json['n'] as String,
-      p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
+      f: json['f'] as int,
+      ps: (json['ps'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
       mtx: json['mtx'] as int? ?? 320001,
       fp: json['fp'] as int? ?? 0,
@@ -73,7 +78,8 @@ class ModelX {
     'a': a,
     'dxi': dxi,
     'n': n,
-    'p': p,
+    'f': f,
+    'ps': ps,
     'c': c,
     'mtx': mtx,
     'fp': fp,

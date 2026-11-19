@@ -11,6 +11,7 @@ type ColumnX struct {
 	A   *int    `json:"a,omitempty"`   // Active status
 	DXI *int    `json:"dxi,omitempty"` // Domain ID
 	N   *string `json:"n,omitempty"`   // Name
+	F   *int    `json:"f,omitempty"`   // Provenance: 0=native, >0=copied, <0=imported
 	C   *string `json:"c,omitempty"`   // Code
 	T   *int    `json:"t,omitempty"`   // Table ID
 	CTX *int    `json:"ctx,omitempty"` // Column type (TypeX Group 5)
@@ -31,6 +32,9 @@ func (c *ColumnX) MarshalJSON() ([]byte, error) {
 	}
 	if c.N != nil {
 		data["n"] = *c.N
+	}
+	if c.F != nil {
+		data["f"] = *c.F
 	}
 	if c.T != nil {
 		data["t"] = *c.T

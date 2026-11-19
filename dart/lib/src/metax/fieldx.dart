@@ -18,6 +18,9 @@ class FieldX {
   /// Display name
   final String n;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Parent entity ID
   final int ent;
 
@@ -47,6 +50,7 @@ class FieldX {
     required this.a,
     required this.dxi,
     required this.n,
+    required this.f,
     required this.ent,
     this.p = const [],
     required this.ctx,
@@ -84,6 +88,7 @@ class FieldX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       n: json['n'] as String,
+      f: json['f'] as int,
       ent: json['ent'] as int,
       p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
       ctx: json['ctx'] as int,
@@ -101,6 +106,7 @@ class FieldX {
     'a': a,
     'dxi': dxi,
     'n': n,
+    'f': f,
     'ent': ent,
     'p': p,
     'ctx': ctx,

@@ -18,6 +18,9 @@ class ColumnX {
   /// Display name
   final String n;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Code (unique within domain)
   final String c;
 
@@ -41,6 +44,7 @@ class ColumnX {
     required this.a,
     required this.dxi,
     required this.n,
+    required this.f,
     required this.c,
     required this.t,
     required this.ctx,
@@ -93,6 +97,7 @@ class ColumnX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       n: json['n'] as String,
+      f: json['f'] as int,
       c: json['c'] as String,
       t: json['t'] as int,
       ctx: json['ctx'] as int,
@@ -108,6 +113,7 @@ class ColumnX {
     'a': a,
     'dxi': dxi,
     'n': n,
+    'f': f,
     'c': c,
     't': t,
     'ctx': ctx,

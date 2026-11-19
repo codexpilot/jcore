@@ -9,6 +9,7 @@ type ParamX struct {
 	E   int    `json:"e"`   // Editor user ID
 	A   int    `json:"a"`   // Active status
 	DXI int    `json:"dxi"` // Domain ID
+	F   int    `json:"f"`   // Provenance: 0=native, >0=copied, <0=imported
 	Q   int    `json:"q"`   // Query ID
 	N   string `json:"n"`   // Display name
 	C   string `json:"c"`   // Code (unique within query)

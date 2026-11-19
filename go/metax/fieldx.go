@@ -32,6 +32,7 @@ type FieldX struct {
 	A   int    `json:"a"`   // Active status
 	DXI int    `json:"dxi"` // Domain ID
 	N   string `json:"n"`   // Display name
+	F   int    `json:"f"`   // Provenance: 0=native, >0=copied, <0=imported
 	Ent int    `json:"ent"` // Parent entity ID
 	P   []int  `json:"p"`   // Parent column IDs (storage binding)
 	CTX int    `json:"ctx"` // Column type (TypeX Group 5)

@@ -15,6 +15,9 @@ class ParamX {
   /// Domain ID
   final int dxi;
 
+  /// Provenance: 0=native, >0=copied, <0=imported
+  final int f;
+
   /// Query ID
   final int q;
 
@@ -39,6 +42,7 @@ class ParamX {
     required this.e,
     required this.a,
     required this.dxi,
+    required this.f,
     required this.q,
     required this.n,
     required this.c,
@@ -54,6 +58,7 @@ class ParamX {
       e: json['e'] as int,
       a: json['a'] as int,
       dxi: json['dxi'] as int,
+      f: json['f'] as int,
       q: json['q'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
@@ -69,6 +74,7 @@ class ParamX {
     'e': e,
     'a': a,
     'dxi': dxi,
+    'f': f,
     'q': q,
     'n': n,
     'c': c,

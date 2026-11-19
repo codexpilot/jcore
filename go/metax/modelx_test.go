@@ -46,7 +46,7 @@ func TestModelX_JSON(t *testing.T) {
 		DXI:        intPtr(100),
 		N:          strPtr("User Model"),
 		C:          strPtr("user"),
-		P:          []int{10, 20},
+		Ps:         []int{10, 20},
 		MTX:        intPtr(10000),
 	}
 
