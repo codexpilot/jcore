@@ -15,8 +15,8 @@ class SqlX {
   /// Domain ID
   final int dxi;
 
-  /// Query ID
-  final int q;
+  /// Query ID (references queryx.i)
+  final int qxi;
 
   /// Display name
   final String n;
@@ -39,7 +39,7 @@ class SqlX {
     required this.e,
     required this.a,
     required this.dxi,
-    required this.q,
+    required this.qxi,
     required this.n,
     required this.c,
     required this.dbt,
@@ -54,7 +54,7 @@ class SqlX {
       e: json['e'] as int,
       a: json['a'] as int,
       dxi: json['dxi'] as int,
-      q: json['q'] as int,
+      qxi: json['qxi'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
       dbt: json['dbt'] as int,
@@ -69,7 +69,7 @@ class SqlX {
     'e': e,
     'a': a,
     'dxi': dxi,
-    'q': q,
+    'qxi': qxi,
     'n': n,
     'c': c,
     'dbt': dbt,
@@ -78,7 +78,7 @@ class SqlX {
   };
 
   @override
-  String toString() => 'SqlX(i=$i, n=$n, q=$q, dbt=$dbt)';
+  String toString() => 'SqlX(i=$i, n=$n, qxi=$qxi, dbt=$dbt)';
 
   @override
   bool operator ==(Object other) =>

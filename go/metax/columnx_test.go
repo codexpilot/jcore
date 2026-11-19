@@ -7,12 +7,12 @@ import (
 
 func TestColumnX_JSON(t *testing.T) {
 	column := &ColumnX{
-		ID: 1001,
-		A:  intPtr(1),
+		ID:  1001,
+		A:   intPtr(1),
 		DXI: intPtr(100),
-		N:  strPtr("id"),
-		C:  strPtr("i"),
-		T:  intPtr(500),
+		N:   strPtr("id"),
+		C:   strPtr("i"),
+		TXI: intPtr(500),
 		CTX: intPtr(200001),
 		DTX: intPtr(300004),
 	}

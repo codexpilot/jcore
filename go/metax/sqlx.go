@@ -11,7 +11,7 @@ type SqlX struct {
 	D   *string `json:"d,omitempty"`  // Date of last edit
 	E   *string `json:"e,omitempty"`  // Last editor user ID
 	DXI *int    `json:"dxi,omitempty"`// Domain ID
-	Q   *int    `json:"q,omitempty"`  // Query ID
+	QXI *int    `json:"qxi,omitempty"`// Query ID (references queryx.i)
 	N   *string `json:"n,omitempty"`  // Name
 	C   *string `json:"c,omitempty"`  // Code
 	DBT *int    `json:"dbt,omitempty"`// Database type
@@ -27,8 +27,8 @@ func (s *SqlX) MarshalJSON() ([]byte, error) {
 	if s.DXI != nil {
 		data["dxi"] = *s.DXI
 	}
-	if s.Q != nil {
-		data["q"] = *s.Q
+	if s.QXI != nil {
+		data["qxi"] = *s.QXI
 	}
 	if s.N != nil {
 		data["n"] = *s.N

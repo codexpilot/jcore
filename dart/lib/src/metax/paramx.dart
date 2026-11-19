@@ -18,8 +18,8 @@ class ParamX {
   /// Provenance: 0=native, >0=copied, <0=imported
   final int f;
 
-  /// Query ID
-  final int q;
+  /// Query ID (references queryx.i)
+  final int qxi;
 
   /// Display name
   final String n;
@@ -28,7 +28,7 @@ class ParamX {
   final String c;
 
   /// Data type (TypeX Group 3)
-  final int dt;
+  final int dtx;
 
   /// Required flag
   final bool req;
@@ -43,10 +43,10 @@ class ParamX {
     required this.a,
     required this.dxi,
     required this.f,
-    required this.q,
+    required this.qxi,
     required this.n,
     required this.c,
-    required this.dt,
+    required this.dtx,
     this.req = false,
     this.fp = 0,
   });
@@ -59,10 +59,10 @@ class ParamX {
       a: json['a'] as int,
       dxi: json['dxi'] as int,
       f: json['f'] as int,
-      q: json['q'] as int,
+      qxi: json['qxi'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
-      dt: json['dt'] as int,
+      dtx: json['dtx'] as int,
       req: json['req'] as bool? ?? false,
       fp: json['fp'] as int? ?? 0,
     );
@@ -75,10 +75,10 @@ class ParamX {
     'a': a,
     'dxi': dxi,
     'f': f,
-    'q': q,
+    'qxi': qxi,
     'n': n,
     'c': c,
-    'dt': dt,
+    'dtx': dtx,
     'req': req,
     'fp': fp,
   };

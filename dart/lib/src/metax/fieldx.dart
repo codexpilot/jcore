@@ -21,11 +21,11 @@ class FieldX {
   /// Provenance: 0=native, >0=copied, <0=imported
   final int f;
 
-  /// Parent entity ID
-  final int ent;
+  /// Model ID (references modelx.i)
+  final int mxi;
 
-  /// Parent column IDs (storage binding)
-  final List<int> p;
+  /// Column IDs (storage binding, references columnx.i)
+  final List<int> cxis;
 
   /// Column type (TypeX Group 5)
   final int ctx;
@@ -51,8 +51,8 @@ class FieldX {
     required this.dxi,
     required this.n,
     required this.f,
-    required this.ent,
-    this.p = const [],
+    required this.mxi,
+    this.cxis = const [],
     required this.ctx,
     required this.dtx,
     required this.c,
@@ -89,8 +89,8 @@ class FieldX {
       dxi: json['dxi'] as int,
       n: json['n'] as String,
       f: json['f'] as int,
-      ent: json['ent'] as int,
-      p: (json['p'] as List<dynamic>?)?.cast<int>() ?? const [],
+      mxi: json['mxi'] as int,
+      cxis: (json['cxis'] as List<dynamic>?)?.cast<int>() ?? const [],
       ctx: json['ctx'] as int,
       dtx: json['dtx'] as int,
       c: json['c'] as String,
@@ -107,8 +107,8 @@ class FieldX {
     'dxi': dxi,
     'n': n,
     'f': f,
-    'ent': ent,
-    'p': p,
+    'mxi': mxi,
+    'cxis': cxis,
     'ctx': ctx,
     'dtx': dtx,
     'c': c,

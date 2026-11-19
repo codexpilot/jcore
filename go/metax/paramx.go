@@ -10,7 +10,7 @@ type ParamX struct {
 	A   int    `json:"a"`   // Active status
 	DXI int    `json:"dxi"` // Domain ID
 	F   int    `json:"f"`   // Provenance: 0=native, >0=copied, <0=imported
-	Q   int    `json:"q"`   // Query ID
+	QXI int    `json:"qxi"` // Query ID (references queryx.i)
 	N   string `json:"n"`   // Display name
 	C   string `json:"c"`   // Code (unique within query)
 	DTX int    `json:"dtx"` // Data type (TypeX Group 3)

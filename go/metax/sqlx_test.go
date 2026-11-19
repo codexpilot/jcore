@@ -8,8 +8,8 @@ import (
 func TestSqlX_JSON(t *testing.T) {
 	sqlx := &SqlX{
 		ID:  1001,
-		DXI:  intPtr(100),
-		Q:   intPtr(500),
+		DXI: intPtr(100),
+		QXI: intPtr(500),
 		N:   strPtr("Get User SQL"),
 		C:   strPtr("get_user_pg"),
 		DBT: intPtr(1),
@@ -26,7 +26,7 @@ func TestSqlX_JSON(t *testing.T) {
 		t.Fatalf("Unmarshal failed: %v", err)
 	}
 
-	if decoded.ID != sqlx.ID || *decoded.Q != *sqlx.Q {
+	if decoded.ID != sqlx.ID || *decoded.QXI != *sqlx.QXI {
 		t.Errorf("JSON roundtrip failed")
 	}
 }

@@ -24,8 +24,8 @@ class ColumnX {
   /// Code (unique within domain)
   final String c;
 
-  /// Parent table ID
-  final int t;
+  /// Parent table ID (references tablex.i)
+  final int txi;
 
   /// Column type (TypeX Group 5: 200000-200012)
   /// 200000=User-defined, 200001=i, 200002=d, 200003=e, 200004=a, etc.
@@ -46,7 +46,7 @@ class ColumnX {
     required this.n,
     required this.f,
     required this.c,
-    required this.t,
+    required this.txi,
     required this.ctx,
     required this.dtx,
     this.fp = 0,
@@ -99,7 +99,7 @@ class ColumnX {
       n: json['n'] as String,
       f: json['f'] as int,
       c: json['c'] as String,
-      t: json['t'] as int,
+      txi: json['txi'] as int,
       ctx: json['ctx'] as int,
       dtx: json['dtx'] as int,
       fp: json['fp'] as int? ?? 0,
@@ -115,7 +115,7 @@ class ColumnX {
     'n': n,
     'f': f,
     'c': c,
-    't': t,
+    'txi': txi,
     'ctx': ctx,
     'dtx': dtx,
     'fp': fp,

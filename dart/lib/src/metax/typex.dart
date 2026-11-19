@@ -15,8 +15,8 @@ class TypeX {
   /// Type name
   final String n;
 
-  /// Group ID (references typeg)
-  final int g;
+  /// Group ID (references typeg.i)
+  final int tgi;
 
   /// Key within group
   final int k;
@@ -30,7 +30,7 @@ class TypeX {
     required this.e,
     required this.a,
     required this.n,
-    required this.g,
+    required this.tgi,
     required this.k,
     required this.c,
   });
@@ -45,7 +45,7 @@ class TypeX {
       e: json['e'] as int,
       a: json['a'] as int,
       n: json['n'] as String,
-      g: json['g'] as int,
+      tgi: json['tgi'] as int,
       k: json['k'] as int,
       c: json['c'] as String,
     );
@@ -57,13 +57,13 @@ class TypeX {
     'e': e,
     'a': a,
     'n': n,
-    'g': g,
+    'tgi': tgi,
     'k': k,
     'c': c,
   };
 
   @override
-  String toString() => 'TypeX(i=$i, n=$n, c=$c, g=$g)';
+  String toString() => 'TypeX(i=$i, n=$n, c=$c, tgi=$tgi)';
 
   @override
   bool operator ==(Object other) =>

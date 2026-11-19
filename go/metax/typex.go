@@ -8,9 +8,9 @@ type TypeX struct {
 	D int64  `json:"d"` // Date of last edit (epoch ms)
 	E int    `json:"e"` // Last editor user ID
 	A int    `json:"a"` // Active status (0-3)
-	N string `json:"n"` // Type name
-	G int    `json:"g"` // Group ID (references typeg)
-	K int    `json:"k"` // Key within group
+	N   string `json:"n"`   // Type name
+	TGI int    `json:"tgi"` // Group ID (references typeg.i)
+	K   int    `json:"k"`   // Key within group
 	C string `json:"c"` // Code identifier (kebab-case)
 }
 
@@ -21,5 +21,5 @@ func (tx *TypeX) IsActive() bool {
 
 // String returns a string representation of the type
 func (tx *TypeX) String() string {
-	return "TypeX(i=" + strconv.Itoa(tx.I) + ", n=" + tx.N + ", c=" + tx.C + ", g=" + strconv.Itoa(tx.G) + ")"
+	return "TypeX(i=" + strconv.Itoa(tx.I) + ", n=" + tx.N + ", c=" + tx.C + ", tgi=" + strconv.Itoa(tx.TGI) + ")"
 }

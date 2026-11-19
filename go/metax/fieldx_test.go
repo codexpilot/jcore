@@ -71,19 +71,19 @@ func TestFieldX_CanOutput(t *testing.T) {
 
 func TestFieldX_JSON(t *testing.T) {
 	field := &FieldX{
-		I:   1001,
-		D:   1700000000000,
-		E:   42,
-		A:   1,
-		DXI: 100,
-		N:   "Username",
-		Ent: 500,
-		P:   []int{10, 20},
-		CTX: 200001,
-		DTX: 300001,
-		C:   "username",
-		FTX: 400000,
-		FP:  0,
+		I:    1001,
+		D:    1700000000000,
+		E:    42,
+		A:    1,
+		DXI:  100,
+		N:    "Username",
+		MXI:  500,
+		CXIS: []int{10, 20},
+		CTX:  200001,
+		DTX:  300001,
+		C:    "username",
+		FTX:  400000,
+		FP:   0,
 	}
 
 	// Marshal to JSON

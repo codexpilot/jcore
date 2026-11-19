@@ -16,6 +16,8 @@
 | Table | Singular Reference | Plural Array | Usage |
 |-------|-------------------|--------------|-------|
 | DomainX | dxi | dxis | Foreign key → domainx.i |
+| TypeG | tgi | tgis | Foreign key → typeg.i |
+| TypeX | tyxi | tyxis | Foreign key → typex.i (catalog row) |
 | TableX | txi | txis | Foreign key → tablex.i |
 | ColumnX | cxi | cxis | Foreign key → columnx.i |
 | ModelX | mxi | mxis | Foreign key → modelx.i |
@@ -217,3 +219,31 @@ dxi INT NOT NULL  -- Correct
 ```
 
 All AIX schemas must be updated to follow the taxonomy pattern.
+
+---
+
+## TypeX Catalog References
+
+**TypeX catalog entries** use a different pattern than MetaX table row references:
+
+| Reference | Pattern | Usage |
+|-----------|---------|-------|
+| Column Type | ctx | References TypeX catalog (Group 5) |
+| Data Type | dtx | References TypeX catalog (Group 3) |
+| Field Type | ftx | References TypeX catalog (Group 7) |
+| Parameter Type | ptx | References TypeX catalog (Group 6) |
+| Table Type | ttx | References TypeX catalog (Group 1) |
+
+**Pattern:** `[entity]tx` where entity is what's being typed (column, data, field, parameter, table).
+
+**Example:**
+```sql
+CREATE TABLE mx.columnx (
+    i BIGINT PRIMARY KEY,
+    txi BIGINT NOT NULL,  -- References tablex.i (MetaX table row)
+    ctx INT NOT NULL,     -- Column type (TypeX catalog entry)
+    dtx INT NOT NULL      -- Data type (TypeX catalog entry)
+);
+```
+
+**Note:** Use `tyxi/tyxis` when referencing the typex TABLE ROW itself (rare), and `ctx/dtx/ftx/ptx/ttx` when referencing a TYPE CATALOG ENTRY (common).

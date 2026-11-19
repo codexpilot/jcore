@@ -1,3 +1,52 @@
+## 4.0.0
+
+**BREAKING CHANGES: Taxonomy Compliance**
+
+All MetaX models now comply with the ID-PATTERNS.md taxonomy for foreign key references.
+
+**Field Name Changes:**
+
+**Go Models:**
+- ColumnX: `T` → `TXI` (json:"t" → json:"txi")
+- FieldX: `Ent` → `MXI` (json:"ent" → json:"mxi")
+- FieldX: `P` → `CXIS` (json:"p" → json:"cxis")
+- ParamX: `Q` → `QXI` (json:"q" → json:"qxi")
+- SqlX: `Q` → `QXI` (json:"q" → json:"qxi")
+- TypeX: `G` → `TGI` (json:"g" → json:"tgi")
+
+**Dart Models:**
+- ColumnX: `t` → `txi` (json:"t" → json:"txi")
+- FieldX: `ent` → `mxi` (json:"ent" → json:"mxi")
+- FieldX: `p` → `cxis` (json:"p" → json:"cxis")
+- ParamX: `q` → `qxi` (json:"q" → json:"qxi")
+- ParamX: `dt` → `dtx` (json:"dt" → json:"dtx") - **Bug fix**
+- SqlX: `q` → `qxi` (json:"q" → json:"qxi")
+- TypeX: `g` → `tgi` (json:"g" → json:"tgi")
+
+**Documentation Updates:**
+- ID-PATTERNS.md: Added TypeG (tgi/tgis) and TypeX (tyxi/tyxis) patterns
+- ID-PATTERNS.md: Added TypeX catalog reference pattern documentation (ctx, dtx, ftx, ptx, ttx)
+
+**Bug Fixes:**
+- ParamX Dart model: Fixed pre-existing inconsistency where field was named `dt` but Go used `dtx`
+
+**Migration Guide:**
+
+All JSON payloads using these models must update field names:
+```json
+// Before (v3.x)
+{"t": 100, "ent": 500, "p": [10, 20], "q": 200, "g": 3}
+
+// After (v4.0.0)
+{"txi": 100, "mxi": 500, "cxis": [10, 20], "qxi": 200, "tgi": 3}
+```
+
+Database schemas and CRUD functions also need updates to match these patterns.
+
+**Tests:**
+- Go: All metax tests pass
+- Dart: All 120 tests pass
+
 ## 3.3.0
 
 **BREAKING CHANGES:**
