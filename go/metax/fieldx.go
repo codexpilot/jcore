@@ -34,7 +34,7 @@ type FieldX struct {
 	N   string `json:"n"`   // Display name
 	F    int   `json:"f"`    // Provenance: 0=native, >0=copied, <0=imported
 	MXI  int   `json:"mxi"`  // Model ID (references modelx.i)
-	CXIS []int `json:"cxis"` // Column IDs (storage binding, references columnx.i)
+	CXIS []int `json:"cxis"` // System-managed preview: ColumnX IDs from MapX 973000
 	CTX int    `json:"ctx"` // Column type (TypeX Group 5)
 	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
 	C   string `json:"c"`   // Code (unique)

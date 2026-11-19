@@ -14,6 +14,7 @@ type ModelX struct {
 	F          *int    `json:"f,omitempty"`          // Provenance: 0=native, >0=copied, <0=imported
 	C          *string `json:"c,omitempty"`          // Code
 	Ps         []int   `json:"ps,omitempty"`         // Parent model IDs
+	TXIS       []int   `json:"txis,omitempty"`       // System-managed preview: TableX IDs from MapX 971600
 	MTX        *int    `json:"mtx,omitempty"`        // Model type
 }
 
@@ -51,6 +52,9 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	}
 	if mx.Ps != nil {
 		data["ps"] = mx.Ps
+	}
+	if mx.TXIS != nil {
+		data["txis"] = mx.TXIS
 	}
 	if mx.MTX != nil {
 		data["mtx"] = *mx.MTX

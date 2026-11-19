@@ -24,6 +24,9 @@ class ModelX {
   /// Parent model IDs
   final List<int> ps;
 
+  /// System-managed preview: TableX IDs from MapX 971600
+  final List<int> txis;
+
   /// Code (unique)
   final String c;
 
@@ -42,6 +45,7 @@ class ModelX {
     required this.n,
     required this.f,
     this.ps = const [],
+    this.txis = const [],
     required this.c,
     this.mtx = 320001,
     this.fp = 0,
@@ -65,6 +69,7 @@ class ModelX {
       n: json['n'] as String,
       f: json['f'] as int,
       ps: (json['ps'] as List<dynamic>?)?.cast<int>() ?? const [],
+      txis: (json['txis'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
       mtx: json['mtx'] as int? ?? 320001,
       fp: json['fp'] as int? ?? 0,
@@ -80,6 +85,7 @@ class ModelX {
     'n': n,
     'f': f,
     'ps': ps,
+    'txis': txis,
     'c': c,
     'mtx': mtx,
     'fp': fp,

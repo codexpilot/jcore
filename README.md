@@ -3,7 +3,7 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of truth** for AIX MetaX taxonomy and type definitions.
 
-**Current jcore version:** `v4.0.0`
+**Current jcore version:** `v4.1.0`
 
 ## Current implementation
 

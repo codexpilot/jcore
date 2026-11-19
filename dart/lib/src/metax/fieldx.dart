@@ -24,7 +24,7 @@ class FieldX {
   /// Model ID (references modelx.i)
   final int mxi;
 
-  /// Column IDs (storage binding, references columnx.i)
+  /// System-managed preview: ColumnX IDs from MapX 973000
   final List<int> cxis;
 
   /// Column type (TypeX Group 5)
