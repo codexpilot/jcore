@@ -231,8 +231,9 @@ All AIX schemas must be updated to follow the taxonomy pattern.
 | Column Type | ctx | References TypeX catalog (Group 5) |
 | Data Type | dtx | References TypeX catalog (Group 3) |
 | Field Type | ftx | References TypeX catalog (Group 7) |
-| Parameter Type | ptx | References TypeX catalog (Group 6) |
-| Table Type | ttx | References TypeX catalog (Group 1) |
+| Model Type | mtx | References TypeX catalog (Group 6) |
+| Parameter Type | ptx | References TypeX catalog (Group 9) |
+| Table Type | ttx | References TypeX catalog (Group 4) |
 
 **Pattern:** `[entity]tx` where entity is what's being typed (column, data, field, parameter, table).
 
