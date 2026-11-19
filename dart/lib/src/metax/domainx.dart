@@ -24,11 +24,11 @@ class DomainX {
   /// Parent domain ID (framework root for templates/solutions)
   final int p;
 
-  /// Import source IDs (template domains only)
-  final List<int> ids;
+  /// Import source domain IDs (template domains only)
+  final List<int> iDxis;
 
-  /// Copy source IDs (solution domains only)
-  final List<int> cds;
+  /// Copy source domain IDs (solution domains only)
+  final List<int> cDxis;
 
   /// Server digit count (Algorithm 2 configuration)
   /// Default: 3 (max 999 servers)
@@ -54,8 +54,8 @@ class DomainX {
     required this.n,
     required this.c,
     required this.p,
-    this.ids = const [],
-    this.cds = const [],
+    this.iDxis = const [],
+    this.cDxis = const [],
     this.sc = 3,
     this.tc = 3,
     this.ry = -1,
@@ -122,8 +122,8 @@ class DomainX {
       n: json['n'] as String,
       c: json['c'] as String,
       p: json['p'] as int,
-      ids: (json['ids'] as List<dynamic>?)?.cast<int>() ?? const [],
-      cds: (json['cds'] as List<dynamic>?)?.cast<int>() ?? const [],
+      iDxis: (json['i_dxis'] as List<dynamic>?)?.cast<int>() ?? const [],
+      cDxis: (json['c_dxis'] as List<dynamic>?)?.cast<int>() ?? const [],
       sc: json['sc'] as int? ?? 3,
       tc: json['tc'] as int? ?? 3,
       ry: json['ry'] as int? ?? -1,
@@ -139,8 +139,8 @@ class DomainX {
     'n': n,
     'c': c,
     'p': p,
-    'ids': ids,
-    'cds': cds,
+    'i_dxis': iDxis,
+    'c_dxis': cDxis,
     'sc': sc,
     'tc': tc,
     'ry': ry,

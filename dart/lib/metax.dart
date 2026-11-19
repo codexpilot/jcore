@@ -1,7 +1,9 @@
 /// MetaX models for AIX metadata tables
 ///
-/// This library provides Dart models for AIX MetaX tables:
+/// This library provides Dart models for the 10 canonical AIX MetaX types:
 /// - DomainX: Domain hierarchy (cox.domainx)
+/// - TypeG: Type groups (cox.typeg)
+/// - TypeX: Type catalog (cox.typex)
 /// - TableX: Physical tables (mx.tablex)
 /// - ColumnX: Physical columns (mx.columnx)
 /// - ModelX: Logical models (mx.modelx)
@@ -12,6 +14,8 @@
 library metax;
 
 export 'src/metax/domainx.dart';
+export 'src/metax/typeg.dart';
+export 'src/metax/typex.dart';
 export 'src/metax/tablex.dart';
 export 'src/metax/columnx.dart';
 export 'src/metax/modelx.dart';

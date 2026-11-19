@@ -3,7 +3,7 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of truth** for AIX MetaX taxonomy and type definitions.
 
-**Current jcore version:** `v3.2.0`
+**Current jcore version:** `v3.3.0`
 
 ## Current implementation
 
@@ -44,6 +44,19 @@ Contributor credit is listed in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 JCore defines the canonical taxonomy for AIX MetaX systems:
 
+**10 Core MetaX Types:**
+1. **DomainX** - Domain hierarchy and scope configuration
+2. **TypeG** - Type group catalog (organizes types into semantic categories)
+3. **TypeX** - Type catalog (all system types with group-based ID construction)
+4. **TableX** - Physical table metadata
+5. **ColumnX** - Physical column metadata
+6. **ModelX** - Logical model metadata
+7. **FieldX** - Logical field metadata
+8. **QueryX** - Query operation metadata
+9. **ParamX** - Query parameter metadata
+10. **SqlX** - SQL template metadata
+
+**Taxonomy Documentation:**
 - **[ID Patterns](docs/taxonomy/ID-PATTERNS.md)** - Singular/plural ID naming (dxi/dxis, mxi/mxis, etc.)
 - **[System Columns](docs/taxonomy/SYSTEM-COLUMNS.md)** - Standard column definitions (i, d, e, a, etc.)
 - **[Parent Rules](docs/taxonomy/PARENT-RULES.md)** - Self-referential p/ps architectural rules

@@ -13,10 +13,10 @@ type DomainX struct {
 	A   int    `json:"a"`            // Active status (0=inactive, 1=active)
 	N   string `json:"n"`            // Name
 	C   string `json:"c"`            // Code
-	P   int    `json:"p"`            // Parent ID
-	IDS []int  `json:"ids"`          // ID structure
-	CDS []int  `json:"cds"`          // Code structure
-	SC  int    `json:"sc"`           // Server count digits
+	P     int   `json:"p"`      // Parent ID
+	IDXIS []int `json:"i_dxis"` // Import source domain IDs (template domains)
+	CDXIS []int `json:"c_dxis"` // Copy source domain IDs (solution domains)
+	SC    int   `json:"sc"`     // Server count digits
 	TC  int    `json:"tc"`           // Terminal count digits
 	RY  int    `json:"ry"`           // Reference year
 	CC  int    `json:"cc"`           // Count capacity
