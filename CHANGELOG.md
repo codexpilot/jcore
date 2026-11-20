@@ -1,3 +1,100 @@
+## 4.2.0
+
+**NEW: JUX UI/UX Framework**
+
+JCore now includes a complete metadata-driven UI/UX framework for building reactive interfaces without code generation.
+
+**JData Additions:**
+- **QueryService** - Abstract interface for data operations
+  - Enables backend abstraction (HTTP API, local DB, mock data)
+  - Query-based pattern: operations identified by query IDs
+  - Used by JUX ViewModels for data persistence
+  - Location: `lib/src/jdata/query_service.dart`
+
+**JUX Framework (NEW):**
+
+Complete reactive ViewModel architecture for dynamic schemas:
+
+1. **ViewModel** (Base) - `lib/src/jux/view_model.dart`
+   - Reactive state management via ChangeNotifier
+   - Loading and error state handling
+   - Pure Dart (testable without Flutter)
+
+2. **JuxFormViewModel** - `lib/src/jux/jux_form_view_model.dart`
+   - Edit views with validation
+   - Dirty tracking for unsaved changes
+   - Metadata-driven type coercion and validation
+   - Save/discard operations via QueryService
+
+3. **JuxCollectionViewModel** - `lib/src/jux/jux_collection_view_model.dart`
+   - List views with pagination
+   - Search and filtering
+   - Row selection
+   - Display value formatting by data type
+
+4. **JuxInspectionViewModel** - `lib/src/jux/jux_inspection_view_model.dart`
+   - Read-only detail views
+   - Display value formatting
+   - Lightweight (no editing logic)
+
+**Key Features:**
+- Works with ANY model defined through MetaX metadata
+- No code generation required
+- No recompilation when users create new models
+- Type safety through metadata validation
+- Fully testable (ViewModels are pure Dart)
+- Reactive updates via ChangeNotifier
+
+**Architecture:**
+```
+JUX (Presentation) → JData (Data) → Backend
+   ViewModels         QueryService    HTTP/DB
+```
+
+**Usage Example:**
+```dart
+import 'package:jcore/jdata.dart';
+import 'package:jcore/jux.dart';
+
+// Implement QueryService for your backend
+class MyQueryService implements QueryService {
+  @override
+  Future<dynamic> executeQuery(int queryId, Map<String, dynamic> params) {
+    // Route to your backend
+  }
+}
+
+// Create ViewModel
+final formVM = JuxFormViewModel(
+  queryService: MyQueryService(),
+  jux: viewDefinition,
+  model: modelMetadata,
+  columns: columnMetadata,
+);
+
+// Load and edit
+await formVM.load(recordId: 123);
+formVM.updateField('name', 'New Value');
+if (formVM.validate()) {
+  await formVM.save();
+}
+```
+
+**Integration:**
+- JUX ViewModels use QueryService from jdata
+- Applications implement QueryService for their specific backends
+- ViewModels work with MetaX metadata (ModelX, ColumnX)
+- Designed for ContextStudio and Dataset applications
+
+**Exports:**
+- `jdata.dart` now exports QueryService
+- New `jux.dart` exports all ViewModels
+- Main `jcore.dart` re-exports jux
+
+**Tests:**
+- Dart: Structure validated, ready for unit tests
+- Integration tested in ContextStudio pilot
+
 ## 4.0.0
 
 **BREAKING CHANGES: Taxonomy Compliance**

@@ -3,15 +3,27 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of truth** for AIX MetaX taxonomy and type definitions.
 
-**Current jcore version:** `v4.1.0`
+**Current jcore version:** `v4.2.0`
+
+## What's New in 4.2.0
+
+**JUX UI/UX Framework** - Complete metadata-driven UI framework with reactive ViewModels that work with dynamic schemas without code generation. See [JUX Framework](#jux-framework) below.
 
 ## Current implementation
 
 The Dart `jcore` package lives at [`dart`](dart). Its public package name and
-import remain `jcore` and `package:jcore/jcore.dart`; jdata is implemented
-there. The Go MetaX models live at [`go/metax`](go/metax) and are published
-through the [`go`](go) module. jux, jsync, and other language implementations
-remain planned.
+import remain `jcore` and `package:jcore/jcore.dart`.
+
+**Implemented:**
+- **jdata** - Data types, exact numeric values, JSONC, and QueryService interface
+- **metax** - MetaX models (Go and Dart implementations)
+- **jux** - UI/UX framework with reactive ViewModels (Dart)
+
+**Planned:**
+- jsync and other language implementations
+
+The Go MetaX models live at [`go/metax`](go/metax) and are published
+through the [`go`](go) module.
 
 ## Language folders
 
@@ -63,6 +75,100 @@ JCore defines the canonical taxonomy for AIX MetaX systems:
 - **[Type Patterns](docs/taxonomy/TYPE-PATTERNS.md)** - Type suffix patterns (dtx, ttx, ctx, etc.)
 
 These definitions are the **source of truth** for all AIX implementations.
+
+## JUX Framework
+
+**JUX** (JCore UI/UX) is a metadata-driven UI framework that enables building reactive interfaces for dynamic schemas without code generation.
+
+### Architecture
+
+```
+JUX (Presentation) → JData (Data) → Backend
+   ViewModels         QueryService    HTTP/DB
+```
+
+### Core Components
+
+**1. QueryService (jdata)**
+- Abstract interface for data operations
+- Applications implement for their specific backends
+- Query-based pattern: operations identified by integer IDs
+
+**2. ViewModels (jux)**
+
+Three reactive ViewModels that work with ANY model defined through MetaX:
+
+- **ViewModel** (Base) - Reactive state management
+  - Loading and error states
+  - ChangeNotifier for automatic UI updates
+  - Pure Dart (testable without Flutter)
+
+- **JuxFormViewModel** - Edit views
+  - Validation and dirty tracking
+  - Metadata-driven type coercion
+  - Save/discard operations
+
+- **JuxCollectionViewModel** - List views
+  - Pagination and search
+  - Filtering and selection
+  - Display value formatting
+
+- **JuxInspectionViewModel** - Read-only detail views
+  - Single record display
+  - Lightweight (no editing logic)
+
+### Key Features
+
+- ✅ Works with ANY model created in ContextStudio
+- ✅ No code generation required
+- ✅ No recompilation when users create new models
+- ✅ Type safety through metadata validation
+- ✅ Fully testable (ViewModels are pure Dart)
+- ✅ Reactive updates via ChangeNotifier
+
+### Usage Example
+
+```dart
+import 'package:jcore/jdata.dart';
+import 'package:jcore/jux.dart';
+
+// 1. Implement QueryService for your backend
+class MyQueryService implements QueryService {
+  @override
+  Future<dynamic> executeQuery(int queryId, Map<String, dynamic> params) {
+    // Route to your backend services
+    if (queryId == 1000) return modelService.list(params);
+    if (queryId == 1001) return modelService.get(params['i']);
+    // ...
+  }
+}
+
+// 2. Create ViewModel
+final formVM = JuxFormViewModel(
+  queryService: MyQueryService(),
+  jux: viewDefinition,        // JUX view metadata
+  model: modelMetadata,        // MetaX ModelX
+  columns: columnMetadata,     // MetaX ColumnX
+);
+
+// 3. Load and edit
+await formVM.load(recordId: 123);
+formVM.updateField('name', 'New Value');
+
+// 4. Validate and save
+if (formVM.validate()) {
+  final saved = await formVM.save();
+}
+```
+
+### Integration with MetaX
+
+JUX ViewModels use MetaX metadata for:
+- **ModelX**: Model identity and relationships
+- **ColumnX**: Data types, validation rules, labels
+- **QueryX bindings**: List, get, save, delete operations
+
+This enables a single ViewModel to work with customer, sales_order, or any other model without modification.
 
 ## Verification
 

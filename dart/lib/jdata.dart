@@ -13,3 +13,6 @@ export 'src/jdata/numeric_value_validation.dart';
 export 'src/jdata/jsonc.dart';
 export 'src/jdata/jconverter.dart';
 export 'src/jdata/jbase.dart';
+
+// Data operations service interface.
+export 'src/jdata/query_service.dart';
