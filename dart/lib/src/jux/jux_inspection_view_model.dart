@@ -1,4 +1,4 @@
-import '../jdata/query_service.dart';
+import '../data/query_service.dart';
 import 'view_model.dart';
 
 /// Generic inspection ViewModel for JUX framework - read-only detail views.
@@ -12,7 +12,7 @@ import 'view_model.dart';
 /// Uses metadata from JCore structure:
 /// - **JUX**: View definition (field layout, query get binding)
 /// - **MetaX**: Model schema (ModelX, ColumnX)
-/// - **JData**: Data operations (QueryX bindings)
+/// - **Data**: Data operations (QueryX bindings)
 ///
 /// ## Differences from JuxFormViewModel
 ///

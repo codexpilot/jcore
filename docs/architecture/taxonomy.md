@@ -33,7 +33,7 @@
 
 **JCore:**
 - Type: Framework (Java/Go/Dart packages)
-- Provides: JData (data types), JMetaX (MetaX contracts), Taxonomy (naming standards)
+- Provides: Data (data types), JMetaX (MetaX contracts), Taxonomy (naming standards)
 - Scope: TYPE DEFINITIONS, CONTRACTS, TAXONOMY
 - Does NOT have: Physical database tables
 
@@ -47,7 +47,7 @@
 ```
 ┌─────────────────────────────┐
 │ JCore Framework             │
-│ - JData (types)             │
+│ - Data (types)              │
 │ - JMetaX (contracts)        │
 │ - Taxonomy (naming)         │
 └─────────┬───────────────────┘
@@ -268,7 +268,7 @@ Examples:
 
 **CRITICAL:** JCore implements `Numeric` as an **exact decimal class**, NOT as `double`.
 
-**Implementation:** `jcore/dart/lib/src/jdata/numeric.dart`
+**Implementation:** `jcore/dart/lib/src/data/numeric.dart`
 
 ```dart
 /// Exact decimal value with scale-preserving arithmetic.

@@ -3,7 +3,14 @@
 JCore is a multi-language foundation for data types, exact numeric values,
 jsonc, UI bindings, catalogs, and synchronization. It serves as the **source of truth** for AIX MetaX taxonomy and type definitions.
 
-**Current jcore version:** `v4.2.0`
+**Current jcore version:** `v4.4.0`
+
+## What's New in 4.4.0
+
+**Data Module Migration** - The former `jdata` Dart module is now named `data`.
+Use `package:jcore/data.dart` for direct data API imports. The legacy
+`package:jcore/jdata.dart` entry point remains as a deprecated compatibility
+re-export.
 
 ## What's New in 4.2.0
 
@@ -15,7 +22,7 @@ The Dart `jcore` package lives at [`dart`](dart). Its public package name and
 import remain `jcore` and `package:jcore/jcore.dart`.
 
 **Implemented:**
-- **jdata** - Data types, exact numeric values, JSONC, and QueryService interface
+- **data** - Data types, exact numeric values, JSONC, and QueryService interface
 - **metax** - MetaX models (Go and Dart implementations)
 - **jux** - UI/UX framework with reactive ViewModels (Dart)
 
@@ -27,7 +34,7 @@ through the [`go`](go) module.
 
 ## Language folders
 
-- `dart` — current jdata implementation.
+- `dart` — current data implementation.
 - `go` — current MetaX model implementation.
 - `pgsql`, `javascript`, `java`, `swift`, `csharp`, and `cplusplus` — coming
   soon.
@@ -83,13 +90,13 @@ These definitions are the **source of truth** for all AIX implementations.
 ### Architecture
 
 ```
-JUX (Presentation) → JData (Data) → Backend
+JUX (Presentation) → Data → Backend
    ViewModels         QueryService    HTTP/DB
 ```
 
 ### Core Components
 
-**1. QueryService (jdata)**
+**1. QueryService (data)**
 - Abstract interface for data operations
 - Applications implement for their specific backends
 - Query-based pattern: operations identified by integer IDs
@@ -129,7 +136,7 @@ Three reactive ViewModels that work with ANY model defined through MetaX:
 ### Usage Example
 
 ```dart
-import 'package:jcore/jdata.dart';
+import 'package:jcore/data.dart';
 import 'package:jcore/jux.dart';
 
 // 1. Implement QueryService for your backend

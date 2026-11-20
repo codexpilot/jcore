@@ -1,15 +1,25 @@
+## 4.4.0
+
+**Data Module Migration**
+
+- Renamed the Dart data module from `jdata` to `data`.
+- Added `package:jcore/data.dart` as the current entry point.
+- Moved the implementation to `dart/lib/src/data/`.
+- Kept `package:jcore/jdata.dart` as a deprecated compatibility re-export.
+- Updated Dart, Go, architecture, and integration documentation.
+
 ## 4.2.0
 
 **NEW: JUX UI/UX Framework**
 
 JCore now includes a complete metadata-driven UI/UX framework for building reactive interfaces without code generation.
 
-**JData Additions:**
+**Data Additions:**
 - **QueryService** - Abstract interface for data operations
   - Enables backend abstraction (HTTP API, local DB, mock data)
   - Query-based pattern: operations identified by query IDs
   - Used by JUX ViewModels for data persistence
-  - Location: `lib/src/jdata/query_service.dart`
+  - Location: `lib/src/data/query_service.dart`
 
 **JUX Framework (NEW):**
 
@@ -47,13 +57,13 @@ Complete reactive ViewModel architecture for dynamic schemas:
 
 **Architecture:**
 ```
-JUX (Presentation) → JData (Data) → Backend
+JUX (Presentation) → Data → Backend
    ViewModels         QueryService    HTTP/DB
 ```
 
 **Usage Example:**
 ```dart
-import 'package:jcore/jdata.dart';
+import 'package:jcore/data.dart';
 import 'package:jcore/jux.dart';
 
 // Implement QueryService for your backend
@@ -81,13 +91,14 @@ if (formVM.validate()) {
 ```
 
 **Integration:**
-- JUX ViewModels use QueryService from jdata
+- JUX ViewModels use QueryService from data
 - Applications implement QueryService for their specific backends
 - ViewModels work with MetaX metadata (ModelX, ColumnX)
 - Designed for ContextStudio and Dataset applications
 
 **Exports:**
-- `jdata.dart` now exports QueryService
+- `data.dart` exports QueryService
+- `jdata.dart` remains as a deprecated compatibility re-export
 - New `jux.dart` exports all ViewModels
 - Main `jcore.dart` re-exports jux
 

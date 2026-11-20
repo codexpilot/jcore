@@ -1,7 +1,7 @@
 /// jux - JCore UI/UX framework for metadata-driven interfaces.
 ///
 /// Provides reactive ViewModels that work with dynamic schemas without
-/// code generation. ViewModels use the QueryService from jdata for
+/// code generation. ViewModels use the QueryService from data for
 /// data operations and are designed to work with any model defined
 /// through MetaX metadata.
 ///
@@ -15,7 +15,7 @@
 /// ## Usage
 ///
 /// ```dart
-/// import 'package:jcore/jdata.dart';
+/// import 'package:jcore/data.dart';
 /// import 'package:jcore/jux.dart';
 ///
 /// // Implement QueryService for your backend
@@ -45,7 +45,7 @@
 /// ## Architecture
 ///
 /// ```
-/// JUX (Presentation) → JData (Data) → Backend
+/// JUX (Presentation) → Data → Backend
 ///    ViewModels         QueryService    HTTP/DB
 /// ```
 library;

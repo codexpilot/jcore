@@ -1,6 +1,6 @@
 name: jcore
 description: JCore data types, exact numeric values, JSONC, and JUX UI/UX framework for Dart.
-version: 4.2.0
+version: 4.4.0
 repository: https://github.com/codexpilot/jcore
 
 environment:

@@ -1,6 +1,7 @@
 # JCore Go - MetaX Package
 
 Go implementation of AIX MetaX metadata models, mirroring the Dart implementation in ContextStudio.
+MetaX consumes the shared JCore `data` contracts.
 
 ## Models
 

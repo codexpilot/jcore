@@ -3,7 +3,7 @@
 The Dart package root is dart. The package name stays jcore, so
 applications continue to use import 'package:jcore/jcore.dart'.
 
-JData, including the data type registry, Numeric, JSONC, and validation,
+Data, including the data type registry, Numeric, JSONC, and validation,
 is implemented in Dart. JUX, JSYNC, and other language implementations remain
 planned.
 
@@ -44,6 +44,15 @@ assert(DataTypeRegistry.isValid(smallintId));
 assert(DataTypeRegistry.postgresType(numericId) == 'numeric(10,2)');
 assert(DataTypeRegistry.postgresType(textId) == 'varchar(100)');
 ~~~
+
+To import only the data layer:
+
+~~~dart
+import 'package:jcore/data.dart';
+~~~
+
+The previous `package:jcore/jdata.dart` entry point is deprecated and
+re-exported for compatibility.
 
 `DataType` represents the base types in the current catalog. Its first decimal
 digit identifies an ordered storage-size class, not always a literal byte

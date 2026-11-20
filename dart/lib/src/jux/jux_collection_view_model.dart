@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import '../jdata/query_service.dart';
+import '../data/query_service.dart';
 import 'view_model.dart';
 
 /// Generic collection ViewModel for JUX framework - works with any dynamic schema.
@@ -12,7 +11,7 @@ import 'view_model.dart';
 /// Uses metadata from JCore structure:
 /// - **JUX**: View definition (column display, query list binding)
 /// - **MetaX**: Model schema (ModelX, ColumnX)
-/// - **JData**: Data operations (QueryX bindings)
+/// - **Data**: Data operations (QueryX bindings)
 ///
 /// ## Features
 ///

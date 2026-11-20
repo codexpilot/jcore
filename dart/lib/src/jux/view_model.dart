@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Base class for all ViewModels in the JUX framework (JCore UI/UX system).
 ///
 /// ## JUX Framework
@@ -10,7 +8,7 @@ import 'package:flutter/foundation.dart';
 /// ## Architecture
 ///
 /// ```
-/// Model (JData/MetaX)  →  ViewModel (JUX)  →  View (Flutter)
+/// Model (Data/MetaX)  →  ViewModel (JUX)  →  View (Flutter)
 ///       ↓                      ↓                   ↓
 /// Business metadata      Presentation logic    Reactive UI
 /// ```
@@ -59,6 +57,24 @@ import 'package:flutter/foundation.dart';
 /// - [setLoading] is called
 /// - [setError] is called
 /// - [notifyListeners] is called by subclasses
+abstract class ChangeNotifier {
+  final List<void Function()> _listeners = [];
+
+  void addListener(void Function() listener) => _listeners.add(listener);
+
+  void removeListener(void Function() listener) => _listeners.remove(listener);
+
+  void notifyListeners() {
+    for (final listener in List<void Function()>.of(_listeners)) {
+      listener();
+    }
+  }
+
+  void dispose() {
+    _listeners.clear();
+  }
+}
+
 abstract class ViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
@@ -85,7 +101,6 @@ abstract class ViewModel extends ChangeNotifier {
   ///   }
   /// }
   /// ```
-  @protected
   void setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -102,7 +117,6 @@ abstract class ViewModel extends ChangeNotifier {
   ///   setError('Failed to save: $e');
   /// }
   /// ```
-  @protected
   void setError(String? error) {
     _errorMessage = error;
     notifyListeners();

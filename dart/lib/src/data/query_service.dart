@@ -10,7 +10,7 @@
 /// ## JCore Layer Architecture
 ///
 /// ```
-/// jux/  (Presentation) → uses → jdata/ (Data) → uses → Backend
+/// jux/  (Presentation) → uses → data/       → uses → Backend
 ///   ViewModels                QueryService           HTTP/DB/etc
 /// ```
 ///
@@ -19,7 +19,7 @@
 /// JUX ViewModels depend on this interface to execute data operations:
 ///
 /// ```dart
-/// import 'package:jcore/jdata.dart';
+/// import 'package:jcore/data.dart';
 /// import 'package:jcore/jux.dart';
 ///
 /// class JuxFormViewModel extends ViewModel {
@@ -33,6 +33,10 @@
 ///   }
 /// }
 /// ```
+///
+/// `package:jcore/data.dart` is the current entry point for this interface.
+/// `package:jcore/jdata.dart` remains available temporarily as a deprecated
+/// compatibility re-export.
 ///
 /// ## Implementation in Applications
 ///

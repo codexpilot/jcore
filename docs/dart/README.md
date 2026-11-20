@@ -1,10 +1,10 @@
 # jcore for Dart
 
-This package implements the jcore jdata layer in Dart. The repository package
+This package implements the jcore data layer in Dart. The repository package
 root is dart; its package name remains jcore, and applications
 continue to import package:jcore/jcore.dart.
 
-jdata provides the data type registry, exact Numeric values, jsonc,
+data provides the data type registry, exact Numeric values, jsonc,
 and data validation. jux, jsync, and implementations in other languages are
 planned. They do not have placeholder packages or APIs here.
 
@@ -94,4 +94,4 @@ dart analyze --fatal-infos
 ~~~
 
 See the [architecture overview](../architecture/README.md) for the
-planned jdata, jux, and jsync boundaries.
+planned data, jux, and jsync boundaries.

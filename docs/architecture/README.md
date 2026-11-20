@@ -4,12 +4,12 @@ jcore is a shared, multi-language foundation. Its layers are intended to
 depend on the data model below them:
 
 ```text
-jdata  →  jux  →  jsync
+data   →  jux  →  jsync
      ↓
    metax (AIX MetaX models)
 ```
 
-This repository currently implements **jdata in Dart** and **metax models in Dart and Go** through
+This repository currently implements **data in Dart** and **metax models in Dart and Go** through
 `package:jcore/jcore.dart`. jux, jsync, other language implementations, and a
 repository or package split remain planned. The public Dart package name stays
 `jcore`.
@@ -18,13 +18,13 @@ repository or package split remain planned. The public Dart package name stays
 
 | Layer | Responsibility | Status in this repository |
 | --- | --- | --- |
-| jdata | Type IDs, `Numeric`, jsonc, and data validation | Implemented in Dart |
+| data | Type IDs, `Numeric`, jsonc, and data validation | Implemented in Dart |
 | metax | MetaX metadata models (DomainX, TableX, ModelX, etc.) | Implemented in Dart and Go |
 | jux | Portable UI definitions, bindings, and generic Catalog references | Planned |
 | jsync | Synchronization contracts, topology, and algorithms | Planned |
 
-jux will build on jdata values and identifiers. jsync will build on jdata and
-jux contracts. metax models use jdata types. Transport, rendering, and storage integrations remain outside
+jux will build on data values and identifiers. jsync will build on data and
+jux contracts. metax models use data types. Transport, rendering, and storage integrations remain outside
 the portable contracts until those designs are specified.
 
 ## MetaX Taxonomy
@@ -45,7 +45,7 @@ The Dart package is organized under its language root:
 
 - `dart/pubspec.yaml` keeps the package name `jcore`.
 - `dart/lib/jcore.dart` is the package public entry point.
-- `dart/lib/src/jdata/` contains the Dart implementation.
+- `dart/lib/src/data/` contains the Dart implementation.
 - `dart/test/` contains the Dart package tests.
 - `example/` contains Dart examples.
 - `docs/` contains shared, language-neutral contracts and plans.
@@ -53,7 +53,7 @@ The Dart package is organized under its language root:
 Git consumers select `dart` as the package subdirectory; the package
 name and `package:jcore/jcore.dart` import remain stable. When a second language
 implementation is ready, give it a language-specific source root and native
-tests. Keep jdata, jux, and jsync modules distinct within each implementation
+tests. Keep data, jux, and jsync modules distinct within each implementation
 and preserve their dependency order.
 
 ## Data type registry
