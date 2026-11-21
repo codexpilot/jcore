@@ -87,9 +87,9 @@ void main() {
     test('round-trips registered Numeric and INT64 in JSONC number modes', () {
       final amount = Numeric.fromString('123.40', 2);
       final stringMode = JsonC(
-        jv: 1,
-        jid: 1,
-        jnf: 4,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 4,
         schema: {'amount': 60502},
         data: [
           <dynamic>[amount],
@@ -100,9 +100,9 @@ void main() {
       expect((stringJson['data'] as List).single.single, '123.40');
 
       final numberMode = JsonC(
-        jv: 1,
-        jid: 1,
-        jnf: 2,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 2,
         schema: {'amount': 60502},
         data: [
           <dynamic>[amount],
@@ -114,9 +114,9 @@ void main() {
 
       final largeId = BigInt.parse('9223372036854775807');
       final int64Jsonc = JsonC(
-        jv: 1,
-        jid: 1,
-        jnf: 3,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 3,
         schema: {'id': 40000},
         data: [
           <dynamic>[largeId],

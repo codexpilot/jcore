@@ -5,8 +5,8 @@ void main() {
   group('JConverter validation', () {
     test('validates correct JSONC', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -21,8 +21,8 @@ void main() {
 
     test('detects invalid data type in schema', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 999999}, // Invalid type ID
       );
 
@@ -34,8 +34,8 @@ void main() {
 
     test('detects row length mismatch', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John', 'Extra'], // Too many values
@@ -50,8 +50,8 @@ void main() {
 
     test('validates type compatibility - boolean', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'is_active': 10000}, // BOOLEAN
         data: [
           ['not a boolean'], // Wrong type
@@ -66,8 +66,8 @@ void main() {
 
     test('validates type compatibility - integer', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000}, // INT64
         data: [
           ['not an int'], // Wrong type
@@ -82,8 +82,8 @@ void main() {
 
     test('validates TEXT length constraint', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'code': 70002}, // TEXT(2) - only 2 characters allowed (70000 + 2)
         data: [
           ['ABC'], // 3 characters - exceeds limit
@@ -100,8 +100,8 @@ void main() {
   group('JConverter toMaps', () {
     test('converts JSONC data to list of maps', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000, 'age': 30000},
         data: [
           [1, 'John', 30],
@@ -118,8 +118,8 @@ void main() {
 
     test('throws when JSONC lacks schema', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         data: [
           [1, 'John'],
         ],
@@ -129,7 +129,7 @@ void main() {
     });
 
     test('throws when JSONC lacks data', () {
-      final jsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
+      final jsonc = JsonC(dataSchemaVersion: 1, resultSchemaId: 12345, schema: {'id': 40000});
 
       expect(() => JConverter.toMaps(jsonc), throwsArgumentError);
     });
@@ -144,10 +144,10 @@ void main() {
 
       final schema = {'id': 40000, 'name': 70000};
 
-      final jsonc = JConverter.fromMaps(maps, schema, jv: 1, jid: 12345);
+      final jsonc = JConverter.fromMaps(maps, schema, dataSchemaVersion: 1, resultSchemaId: 12345);
 
-      expect(jsonc.jv, equals(1));
-      expect(jsonc.jid, equals(12345));
+      expect(jsonc.dataSchemaVersion, equals(1));
+      expect(jsonc.resultSchemaId, equals(12345));
       expect(jsonc.schema, equals(schema));
       expect(
         jsonc.data,
@@ -159,7 +159,7 @@ void main() {
     });
 
     test('handles empty maps list', () {
-      final jsonc = JConverter.fromMaps([], {'id': 40000}, jv: 1, jid: 12345);
+      final jsonc = JConverter.fromMaps([], {'id': 40000}, dataSchemaVersion: 1, resultSchemaId: 12345);
 
       expect(jsonc.data, isEmpty);
       expect(jsonc.hasSchema, isTrue);
@@ -169,8 +169,8 @@ void main() {
   group('JConverter toCreateTableDDL', () {
     test('generates PostgreSQL CREATE TABLE statement', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {
           'id': 40000, // INT64 -> bigint
           'name': 70000, // TEXT -> text
@@ -188,8 +188,8 @@ void main() {
 
     test('throws when JSONC lacks schema', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         data: [
           [1],
         ],
@@ -205,14 +205,14 @@ void main() {
   group('JConverter merge', () {
     test('merges schema-only and data-only JSONC', () {
       final schemaJsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
       );
 
       final dataJsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         data: [
           [1, 'John'],
           [2, 'Jane'],
@@ -224,15 +224,15 @@ void main() {
       expect(merged.hasSchema, isTrue);
       expect(merged.hasData, isTrue);
       expect(merged.type, equals(JsonCType.full));
-      expect(merged.jid, equals(12345));
+      expect(merged.resultSchemaId, equals(12345));
     });
 
     test('throws on JID mismatch', () {
-      final schemaJsonc = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
+      final schemaJsonc = JsonC(dataSchemaVersion: 1, resultSchemaId: 12345, schema: {'id': 40000});
 
       final dataJsonc = JsonC(
-        jv: 1,
-        jid: 99999, // Different JID
+        dataSchemaVersion: 1,
+        resultSchemaId: 99999, // Different JID
         data: [
           [1],
         ],
@@ -248,8 +248,8 @@ void main() {
   group('JConverter extract', () {
     test('extracts schema from full JSONC', () {
       final fullJsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -265,8 +265,8 @@ void main() {
 
     test('extracts data from full JSONC', () {
       final fullJsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -284,8 +284,8 @@ void main() {
   group('JConverter getColumnMetadata', () {
     test('returns column metadata', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {
           'id': 40000, // INT64
           'price': 61002, // NUMERIC(10,2)
@@ -316,8 +316,8 @@ void main() {
     test('API response scenario', () {
       // Simulating aixhub sending data to contextstudio
       final apiResponse = {
-        'jv': 1,
-        'jid': 5001,
+        'dataSchemaVersion': 1,
+        'resultSchemaId': 5001,
         'schema': {
           'user_id': 40000,
           'username': 70100,
@@ -345,8 +345,8 @@ void main() {
     test('Schema definition scenario', () {
       // contextstudio defining a new table structure
       final tableSchema = JsonC(
-        jv: 1,
-        jid: 6001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 6001,
         schema: {
           'product_id': 40000,
           'sku': 70010, // TEXT(10)
@@ -368,15 +368,15 @@ void main() {
     test('Incremental data loading scenario', () {
       // First: Send schema
       final schemaJsonc = JsonC(
-        jv: 1,
-        jid: 7001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 7001,
         schema: {'id': 40000, 'value': 70000},
       );
 
       // Later: Send data batches with same JID
       final batch1 = JsonC(
-        jv: 1,
-        jid: 7001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 7001,
         data: [
           [1, 'First'],
           [2, 'Second'],
@@ -384,8 +384,8 @@ void main() {
       );
 
       final batch2 = JsonC(
-        jv: 1,
-        jid: 7001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 7001,
         data: [
           [3, 'Third'],
           [4, 'Fourth'],

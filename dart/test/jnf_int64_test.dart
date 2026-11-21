@@ -15,9 +15,9 @@ void main() {
     for (final mode in [0, 3, 5]) {
       test('mode $mode reads INT64 strings as BigInt and round-trips', () {
         final input = jsonEncode({
-          'jv': 1,
-          'jid': 1,
-          'jnf': mode,
+          'dataSchemaVersion': 1,
+          'resultSchemaId': 1,
+          'encoding': mode,
           'schema': schema,
           'data': [
             ['9223372036854775807', '123', 42, '123.45'],
@@ -50,14 +50,14 @@ void main() {
     for (final mode in <int?>[1, 2, 4, null]) {
       test('mode ${mode ?? 'default'} leaves INT64 values as int', () {
         final input = <String, dynamic>{
-          'jv': 1,
-          'jid': 1,
+          'dataSchemaVersion': 1,
+          'resultSchemaId': 1,
           'schema': schema,
           'data': [
             [123, '123', 42, '123.45'],
           ],
         };
-        if (mode != null) input['jnf'] = mode;
+        if (mode != null) input['encoding'] = mode;
         final jsonc = JsonC.fromJson(input);
         final map = JConverter.toMaps(jsonc).single;
         expect(map['id'], isA<int>());
@@ -69,14 +69,14 @@ void main() {
         expect(((encoded['data'] as List).single as List).first, 123);
 
         final stringInput = <String, dynamic>{
-          'jv': 1,
-          'jid': 1,
+          'dataSchemaVersion': 1,
+          'resultSchemaId': 1,
           'schema': {'id': 40000},
           'data': [
             ['123'],
           ],
         };
-        if (mode != null) stringInput['jnf'] = mode;
+        if (mode != null) stringInput['encoding'] = mode;
         final numericString = JsonC.fromJson(stringInput);
         expect(numericString.data!.single.single, isA<int>());
       });
@@ -86,7 +86,13 @@ void main() {
       final data = <List<dynamic>>[
         ['9007199254740993', '12', 42, '123.45'],
       ];
-      final jsonc = JsonC(jv: 1, jid: 1, jnf: 3, schema: schema, data: data);
+      final jsonc = JsonC(
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 3,
+        schema: schema,
+        data: data,
+      );
       final map = JConverter.toMaps(jsonc).single;
       expect(map['id'], BigInt.parse('9007199254740993'));
       expect(map['id'], isA<BigInt>());
@@ -96,7 +102,7 @@ void main() {
 
     test('never treats unsafe raw numbers as exact BigInt input', () {
       const raw =
-          '{"jv":1,"jid":1,"jnf":3,"schema":{"id":40000},'
+          '{"dataSchemaVersion":1,"resultSchemaId":1,"encoding":3,"schema":{"id":40000},'
           '"data":[[9007199254740992]]}';
       try {
         final jsonc = JsonC.parse(raw);
@@ -122,9 +128,9 @@ void main() {
         [value],
       ];
       final jsonc = JsonC(
-        jv: 1,
-        jid: 1,
-        jnf: 3,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 3,
         schema: {'id': 40000},
         data: data,
       );
@@ -142,11 +148,11 @@ void main() {
           {'id': 42},
         ],
         {'id': 40000},
-        jv: 1,
-        jid: 1,
-        jnf: 3,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 3,
       );
-      expect(stringMode.jnf, 3);
+      expect(stringMode.encoding, 3);
       expect(JConverter.toMaps(stringMode).single['id'], BigInt.from(42));
       expect(JConverter.toMaps(stringMode).single['id'], isA<BigInt>());
 
@@ -155,9 +161,9 @@ void main() {
           {'id': BigInt.from(42)},
         ],
         {'id': 40000},
-        jv: 1,
-        jid: 1,
-        jnf: 4,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 4,
       );
       expect(JConverter.toMaps(numberMode).single['id'], 42);
       expect(JConverter.toMaps(numberMode).single['id'], isA<int>());
@@ -170,11 +176,11 @@ void main() {
           {'id': value},
         ],
         {'id': 40000},
-        jv: 1,
-        jid: 1,
-        jnf: 3,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
+        encoding: 3,
       );
-      expect(result.jnf, 3);
+      expect(result.encoding, 3);
       expect(result.data!.single.single, value);
       expect(
         (jsonDecode(result.encode())['data'] as List).single.single,
@@ -186,8 +192,8 @@ void main() {
           {'id': BigInt.from(123)},
         ],
         {'id': 40000},
-        jv: 1,
-        jid: 1,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1,
       );
       expect(raw.data!.single.single, isA<int>());
     });
@@ -196,9 +202,9 @@ void main() {
       'preserves null and leaves mismatched rows available for validation',
       () {
         final jsonc = JsonC.fromJson({
-          'jv': 1,
-          'jid': 1,
-          'jnf': 3,
+          'dataSchemaVersion': 1,
+          'resultSchemaId': 1,
+          'encoding': 3,
           'schema': schema,
           'data': [
             [null, 'name', 1, '1.23'],
@@ -213,9 +219,9 @@ void main() {
     test('rejects malformed or out-of-range INT64 values', () {
       for (final value in ['not-int', '9223372036854775808']) {
         final jsonc = JsonC(
-          jv: 1,
-          jid: 1,
-          jnf: 3,
+          dataSchemaVersion: 1,
+          resultSchemaId: 1,
+          encoding: 3,
           schema: {'id': 40000},
           data: [
             [value],
@@ -227,40 +233,48 @@ void main() {
 
     test('data-only payload retains mode until merged with schema', () {
       final dataOnly = JsonC.fromJson({
-        'jv': 1,
-        'jid': 123,
-        'jnf': 5,
+        'dataSchemaVersion': 1,
+        'resultSchemaId': 123,
+        'encoding': 5,
         'data': [
           ['9007199254740993', 'name', 1, '1.23'],
         ],
       });
       expect(dataOnly.data!.single.first, '9007199254740993');
-      final schemaOnly = JsonC(jv: 1, jid: 123, schema: schema);
+      final schemaOnly = JsonC(
+        dataSchemaVersion: 1,
+        resultSchemaId: 123,
+        schema: schema,
+      );
       final merged = JConverter.merge(schemaOnly, dataOnly);
-      expect(merged.jnf, 5);
+      expect(merged.encoding, 5);
       expect(
         JConverter.toMaps(merged).single['id'],
         BigInt.parse('9007199254740993'),
       );
-      expect(JConverter.extractData(merged).jnf, 5);
+      expect(JConverter.extractData(merged).encoding, 5);
     });
 
     test('JBase merge preserves the data-only jnf', () {
       final base = JBase.instance;
       base.clear();
       addTearDown(base.clear);
-      base.register(JsonC(jv: 1, jid: 123, schema: schema));
+      base.register(JsonC(
+        dataSchemaVersion: 1,
+        resultSchemaId: 123,
+        schema: schema,
+      ));
       final merged = base.mergeWithSchema(
         JsonC(
-          jv: 1,
-          jid: 123,
-          jnf: 3,
+          dataSchemaVersion: 1,
+          resultSchemaId: 123,
+          encoding: 3,
           data: [
             ['9007199254740993', 'name', 1, '1.23'],
           ],
         ),
       );
-      expect(merged.jnf, 3);
+      expect(merged.encoding, 3);
       expect(
         JConverter.toMaps(merged).single['id'],
         BigInt.parse('9007199254740993'),

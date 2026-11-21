@@ -2,21 +2,21 @@ import 'jsonc.dart';
 
 /// JBase - Singleton schema registry for AIX
 ///
-/// Stores and manages JSONC schemas by their JID (schema ID).
+/// Stores and manages JSONC schemas by their resultSchemaId (schema ID).
 /// Use this to cache schemas and avoid re-transmitting them with every data payload.
 ///
 /// Example usage:
 /// ```dart
 /// // Register a schema once
 /// final schema = JsonC(
-///   jv: 1,
-///   jid: 12345,
+///   dataSchemaVersion: 1,
+///   resultSchemaId: 12345,
 ///   schema: {'id': 40000, 'name': 70000},
 /// );
 /// JBase.instance.register(schema);
 ///
-/// // Later, use data-only JSONC with same JID
-/// final dataOnly = JsonC(jv: 1, jid: 12345, data: [[1, 'John']]);
+/// // Later, use data-only JSONC with same resultSchemaId
+/// final dataOnly = JsonC(dataSchemaVersion: 1, resultSchemaId: 12345, data: [[1, 'John']]);
 ///
 /// // Retrieve schema when needed
 /// final fullSchema = JBase.instance.get(12345);
@@ -28,13 +28,13 @@ class JBase {
   /// Singleton instance
   static final JBase instance = JBase._();
 
-  /// Schema registry: JID -> JsonC (schema-only)
+  /// Schema registry: resultSchemaId -> JsonC (schema-only)
   final Map<int, JsonC> _schemas = {};
 
   /// Register a schema
   ///
   /// The JsonC must have a schema. If it has data, only the schema is stored.
-  /// If a schema with the same JID already exists, it will be replaced.
+  /// If a schema with the same resultSchemaId already exists, it will be replaced.
   ///
   /// Returns the registered schema (schema-only JsonC).
   JsonC register(JsonC jsonc) {
@@ -44,12 +44,12 @@ class JBase {
 
     // Extract schema-only version
     final schemaOnly = JsonC(
-      jv: jsonc.jv,
-      jid: jsonc.jid,
+      dataSchemaVersion: jsonc.dataSchemaVersion,
+      resultSchemaId: jsonc.resultSchemaId,
       schema: jsonc.schema,
     );
 
-    _schemas[jsonc.jid] = schemaOnly;
+    _schemas[jsonc.resultSchemaId] = schemaOnly;
 
     return schemaOnly;
   }
@@ -68,34 +68,34 @@ class JBase {
     return count;
   }
 
-  /// Get schema by JID
+  /// Get schema by resultSchemaId
   ///
   /// Returns null if schema not found.
-  JsonC? get(int jid) {
-    return _schemas[jid];
+  JsonC? get(int resultSchemaId) {
+    return _schemas[resultSchemaId];
   }
 
   /// Check if schema exists
-  bool has(int jid) {
-    return _schemas.containsKey(jid);
+  bool has(int resultSchemaId) {
+    return _schemas.containsKey(resultSchemaId);
   }
 
   /// Get schema or throw if not found
   ///
   /// Use this when you expect the schema to exist.
-  JsonC getOrThrow(int jid) {
-    final schema = _schemas[jid];
+  JsonC getOrThrow(int resultSchemaId) {
+    final schema = _schemas[resultSchemaId];
     if (schema == null) {
-      throw StateError('Schema with JID $jid not found in JBase');
+      throw StateError('Schema with resultSchemaId $resultSchemaId not found in JBase');
     }
     return schema;
   }
 
-  /// Remove schema by JID
+  /// Remove schema by resultSchemaId
   ///
   /// Returns true if schema was removed, false if it didn't exist.
-  bool remove(int jid) {
-    return _schemas.remove(jid) != null;
+  bool remove(int resultSchemaId) {
+    return _schemas.remove(resultSchemaId) != null;
   }
 
   /// Clear all schemas
@@ -103,8 +103,8 @@ class JBase {
     _schemas.clear();
   }
 
-  /// Get all registered JIDs
-  List<int> get jids => _schemas.keys.toList();
+  /// Get all registered resultSchemaIds
+  List<int> get resultSchemaIds => _schemas.keys.toList();
 
   /// Get number of registered schemas
   int get count => _schemas.length;
@@ -120,12 +120,12 @@ class JBase {
 
   /// Get schema metadata for all registered schemas
   ///
-  /// Returns list of maps with jv, jid, and column information.
+  /// Returns list of maps with dataSchemaVersion, resultSchemaId, and column information.
   List<Map<String, dynamic>> getMetadata() {
     return _schemas.values.map((schema) {
       return {
-        'jv': schema.jv,
-        'jid': schema.jid,
+        'dataSchemaVersion': schema.dataSchemaVersion,
+        'resultSchemaId': schema.resultSchemaId,
         'columnCount': schema.columnCount,
         'columns': schema.columnNames,
         'dataTypes': schema.dataTypeIds,
@@ -135,7 +135,7 @@ class JBase {
 
   /// Merge data-only JSONC with registered schema
   ///
-  /// Looks up the schema by JID and creates a full JSONC.
+  /// Looks up the schema by resultSchemaId and creates a full JSONC.
   /// Throws if schema not found.
   ///
   /// Example:
@@ -144,7 +144,7 @@ class JBase {
   /// JBase.instance.register(schemaJsonc);
   ///
   /// // Receive data-only payload
-  /// final dataOnly = JsonC(jv: 1, jid: 12345, data: [[1, 'John']]);
+  /// final dataOnly = JsonC(dataSchemaVersion: 1, resultSchemaId: 12345, data: [[1, 'John']]);
   ///
   /// // Merge with schema
   /// final full = JBase.instance.mergeWithSchema(dataOnly);
@@ -155,25 +155,29 @@ class JBase {
       throw ArgumentError('JsonC must have data to merge');
     }
 
-    final schema = getOrThrow(dataOnlyJsonc.jid);
+    final schema = getOrThrow(dataOnlyJsonc.resultSchemaId);
 
     return JsonC(
-      jv: dataOnlyJsonc.jv,
-      jid: dataOnlyJsonc.jid,
-      jnf: dataOnlyJsonc.jnf,
+      dataSchemaVersion: dataOnlyJsonc.dataSchemaVersion,
+      resultSchemaId: dataOnlyJsonc.resultSchemaId,
+      encoding: dataOnlyJsonc.encoding,
       schema: schema.schema,
       data: dataOnlyJsonc.data,
     ).normalizeInt64();
   }
 
-  /// Update schema version (jv) for a JID
+  /// Update schema version (dataSchemaVersion) for a resultSchemaId
   ///
-  /// Returns true if update succeeded, false if JID not found.
-  bool updateVersion(int jid, int newJv) {
-    final schema = _schemas[jid];
+  /// Returns true if update succeeded, false if resultSchemaId not found.
+  bool updateVersion(int resultSchemaId, int newDataSchemaVersion) {
+    final schema = _schemas[resultSchemaId];
     if (schema == null) return false;
 
-    _schemas[jid] = JsonC(jv: newJv, jid: jid, schema: schema.schema);
+    _schemas[resultSchemaId] = JsonC(
+      dataSchemaVersion: newDataSchemaVersion,
+      resultSchemaId: resultSchemaId,
+      schema: schema.schema,
+    );
 
     return true;
   }

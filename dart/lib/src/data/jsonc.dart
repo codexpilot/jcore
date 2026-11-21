@@ -74,36 +74,56 @@ enum JsonCType {
 /// Example full format:
 /// ```json
 /// {
-///   "jv": 1731542400,
-///   "jid": 12345,
-///   "jnf": 3,
+///   "jcore": "4.4.0",
+///   "dataSchemaVersion": 1731542400,
+///   "resultSchemaId": 12345,
+///   "encoding": 3,
+///   "columns": ["id", "name"],
 ///   "schema": {"id": 40000, "name": 70000},
 ///   "data": [[1, "John"], [2, "Jane"]]
 /// }
 /// ```
 ///
-/// Encoding modes (jnf):
+/// Encoding modes (encoding):
 /// - 0: Formal JSON array, both BigInt and Numeric as string (web-safe input)
 /// - 1: Formal JSON array, both as plain number (not web-safe)
 /// - 2: JSONC, both as plain number (default, not web-safe for INT64)
 /// - 3: JSONC, BigInt only as string (web-safe for large integers)
 /// - 4: JSONC, Numeric as string (not web-safe for INT64)
 /// - 5: JSONC, both as string (maximum safety)
+/// - 8-13: Extended modes with text temporal values (RFC 3339, HH:mm:ss.SSS)
 class JsonC {
-  /// Schema version - epoch seconds (timestamp when schema was created)
-  final int jv;
+  /// JCore package version (optional)
+  final String? jcore;
 
-  /// Schema ID - unique identifier for this schema definition
-  final int jid;
+  /// MJUX package version (optional)
+  final String? mjux;
 
-  /// JSONC number format (optional, defaults to 2)
+  /// Application version with build number (optional)
+  final String? appx;
+
+  /// Data schema version - epoch seconds (timestamp when schema was created)
+  final int dataSchemaVersion;
+
+  /// UX schema version - uidef format version (optional)
+  final int? uxSchemaVersion;
+
+  /// Result schema ID - unique identifier for this schema definition
+  final int resultSchemaId;
+
+  /// Encoding mode (0-5, 8-13, defaults to 2)
   /// - 0: Formal JSON array, both BigInt and Numeric as string (web-safe input)
   /// - 1: Formal JSON array, both as plain number (not web-safe)
   /// - 2: JSONC format, both as plain number (default, not web-safe)
   /// - 3: JSONC format, BigInt only as string (web-safe for large integers)
   /// - 4: JSONC format, Numeric as string (not web-safe for INT64)
   /// - 5: JSONC format, both BigInt and Numeric as string (maximum safety)
-  final int? jnf;
+  /// - 8-13: Extended modes with text temporal values
+  final int? encoding;
+
+  /// Explicit column ordering (optional)
+  /// When present, defines the order for decoding data rows
+  final List<String>? columns;
 
   /// Column definitions: column_name -> DataType ID
   /// Example: {"id": 40000, "name": 70000, "price": 61002}
@@ -114,25 +134,48 @@ class JsonC {
   final List<List<dynamic>>? data;
 
   const JsonC({
-    required this.jv,
-    required this.jid,
-    this.jnf,
+    this.jcore,
+    this.mjux,
+    this.appx,
+    required this.dataSchemaVersion,
+    this.uxSchemaVersion,
+    required this.resultSchemaId,
+    this.encoding,
+    this.columns,
     this.schema,
     this.data,
   });
 
-  /// Get encoding mode (0-5, defaults to 2)
-  int get encoding => jnf ?? 2;
+  /// Get encoding mode (0-5, 8-13, defaults to 2)
+  int get encodingMode => encoding ?? 2;
 
-  /// Check if this is formal JSON array format (modes 0-1)
-  bool get isFormalJsonArray => encoding == 0 || encoding == 1;
+  /// Check if this is a valid encoding mode (0-5 or 8-13)
+  bool get isValidEncoding {
+    final mode = encodingMode;
+    return (mode >= 0 && mode <= 5) || (mode >= 8 && mode <= 13);
+  }
 
-  /// Check if this is JSONC format (modes 2-5)
-  bool get isJsonCFormat => encoding >= 2 && encoding <= 5;
+  /// Check if this is extended mode with text temporal values (8-13)
+  bool get isExtendedMode => encodingMode >= 8 && encodingMode <= 13;
+
+  /// Get base mode for extended modes (encoding - 8), or encoding for base modes
+  int get baseMode => isExtendedMode ? encodingMode - 8 : encodingMode;
+
+  /// Check if this is formal JSON array format (modes 0-1, 8-9)
+  bool get isFormalJsonArray {
+    final base = baseMode;
+    return base == 0 || base == 1;
+  }
+
+  /// Check if this is JSONC format (modes 2-5, 10-13)
+  bool get isJsonCFormat {
+    final base = baseMode;
+    return base >= 2 && base <= 5;
+  }
 
   /// Check if BigInt should be encoded as string
   bool get useBigIntStrings {
-    switch (encoding) {
+    switch (baseMode) {
       case 0: // Formal JSON: both string
       case 3: // JSONC: BigInt string
       case 5: // JSONC: both string
@@ -144,7 +187,7 @@ class JsonC {
 
   /// Check if Numeric should be encoded as string
   bool get useNumericStrings {
-    switch (encoding) {
+    switch (baseMode) {
       case 0: // Formal JSON: both string
       case 4: // JSONC: Numeric string
       case 5: // JSONC: both string
@@ -168,10 +211,16 @@ class JsonC {
   bool get hasData => data != null;
 
   /// Get column names in order
-  List<String> get columnNames => schema?.keys.toList() ?? [];
+  /// Uses explicit columns field if present, otherwise schema keys
+  List<String> get columnNames => columns ?? schema?.keys.toList() ?? [];
 
   /// Get data type IDs in column order
-  List<int> get dataTypeIds => schema?.values.toList() ?? [];
+  /// Uses explicit columns ordering if present
+  List<int> get dataTypeIds {
+    if (schema == null) return [];
+    final cols = columnNames;
+    return cols.map((name) => schema![name]).whereType<int>().toList();
+  }
 
   /// Get number of columns
   int get columnCount => schema?.length ?? 0;
@@ -181,8 +230,8 @@ class JsonC {
 
   /// Check if JSONC is valid
   bool get isValid {
-    // Must have jv and jid
-    if (jv < 0 || jid < 0) return false;
+    // Must have dataSchemaVersion and resultSchemaId
+    if (dataSchemaVersion < 0 || resultSchemaId < 0) return false;
 
     // Must have either schema or data
     if (schema == null && data == null) return false;
@@ -200,36 +249,80 @@ class JsonC {
 
   /// Return a copy with schema-identified INT64 cells in their Dart form.
   ///
-  /// Modes 0, 3 and 5 use [BigInt]; other modes use [int]. An optional schema
-  /// can be supplied for data-only payloads. Values that are not valid INT64
-  /// inputs remain unchanged so callers can report validation errors.
+  /// Modes 0, 3, 5, 8, 11, 13 use [BigInt]; other modes use [int]. An optional
+  /// schema can be supplied for data-only payloads. Values that are not valid
+  /// INT64 inputs remain unchanged so callers can report validation errors.
   JsonC normalizeInt64({Map<String, int>? schema}) {
     final effectiveSchema = schema ?? this.schema;
     if (effectiveSchema == null || data == null) return this;
-    final types = effectiveSchema.values.toList();
+
+    // Use explicit column ordering if available
+    final cols = columns ?? effectiveSchema.keys.toList();
+    final types = cols.map((name) => effectiveSchema[name]).whereType<int>().toList();
+
     final rows = data!.map((row) {
       return List<dynamic>.generate(row.length, (i) {
         if (i >= types.length || !_int64TypeIds.contains(types[i])) {
           return row[i];
         }
-        return _normalizeInt64Cell(row[i], _isInt64StringMode(jnf));
+        return _normalizeInt64Cell(row[i], _isInt64StringMode(encoding));
       });
     }).toList();
+
     return JsonC(
-      jv: jv,
-      jid: jid,
-      jnf: jnf,
+      jcore: jcore,
+      mjux: mjux,
+      appx: appx,
+      dataSchemaVersion: dataSchemaVersion,
+      uxSchemaVersion: uxSchemaVersion,
+      resultSchemaId: resultSchemaId,
+      encoding: encoding,
+      columns: columns,
       schema: effectiveSchema,
       data: rows,
     );
   }
 
   /// Create from JSON map
+  /// Only accepts canonical field names (not legacy jv/jid/jnf)
   factory JsonC.fromJson(Map<String, dynamic> json) {
+    // Require canonical field names
+    final dataSchemaVersion = json['dataSchemaVersion'] as int?;
+    if (dataSchemaVersion == null) {
+      throw FormatException('Missing required field: dataSchemaVersion');
+    }
+
+    final resultSchemaId = json['resultSchemaId'] as int?;
+    if (resultSchemaId == null) {
+      throw FormatException('Missing required field: resultSchemaId');
+    }
+
+    final encoding = json['encoding'] as int?;
+
+    // Validate encoding mode if present
+    if (encoding != null) {
+      final isValid = (encoding >= 0 && encoding <= 5) || (encoding >= 8 && encoding <= 13);
+      if (!isValid) {
+        throw FormatException(
+          'Invalid encoding mode: $encoding (valid: 0-5, 8-13)',
+        );
+      }
+    }
+
+    // Parse columns if present
+    final columns = json['columns'] != null
+        ? List<String>.from(json['columns'] as List)
+        : null;
+
     return JsonC(
-      jv: json['jv'] as int,
-      jid: json['jid'] as int,
-      jnf: json['jnf'] as int?,
+      jcore: json['jcore'] as String?,
+      mjux: json['mjux'] as String?,
+      appx: json['appx'] as String?,
+      dataSchemaVersion: dataSchemaVersion,
+      uxSchemaVersion: json['uxSchemaVersion'] as int?,
+      resultSchemaId: resultSchemaId,
+      encoding: encoding,
+      columns: columns,
       schema: json['schema'] != null
           ? Map<String, int>.from(json['schema'] as Map)
           : null,
@@ -242,11 +335,36 @@ class JsonC {
   }
 
   /// Convert to JSON map
+  /// Emits only canonical field names (not legacy jv/jid/jnf)
   Map<String, dynamic> toJson() {
-    final result = <String, dynamic>{'jv': jv, 'jid': jid};
+    final result = <String, dynamic>{
+      'dataSchemaVersion': dataSchemaVersion,
+      'resultSchemaId': resultSchemaId,
+    };
 
-    if (jnf != null) {
-      result['jnf'] = jnf;
+    // Include optional version fields
+    if (jcore != null) {
+      result['jcore'] = jcore;
+    }
+
+    if (mjux != null) {
+      result['mjux'] = mjux;
+    }
+
+    if (appx != null) {
+      result['appx'] = appx;
+    }
+
+    if (uxSchemaVersion != null) {
+      result['uxSchemaVersion'] = uxSchemaVersion;
+    }
+
+    if (encoding != null) {
+      result['encoding'] = encoding;
+    }
+
+    if (columns != null) {
+      result['columns'] = columns;
     }
 
     if (schema != null) {
@@ -254,23 +372,30 @@ class JsonC {
     }
 
     if (data != null) {
-      final types = schema?.values.toList();
-      final stringMode = _isInt64StringMode(jnf);
+      // Use explicit column ordering to get types
+      final types = dataTypeIds;
+      final stringMode = _isInt64StringMode(encoding);
+
       result['data'] = data!.map((row) {
         return List<dynamic>.generate(row.length, (i) {
           final value = row[i];
-          final hasType = types != null && i < types.length;
+          final hasType = i < types.length;
           final typeId = hasType ? types[i] : null;
           final isInt64 = typeId != null && _int64TypeIds.contains(typeId);
-          if (stringMode && (isInt64 || types == null && value is BigInt)) {
+
+          if (stringMode && (isInt64 || types.isEmpty && value is BigInt)) {
             if (value is BigInt) return value.toString();
             if (value is int) return _bigIntFromSafeInt(value).toString();
           } else if (!stringMode && isInt64) {
             return _normalizeInt64Cell(value, false);
           }
+
           if (value is Numeric) {
-            return _isNumericStringMode(jnf) ? value.toString() : value.toNum();
+            return _isNumericStringMode(encoding)
+                ? value.toString()
+                : value.toNum();
           }
+
           return value;
         });
       }).toList();
@@ -301,17 +426,27 @@ class JsonC {
       identical(this, other) ||
       other is JsonC &&
           runtimeType == other.runtimeType &&
-          jv == other.jv &&
-          jid == other.jid &&
-          jnf == other.jnf &&
+          jcore == other.jcore &&
+          mjux == other.mjux &&
+          appx == other.appx &&
+          dataSchemaVersion == other.dataSchemaVersion &&
+          uxSchemaVersion == other.uxSchemaVersion &&
+          resultSchemaId == other.resultSchemaId &&
+          encoding == other.encoding &&
+          _listEquals(columns, other.columns) &&
           _mapEquals(schema, other.schema) &&
           _listEquals(data, other.data);
 
   @override
   int get hashCode =>
-      jv.hashCode ^
-      jid.hashCode ^
-      jnf.hashCode ^
+      jcore.hashCode ^
+      mjux.hashCode ^
+      appx.hashCode ^
+      dataSchemaVersion.hashCode ^
+      uxSchemaVersion.hashCode ^
+      resultSchemaId.hashCode ^
+      encoding.hashCode ^
+      columns.hashCode ^
       schema.hashCode ^
       data.hashCode;
 

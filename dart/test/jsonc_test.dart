@@ -5,8 +5,8 @@ void main() {
   group('JsonC construction', () {
     test('creates full JSONC with schema and data', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -14,8 +14,8 @@ void main() {
         ],
       );
 
-      expect(jsonc.jv, equals(1));
-      expect(jsonc.jid, equals(12345));
+      expect(jsonc.dataSchemaVersion, equals(1));
+      expect(jsonc.resultSchemaId, equals(12345));
       expect(jsonc.hasSchema, isTrue);
       expect(jsonc.hasData, isTrue);
       expect(jsonc.type, equals(JsonCType.full));
@@ -25,8 +25,8 @@ void main() {
 
     test('creates schema-only JSONC', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
       );
 
@@ -37,8 +37,8 @@ void main() {
 
     test('creates data-only JSONC', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         data: [
           [1, 'John'],
           [2, 'Jane'],
@@ -54,8 +54,8 @@ void main() {
   group('JsonC validation', () {
     test('validates correct JSONC', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -67,15 +67,15 @@ void main() {
     });
 
     test('rejects JSONC without schema and data', () {
-      final jsonc = JsonC(jv: 1, jid: 12345);
+      final jsonc = JsonC(dataSchemaVersion: 1, resultSchemaId: 12345);
 
       expect(jsonc.isValid, isFalse);
     });
 
     test('rejects JSONC with mismatched row length', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -88,10 +88,10 @@ void main() {
   });
 
   group('JsonC JSON serialization', () {
-    test('converts to JSON map', () {
+    test('converts to JSON map with canonical names', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000},
         data: [
           [1, 'John'],
@@ -100,8 +100,8 @@ void main() {
 
       final json = jsonc.toJson();
 
-      expect(json['jv'], equals(1));
-      expect(json['jid'], equals(12345));
+      expect(json['dataSchemaVersion'], equals(1));
+      expect(json['resultSchemaId'], equals(12345));
       expect(json['schema'], equals({'id': 40000, 'name': 70000}));
       expect(
         json['data'],
@@ -111,10 +111,10 @@ void main() {
       );
     });
 
-    test('creates from JSON map', () {
+    test('creates from JSON map with canonical names', () {
       final json = {
-        'jv': 1,
-        'jid': 12345,
+        'dataSchemaVersion': 1,
+        'resultSchemaId': 12345,
         'schema': {'id': 40000, 'name': 70000},
         'data': [
           [1, 'John'],
@@ -123,8 +123,8 @@ void main() {
 
       final jsonc = JsonC.fromJson(json);
 
-      expect(jsonc.jv, equals(1));
-      expect(jsonc.jid, equals(12345));
+      expect(jsonc.dataSchemaVersion, equals(1));
+      expect(jsonc.resultSchemaId, equals(12345));
       expect(jsonc.schema, equals({'id': 40000, 'name': 70000}));
       expect(
         jsonc.data,
@@ -134,10 +134,10 @@ void main() {
       );
     });
 
-    test('encodes to JSON string', () {
+    test('encodes to JSON string with canonical names', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000},
         data: [
           [1],
@@ -146,26 +146,26 @@ void main() {
 
       final jsonString = jsonc.encode();
 
-      expect(jsonString, contains('"jv":1'));
-      expect(jsonString, contains('"jid":12345'));
+      expect(jsonString, contains('"dataSchemaVersion":1'));
+      expect(jsonString, contains('"resultSchemaId":12345'));
     });
 
-    test('parses from JSON string', () {
+    test('parses from JSON string with canonical names', () {
       final jsonString =
-          '{"jv":1,"jid":12345,"schema":{"id":40000},"data":[[1]]}';
+          '{"dataSchemaVersion":1,"resultSchemaId":12345,"schema":{"id":40000},"data":[[1]]}';
 
       final jsonc = JsonC.parse(jsonString);
 
-      expect(jsonc.jv, equals(1));
-      expect(jsonc.jid, equals(12345));
+      expect(jsonc.dataSchemaVersion, equals(1));
+      expect(jsonc.resultSchemaId, equals(12345));
     });
   });
 
   group('JsonC helpers', () {
     test('gets column names', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000, 'price': 61002},
       );
 
@@ -179,8 +179,8 @@ void main() {
 
     test('gets data type IDs', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000, 'name': 70000, 'price': 61002},
       );
 
@@ -191,13 +191,25 @@ void main() {
       expect(typeIds, contains(70000));
       expect(typeIds, contains(61002));
     });
+
+    test('uses explicit columns ordering', () {
+      final jsonc = JsonC(
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
+        columns: ['price', 'id', 'name'], // Explicit order
+        schema: {'id': 40000, 'name': 70000, 'price': 61002},
+      );
+
+      expect(jsonc.columnNames, equals(['price', 'id', 'name']));
+      expect(jsonc.dataTypeIds, equals([61002, 40000, 70000]));
+    });
   });
 
   group('JsonC equality', () {
     test('equal JSONC instances are equal', () {
       final jsonc1 = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000},
         data: [
           [1],
@@ -205,8 +217,8 @@ void main() {
       );
 
       final jsonc2 = JsonC(
-        jv: 1,
-        jid: 12345,
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
         schema: {'id': 40000},
         data: [
           [1],
@@ -217,11 +229,15 @@ void main() {
     });
 
     test('different JSONC instances are not equal', () {
-      final jsonc1 = JsonC(jv: 1, jid: 12345, schema: {'id': 40000});
+      final jsonc1 = JsonC(
+        dataSchemaVersion: 1,
+        resultSchemaId: 12345,
+        schema: {'id': 40000},
+      );
 
       final jsonc2 = JsonC(
-        jv: 1,
-        jid: 12346, // Different jid
+        dataSchemaVersion: 1,
+        resultSchemaId: 12346, // Different ID
         schema: {'id': 40000},
       );
 
@@ -229,11 +245,73 @@ void main() {
     });
   });
 
+  group('JsonC encoding modes', () {
+    test('validates encoding modes 0-5', () {
+      for (final mode in [0, 1, 2, 3, 4, 5]) {
+        final jsonc = JsonC(
+          dataSchemaVersion: 1,
+          resultSchemaId: 12345,
+          encoding: mode,
+        );
+        expect(jsonc.isValidEncoding, isTrue, reason: 'Mode $mode');
+        expect(jsonc.isExtendedMode, isFalse, reason: 'Mode $mode');
+      }
+    });
+
+    test('validates extended encoding modes 8-13', () {
+      for (final mode in [8, 9, 10, 11, 12, 13]) {
+        final jsonc = JsonC(
+          dataSchemaVersion: 1,
+          resultSchemaId: 12345,
+          encoding: mode,
+        );
+        expect(jsonc.isValidEncoding, isTrue, reason: 'Mode $mode');
+        expect(jsonc.isExtendedMode, isTrue, reason: 'Mode $mode');
+      }
+    });
+
+    test('rejects invalid encoding modes', () {
+      for (final mode in [6, 7, 14, 15, 100, -1]) {
+        final json = {
+          'dataSchemaVersion': 1,
+          'resultSchemaId': 12345,
+          'encoding': mode,
+        };
+        expect(
+          () => JsonC.fromJson(json),
+          throwsFormatException,
+          reason: 'Mode $mode should be rejected',
+        );
+      }
+    });
+
+    test('extended mode base calculation', () {
+      final tests = {
+        8: 0,
+        9: 1,
+        10: 2,
+        11: 3,
+        12: 4,
+        13: 5,
+      };
+
+      tests.forEach((mode, expectedBase) {
+        final jsonc = JsonC(
+          dataSchemaVersion: 1,
+          resultSchemaId: 12345,
+          encoding: mode,
+        );
+        expect(jsonc.baseMode, equals(expectedBase),
+            reason: 'Mode $mode should have base $expectedBase');
+      });
+    });
+  });
+
   group('Real-world examples', () {
     test('product catalog example', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 1001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 1001,
         schema: {
           'product_id': 40000, // INT64
           'name': 70000, // TEXT
@@ -254,8 +332,8 @@ void main() {
 
     test('user records example', () {
       final jsonc = JsonC(
-        jv: 1,
-        jid: 2001,
+        dataSchemaVersion: 1,
+        resultSchemaId: 2001,
         schema: {
           'user_id': 40000, // INT64
           'username': 70100, // TEXT(100)
@@ -271,6 +349,25 @@ void main() {
 
       expect(jsonc.isValid, isTrue);
       expect(jsonc.type, equals(JsonCType.full));
+    });
+
+    test('includes version fields', () {
+      final jsonc = JsonC(
+        jcore: '4.5.0',
+        mjux: '0.2.0',
+        appx: 'ContextStudio 1.0.0 (build 123)',
+        dataSchemaVersion: 1737849600,
+        uxSchemaVersion: 2,
+        resultSchemaId: 5001,
+        encoding: 13,
+        schema: {'id': 40000},
+      );
+
+      final json = jsonc.toJson();
+      expect(json['jcore'], equals('4.5.0'));
+      expect(json['mjux'], equals('0.2.0'));
+      expect(json['appx'], equals('ContextStudio 1.0.0 (build 123)'));
+      expect(json['uxSchemaVersion'], equals(2));
     });
   });
 }

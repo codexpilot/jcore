@@ -15,12 +15,12 @@ class JConverter {
     final errors = <String>[];
 
     // Basic structure validation
-    if (jsonc.jv < 0) {
-      errors.add('Invalid jv (schema version): ${jsonc.jv}');
+    if (jsonc.dataSchemaVersion < 0) {
+      errors.add('Invalid dataSchemaVersion: ${jsonc.dataSchemaVersion}');
     }
 
-    if (jsonc.jid < 0) {
-      errors.add('Invalid jid (schema id): ${jsonc.jid}');
+    if (jsonc.resultSchemaId < 0) {
+      errors.add('Invalid resultSchemaId: ${jsonc.resultSchemaId}');
     }
 
     // Must have schema or data
@@ -251,12 +251,18 @@ class JConverter {
   static JsonC fromMaps(
     List<Map<String, dynamic>> maps,
     Map<String, int> schema, {
-    required int jv,
-    required int jid,
-    int? jnf,
+    required int dataSchemaVersion,
+    required int resultSchemaId,
+    int? encoding,
   }) {
     if (maps.isEmpty) {
-      return JsonC(jv: jv, jid: jid, jnf: jnf, schema: schema, data: []);
+      return JsonC(
+        dataSchemaVersion: dataSchemaVersion,
+        resultSchemaId: resultSchemaId,
+        encoding: encoding,
+        schema: schema,
+        data: [],
+      );
     }
 
     final columnNames = schema.keys.toList();
@@ -271,9 +277,9 @@ class JConverter {
     }
 
     return JsonC(
-      jv: jv,
-      jid: jid,
-      jnf: jnf,
+      dataSchemaVersion: dataSchemaVersion,
+      resultSchemaId: resultSchemaId,
+      encoding: encoding,
       schema: schema,
       data: data,
     ).normalizeInt64();
@@ -324,17 +330,17 @@ class JConverter {
       throw ArgumentError('Second JSONC must have data');
     }
 
-    // Validate JID match
-    if (schemaJsonc.jid != dataJsonc.jid) {
+    // Validate resultSchemaId match
+    if (schemaJsonc.resultSchemaId != dataJsonc.resultSchemaId) {
       throw ArgumentError(
-        'Schema JID (${schemaJsonc.jid}) does not match data JID (${dataJsonc.jid})',
+        'Schema resultSchemaId (${schemaJsonc.resultSchemaId}) does not match data resultSchemaId (${dataJsonc.resultSchemaId})',
       );
     }
 
     return JsonC(
-      jv: schemaJsonc.jv,
-      jid: schemaJsonc.jid,
-      jnf: dataJsonc.jnf,
+      dataSchemaVersion: schemaJsonc.dataSchemaVersion,
+      resultSchemaId: schemaJsonc.resultSchemaId,
+      encoding: dataJsonc.encoding,
       schema: schemaJsonc.schema,
       data: dataJsonc.data,
     ).normalizeInt64();
@@ -346,7 +352,11 @@ class JConverter {
       throw ArgumentError('JSONC must have schema');
     }
 
-    return JsonC(jv: jsonc.jv, jid: jsonc.jid, schema: jsonc.schema);
+    return JsonC(
+      dataSchemaVersion: jsonc.dataSchemaVersion,
+      resultSchemaId: jsonc.resultSchemaId,
+      schema: jsonc.schema,
+    );
   }
 
   /// Extract data from full JSONC (for sending data without schema)
@@ -356,9 +366,9 @@ class JConverter {
     }
 
     return JsonC(
-      jv: jsonc.jv,
-      jid: jsonc.jid,
-      jnf: jsonc.jnf,
+      dataSchemaVersion: jsonc.dataSchemaVersion,
+      resultSchemaId: jsonc.resultSchemaId,
+      encoding: jsonc.encoding,
       data: jsonc.data,
     );
   }
