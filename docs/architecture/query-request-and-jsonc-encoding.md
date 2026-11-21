@@ -1,4 +1,4 @@
-# JNLD JSONC body encoding
+# JNLD body encoding
 
 Draft for the JCore codec used by Context Studio and Dataset. JCore is a shared library within the query architecture. The Database, Backend, and FrontEnd responsibilities and HTTP headers are defined in the AIX developer note at `docs/apihub/architecture/query-response-developer-note.md`.
 
@@ -71,4 +71,4 @@ For a native client, `encoding: 8018` keeps the same object keys, encodes NUMERI
 
 - Verify scalar, single-row, multirow, and empty results all use the `data` array, and only metadata encodings add the ordered `meta` array.
 - Verify `8000` and `8018` preserve the expected exact NUMERIC and INT64 representations. Verify timezone offsets, duplicate object keys, and the required schema for compact data-only results.
-- JNLD replaces the earlier base-plus-eight proposal for this shared route. Update the encoder, decoder, and fixtures together. [Existing JSONC draft](../dart/JSONC_UPDATE_SPEC.md)
+- JNLD replaces the earlier base-plus-eight proposal for this shared route. Update the encoder, decoder, and fixtures together.

@@ -3,7 +3,7 @@
 The Dart package root is dart. The package name stays jcore, so
 applications continue to use import 'package:jcore/jcore.dart'.
 
-Data, including the data type registry, Numeric, JSONC, and validation,
+Data, including the data type registry, Numeric, JNLD codec, and validation,
 is implemented in Dart. JUX, JSYNC, and other language implementations remain
 planned.
 

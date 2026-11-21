@@ -1,5 +1,7 @@
 # JCore query response update cycle
 
+> **⚠️ LEGACY DOCUMENTATION**: This document describes the JsonC format and base-plus-eight encoding scheme (`jnf = base + 8 * dateMode`) which has been removed from JCore. The current implementation uses JNLD with four-digit encoding (`encoding = J × 1000 + N × 100 + L × 10 + D`). See [JNLD body encoding](query-request-and-jsonc-encoding.md) for current architecture.
+
 ## Scope and baseline
 
 Define one versioned query response for AIXHub and APIHub that ContextStudio and Dataset can decode through JCore. Carry the framework release, app release, data schema version, UX schema version, result identity, and one `jnf` value that controls numeric and temporal encoding. Deliver JCore’s contract, codec, and shared fixtures first. MJUX, the hubs, and the apps adopt that release in the order below.
