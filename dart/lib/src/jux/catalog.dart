@@ -1,7 +1,7 @@
 /// UIG and UIX catalog for the JUX framework.
 ///
-/// Provides stable type identifiers for workspaces, navigation, full views,
-/// and partial views. Each type has a unique ID within its group's range.
+/// Provides stable type identifiers for workspaces, navigation, surfaces,
+/// panels, and controls. Each type has a unique ID within its group's range.
 library;
 
 /// UI Group (UIG) identifier with a stable code and inclusive range.
@@ -11,25 +11,37 @@ final class UIG {
   /// Unique group ID.
   final int i;
 
-  /// Stable group code (e.g., 'workspace', 'nav').
+  /// Stable group code (e.g., 'workspace', 'nav', 'surface').
   final String code;
 
   /// Inclusive range of UIX IDs belonging to this group.
   final (int min, int max) range;
 
-  /// Workspace group (desk, mobile workspaces).
-  static const workspace = UIG._(i: 1, code: 'workspace', range: (1, 999));
+  /// Group 1: Workspace types (desk, mobile, tablet).
+  static const workspace = UIG._(i: 1, code: 'workspace', range: (1, 99));
 
-  /// Navigation group (rail, bottom bar, drawer).
-  static const nav = UIG._(i: 2, code: 'nav', range: (1000, 9999));
+  /// Group 2: Navigation types (rail, bar, drawer).
+  static const navigation = UIG._(i: 2, code: 'navigation', range: (100, 999));
 
-  /// Full view group (record workspace, etc.).
-  static const fullview = UIG._(i: 3, code: 'fullview', range: (10000, 99999));
+  /// Group 3: Surface types (full view compositions).
+  static const surface = UIG._(i: 3, code: 'surface', range: (1000, 9999));
 
-  /// Partial view group (panels: collection, inspection, form).
-  static const partialview = UIG._(i: 4, code: 'partialview', range: (100000, 999999));
+  /// Group 4: Panel types (sectional UI components).
+  static const panel = UIG._(i: 4, code: 'panel', range: (10000, 99999));
 
-  static const _all = [workspace, nav, fullview, partialview];
+  /// Group 5: Control types (individual field controls).
+  static const control = UIG._(i: 5, code: 'control', range: (100000, 999999));
+
+  /// @deprecated Use [navigation] instead. Removed in next major version.
+  static const nav = navigation;
+
+  /// @deprecated Use [surface] instead. Removed in next major version.
+  static const fullview = surface;
+
+  /// @deprecated Use [panel] instead. Removed in next major version.
+  static const partialview = panel;
+
+  static const _all = [workspace, navigation, surface, panel, control];
 
   /// Get a group by its ID.
   static UIG? byId(int id) {
@@ -93,63 +105,66 @@ final class UIX {
     placement: 'workspace',
   );
 
-  // Navigation types (1000-9999)
+  // Navigation types (100-999)
   static const navigationRail = UIX._(
-    i: 1000,
-    uig: UIG.nav,
+    i: 100,
+    uig: UIG.navigation,
     code: 'navigation_rail',
     name: 'Navigation Rail',
-    placement: 'nav',
+    placement: 'navigation',
   );
 
   static const bottomNavigationBar = UIX._(
-    i: 1001,
-    uig: UIG.nav,
+    i: 101,
+    uig: UIG.navigation,
     code: 'bottom_navigation_bar',
     name: 'Bottom Navigation Bar',
-    placement: 'nav',
+    placement: 'navigation',
   );
 
   static const navigationDrawer = UIX._(
-    i: 1002,
-    uig: UIG.nav,
+    i: 102,
+    uig: UIG.navigation,
     code: 'navigation_drawer',
     name: 'Navigation Drawer',
-    placement: 'nav',
+    placement: 'navigation',
   );
 
-  // Full view types (10000-99999)
-  static const recordWorkspace = UIX._(
-    i: 10000,
-    uig: UIG.fullview,
-    code: 'record_workspace',
-    name: 'Record Workspace',
-    placement: 'fullview',
+  // Surface types (1000-9999)
+  static const recordSurface = UIX._(
+    i: 1000,
+    uig: UIG.surface,
+    code: 'record_surface',
+    name: 'Record Surface',
+    placement: 'surface',
   );
 
-  // Partial view types (100000-999999)
+  /// @deprecated Use [recordSurface] instead. Removed in next major version.
+  static const recordWorkspace = recordSurface;
+
+  // Panel types (10000-99999)
   static const collectionPanel = UIX._(
-    i: 100000,
-    uig: UIG.partialview,
+    i: 10000,
+    uig: UIG.panel,
     code: 'collection_panel',
     name: 'Collection Panel',
-    placement: 'partialview',
+    placement: 'panel',
   );
 
   static const inspectionPanel = UIX._(
-    i: 100001,
-    uig: UIG.partialview,
+    i: 20000,
+    uig: UIG.panel,
     code: 'inspection_panel',
     name: 'Inspection Panel',
-    placement: 'partialview',
+    placement: 'panel',
   );
 
   static const formPanel = UIX._(
-    i: 100002,
-    uig: UIG.partialview,
+    i: 30000,
+    uig: UIG.panel,
     code: 'form_panel',
     name: 'Form Panel',
-    placement: 'partialview',
+    placement: 'panel',
   );
 
   static const _all = [
@@ -158,7 +173,7 @@ final class UIX {
     navigationRail,
     bottomNavigationBar,
     navigationDrawer,
-    recordWorkspace,
+    recordSurface,
     collectionPanel,
     inspectionPanel,
     formPanel,

@@ -11,7 +11,7 @@ void main() {
     test('all UIX types are within their group ranges', () {
       expect(UIX.deskWorkspace.validateRange(), isTrue);
       expect(UIX.mobileWorkspace.validateRange(), isTrue);
-      expect(UIX.recordWorkspace.validateRange(), isTrue);
+      expect(UIX.recordSurface.validateRange(), isTrue);
       expect(UIX.collectionPanel.validateRange(), isTrue);
       expect(UIX.inspectionPanel.validateRange(), isTrue);
       expect(UIX.formPanel.validateRange(), isTrue);
@@ -19,8 +19,8 @@ void main() {
 
     test('can lookup UIX by ID', () {
       expect(UIX.byId(1), equals(UIX.deskWorkspace));
-      expect(UIX.byId(10000), equals(UIX.recordWorkspace));
-      expect(UIX.byId(100000), equals(UIX.collectionPanel));
+      expect(UIX.byId(1000), equals(UIX.recordSurface));
+      expect(UIX.byId(10000), equals(UIX.collectionPanel));
       expect(UIX.byId(999999), isNull);
     });
 
@@ -32,17 +32,17 @@ void main() {
 
     test('can lookup UIG by ID', () {
       expect(UIG.byId(1), equals(UIG.workspace));
-      expect(UIG.byId(4), equals(UIG.partialview));
+      expect(UIG.byId(4), equals(UIG.panel));
       expect(UIG.byId(99), isNull);
     });
 
     test('UIG range membership works correctly', () {
       expect(UIG.workspace.contains(1), isTrue);
-      expect(UIG.workspace.contains(999), isTrue);
-      expect(UIG.workspace.contains(1000), isFalse);
-      expect(UIG.partialview.contains(100000), isTrue);
-      expect(UIG.partialview.contains(999999), isTrue);
-      expect(UIG.partialview.contains(1000000), isFalse);
+      expect(UIG.workspace.contains(99), isTrue);
+      expect(UIG.workspace.contains(100), isFalse);
+      expect(UIG.panel.contains(10000), isTrue);
+      expect(UIG.panel.contains(99999), isTrue);
+      expect(UIG.panel.contains(100000), isFalse);
     });
   });
 
@@ -72,7 +72,7 @@ void main() {
       final json = {
         'key': 'bad_workspace',
         'schemaVersion': 1,
-        'uix': 100000, // partial view, not workspace
+        'uix': 10000, // panel, not workspace
         'title': 'Bad',
         'destinations': [
           {'id': 'home', 'label': 'Home', 'viewKey': 'home_view'},
@@ -105,12 +105,12 @@ void main() {
     });
   });
 
-  group('FullViewDef', () {
-    test('parses valid full view definition', () {
+  group('SurfaceDef', () {
+    test('parses valid surface definition', () {
       final json = {
         'key': 'record_view',
         'schemaVersion': 1,
-        'uix': 10000,
+        'uix': 1000,
         'title': 'Record View',
         'supportedWorkspaces': [1, 2],
         'viewModelBinding': 'composed',
@@ -130,55 +130,55 @@ void main() {
         },
       };
 
-      final fullView = FullViewDef.fromJson(json);
-      expect(fullView.key, 'record_view');
-      expect(fullView.uix, UIX.recordWorkspace);
-      expect(fullView.supportedWorkspaces, [1, 2]);
-      expect(fullView.panels, isNotNull);
-      expect(fullView.panels!.desktop.left, 'collection_panel');
-      expect(fullView.panels!.mobile.startingPanel, 'collection_panel');
-      expect(fullView.validate(), isEmpty);
+      final surface = SurfaceDef.fromJson(json);
+      expect(surface.key, 'record_view');
+      expect(surface.uix, UIX.recordSurface);
+      expect(surface.supportedWorkspaces, [1, 2]);
+      expect(surface.panels, isNotNull);
+      expect(surface.panels!.desktop.left, 'collection_panel');
+      expect(surface.panels!.mobile.startingPanel, 'collection_panel');
+      expect(surface.validate(), isEmpty);
     });
 
-    test('rejects full view with wrong UIX type', () {
+    test('rejects surface with wrong UIX type', () {
       final json = {
         'key': 'bad_view',
         'schemaVersion': 1,
-        'uix': 100000, // partial view, not full view
+        'uix': 10000, // panel, not surface
         'title': 'Bad',
         'supportedWorkspaces': [1],
         'viewModelBinding': 'composed',
       };
 
-      final fullView = FullViewDef.fromJson(json);
-      final errors = fullView.validate();
+      final surface = SurfaceDef.fromJson(json);
+      final errors = surface.validate();
       expect(errors, isNotEmpty);
-      expect(errors.first, contains('not a full view type'));
+      expect(errors.first, contains('not a surface type'));
     });
 
-    test('rejects full view with invalid workspace reference', () {
+    test('rejects surface with invalid workspace reference', () {
       final json = {
         'key': 'bad_view',
         'schemaVersion': 1,
-        'uix': 10000,
+        'uix': 1000,
         'title': 'Bad',
         'supportedWorkspaces': [999], // non-existent workspace
         'viewModelBinding': 'composed',
       };
 
-      final fullView = FullViewDef.fromJson(json);
-      final errors = fullView.validate();
+      final surface = SurfaceDef.fromJson(json);
+      final errors = surface.validate();
       expect(errors, isNotEmpty);
       expect(errors.first, contains('Invalid workspace'));
     });
   });
 
-  group('PartialViewDef', () {
-    test('parses valid partial view definition', () {
+  group('PanelDef', () {
+    test('parses valid panel definition', () {
       final json = {
         'key': 'form_panel',
         'schemaVersion': 1,
-        'uix': 100002,
+        'uix': 30000,
         'title': 'Form Panel',
         'dataSchemaRef': 'storage_profile',
         'fields': [
@@ -191,19 +191,19 @@ void main() {
         ],
       };
 
-      final partialView = PartialViewDef.fromJson(json);
-      expect(partialView.key, 'form_panel');
-      expect(partialView.uix, UIX.formPanel);
-      expect(partialView.fields.length, 2);
-      expect(partialView.commands.length, 2);
-      expect(partialView.validate(), isEmpty);
+      final panel = PanelDef.fromJson(json);
+      expect(panel.key, 'form_panel');
+      expect(panel.uix, UIX.formPanel);
+      expect(panel.fields.length, 2);
+      expect(panel.commands.length, 2);
+      expect(panel.validate(), isEmpty);
     });
 
-    test('rejects partial view with duplicate field keys', () {
+    test('rejects panel with duplicate field keys', () {
       final json = {
         'key': 'bad_panel',
         'schemaVersion': 1,
-        'uix': 100002,
+        'uix': 30000,
         'title': 'Bad Panel',
         'dataSchemaRef': 'test',
         'fields': [
@@ -213,8 +213,8 @@ void main() {
         'commands': [],
       };
 
-      final partialView = PartialViewDef.fromJson(json);
-      final errors = partialView.validate();
+      final panel = PanelDef.fromJson(json);
+      final errors = panel.validate();
       expect(errors, isNotEmpty);
       expect(errors.first, contains('Duplicate field keys'));
     });

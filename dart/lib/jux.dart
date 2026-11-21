@@ -1,19 +1,19 @@
 /// jux - JCore UI/UX framework for metadata-driven interfaces.
 ///
 /// Provides the UIG/UIX catalog, versioned UI definitions (uidef), and reactive
-/// ViewModels organized around workspace → full view → partial view placement.
+/// ViewModels organized around workspace → surface → panel → control hierarchy.
 ///
 /// ## Catalog and Taxonomy
 ///
-/// - **UIG**: UI Groups (workspace, nav, fullview, partialview)
-/// - **UIX**: UI Types with stable IDs and codes
+/// - **UIG**: UI Groups (workspace, navigation, surface, panel, control)
+/// - **UIX**: UI Types with stable IDs and codes within group ranges
 /// - **UIDef**: Versioned JSON definitions referencing UIX types
 ///
 /// ## ViewModels
 ///
 /// - **ViewModel**: Base class with reactive state (loading, error)
 /// - **WorkspaceViewModel**: Workspace-level navigation and state
-/// - **ComposedViewModel**: Full view with panel composition
+/// - **ComposedViewModel**: Surface-level with panel composition
 /// - **JuxFormViewModel**: Edit views with validation and dirty tracking
 /// - **JuxCollectionViewModel**: List views with pagination and search
 /// - **JuxInspectionViewModel**: Read-only detail views
@@ -41,10 +41,10 @@
 /// ## Architecture
 ///
 /// ```
-/// Workspace → Full View → Partial View
-///     ↓           ↓            ↓
-/// WorkspaceVM  ComposedVM   FormVM/CollectionVM/InspectionVM
-///     ↓           ↓            ↓
+/// Workspace → Surface → Panel → Control
+///     ↓         ↓         ↓        ↓
+/// WorkspaceVM ComposedVM FormVM   FieldControl
+///     ↓         ↓         ↓
 /// QueryService (from package:jcore/data.dart)
 /// ```
 library;

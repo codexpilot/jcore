@@ -25,7 +25,7 @@ void main() {
       expect(errors.first, contains('viewKey "missing_view" not found'));
     });
 
-    test('WorkspaceDef validates viewKey references are full views', () {
+    test('WorkspaceDef validates viewKey references are surfaces', () {
       final partialView = jux.PartialViewDef(
         key: 'wrong_type',
         schemaVersion: 1,
@@ -49,14 +49,14 @@ void main() {
 
       final errors = workspace.validate({'wrong_type': partialView});
       expect(errors, isNotEmpty);
-      expect(errors.first, contains('must reference a full view'));
+      expect(errors.first, contains('must reference a surface'));
     });
 
     test('FullViewDef validates panel references exist', () {
       final fullView = jux.FullViewDef(
         key: 'test_view',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [jux.UIX.deskWorkspace.i],
         viewModelBinding: 'composed',
@@ -71,11 +71,11 @@ void main() {
       expect(errors.any((e) => e.contains('Panel reference "missing_panel" not found')), isTrue);
     });
 
-    test('FullViewDef validates panel references are partial views', () {
+    test('SurfaceDef validates panel references are panels', () {
       final fullView1 = jux.FullViewDef(
         key: 'full1',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Full1',
         supportedWorkspaces: [jux.UIX.deskWorkspace.i],
         viewModelBinding: 'composed',
@@ -84,7 +84,7 @@ void main() {
       final fullView2 = jux.FullViewDef(
         key: 'test_view',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [jux.UIX.deskWorkspace.i],
         viewModelBinding: 'composed',
@@ -96,14 +96,14 @@ void main() {
 
       final errors = fullView2.validate({'full1': fullView1});
       expect(errors, isNotEmpty);
-      expect(errors.any((e) => e.contains('"full1" must reference a partial view')), isTrue);
+      expect(errors.any((e) => e.contains('"full1" must reference a panel')), isTrue);
     });
 
-    test('WorkspaceDef validates full view supports workspace type', () {
+    test('WorkspaceDef validates surface supports workspace type', () {
       final fullView = jux.FullViewDef(
         key: 'desktop_only_view',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Desktop Only',
         supportedWorkspaces: [jux.UIX.deskWorkspace.i], // Only supports desktop
         viewModelBinding: 'composed',
@@ -144,7 +144,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test_view',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test View',
         supportedWorkspaces: [jux.UIX.deskWorkspace.i],
         viewModelBinding: 'composed',
@@ -189,7 +189,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [1],
         viewModelBinding: 'composed',
@@ -227,7 +227,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [1],
         viewModelBinding: 'composed',
@@ -275,7 +275,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [1],
         viewModelBinding: 'composed',
@@ -320,7 +320,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [1],
         viewModelBinding: 'composed',
@@ -360,7 +360,7 @@ void main() {
       final fullView = jux.FullViewDef(
         key: 'test',
         schemaVersion: 1,
-        uix: jux.UIX.recordWorkspace,
+        uix: jux.UIX.recordSurface,
         title: 'Test',
         supportedWorkspaces: [1],
         viewModelBinding: 'composed',

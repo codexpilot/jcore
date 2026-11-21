@@ -77,18 +77,18 @@ final class WorkspaceDef extends UIDef {
       }
     }
 
-    // Validate that all viewKeys reference actual full views in the registry
+    // Validate that all viewKeys reference actual surfaces in the registry
     if (registry != null) {
       for (final dest in destinations) {
         final view = registry[dest.viewKey];
         if (view == null) {
           errors.add('$key.destinations["${dest.id}"]: viewKey "${dest.viewKey}" not found in registry');
-        } else if (view is! FullViewDef) {
-          errors.add('$key.destinations["${dest.id}"]: viewKey "${dest.viewKey}" must reference a full view, found ${view.runtimeType}');
+        } else if (view is! SurfaceDef) {
+          errors.add('$key.destinations["${dest.id}"]: viewKey "${dest.viewKey}" must reference a surface, found ${view.runtimeType}');
         } else {
-          // Check if this workspace type is supported by the full view
-          final fullView = view;
-          if (!fullView.supportedWorkspaces.contains(uix.i)) {
+          // Check if this workspace type is supported by the surface
+          final surface = view;
+          if (!surface.supportedWorkspaces.contains(uix.i)) {
             errors.add('$key.destinations["${dest.id}"]: view "${dest.viewKey}" does not support workspace type ${uix.code} (UIX ${uix.i})');
           }
         }
@@ -134,7 +134,7 @@ final class WorkspaceDef extends UIDef {
   }
 }
 
-/// Navigation destination referencing a full view.
+/// Navigation destination referencing a surface.
 final class DestinationDef {
   const DestinationDef({
     required this.id,
@@ -155,9 +155,9 @@ final class DestinationDef {
   }
 }
 
-/// Full view definition with optional panel composition.
-final class FullViewDef extends UIDef {
-  const FullViewDef({
+/// Surface definition (full view) with optional panel composition.
+final class SurfaceDef extends UIDef {
+  const SurfaceDef({
     required super.key,
     required super.schemaVersion,
     required super.uix,
@@ -175,8 +175,8 @@ final class FullViewDef extends UIDef {
   @override
   List<String> validate([Map<String, UIDef>? registry]) {
     final errors = <String>[];
-    if (uix.placement != 'fullview') {
-      errors.add('$key: UIX ${uix.code} is not a full view type');
+    if (uix.placement != 'surface') {
+      errors.add('$key: UIX ${uix.code} is not a surface type');
     }
     if (supportedWorkspaces.isEmpty) {
       errors.add('$key: At least one supported workspace is required');
@@ -202,15 +202,15 @@ final class FullViewDef extends UIDef {
         final panel = registry[panelKey];
         if (panel == null) {
           errors.add('$key.panels: Panel reference "$panelKey" not found in registry');
-        } else if (panel is! PartialViewDef) {
-          errors.add('$key.panels: "$panelKey" must reference a partial view, found ${panel.runtimeType}');
+        } else if (panel is! PanelDef) {
+          errors.add('$key.panels: "$panelKey" must reference a panel, found ${panel.runtimeType}');
         }
       }
     }
     return errors;
   }
 
-  factory FullViewDef.fromJson(Map<String, dynamic> json) {
+  factory SurfaceDef.fromJson(Map<String, dynamic> json) {
     final key = _requireString(json, 'key');
     final schemaVersion = _requireInt(json, 'schemaVersion');
     if (schemaVersion != 1) {
@@ -228,7 +228,7 @@ final class FullViewDef extends UIDef {
     final panels = panelsJson == null
         ? null
         : PanelComposition.fromJson(panelsJson as Map<String, dynamic>, key);
-    return FullViewDef(
+    return SurfaceDef(
       key: key,
       schemaVersion: schemaVersion,
       uix: uix,
@@ -239,6 +239,9 @@ final class FullViewDef extends UIDef {
     );
   }
 }
+
+/// @deprecated Use [SurfaceDef] instead. Removed in next major version.
+typedef FullViewDef = SurfaceDef;
 
 /// Panel composition for desktop and mobile layouts.
 final class PanelComposition {
@@ -309,9 +312,9 @@ final class MobilePanels {
   }
 }
 
-/// Partial view definition with field bindings and commands.
-final class PartialViewDef extends UIDef {
-  const PartialViewDef({
+/// Panel definition (partial view) with field bindings and commands.
+final class PanelDef extends UIDef {
+  const PanelDef({
     required super.key,
     required super.schemaVersion,
     required super.uix,
@@ -329,8 +332,8 @@ final class PartialViewDef extends UIDef {
   @override
   List<String> validate([Map<String, UIDef>? registry]) {
     final errors = <String>[];
-    if (uix.placement != 'partialview') {
-      errors.add('$key: UIX ${uix.code} is not a partial view type');
+    if (uix.placement != 'panel') {
+      errors.add('$key: UIX ${uix.code} is not a panel type');
     }
     final fieldKeys = fields.map((f) => f.key).toSet();
     if (fieldKeys.length != fields.length) {
@@ -343,7 +346,7 @@ final class PartialViewDef extends UIDef {
     return errors;
   }
 
-  factory PartialViewDef.fromJson(Map<String, dynamic> json) {
+  factory PanelDef.fromJson(Map<String, dynamic> json) {
     final key = _requireString(json, 'key');
     final schemaVersion = _requireInt(json, 'schemaVersion');
     if (schemaVersion != 1) {
@@ -372,7 +375,7 @@ final class PartialViewDef extends UIDef {
       }
       commands.add(CommandDef.fromJson(item, key));
     }
-    return PartialViewDef(
+    return PanelDef(
       key: key,
       schemaVersion: schemaVersion,
       uix: uix,
@@ -380,6 +383,68 @@ final class PartialViewDef extends UIDef {
       dataSchemaRef: dataSchemaRef,
       fields: fields,
       commands: commands,
+    );
+  }
+}
+
+/// @deprecated Use [PanelDef] instead. Removed in next major version.
+typedef PartialViewDef = PanelDef;
+
+/// Control definition for individual field-level UI controls.
+final class ControlDef extends UIDef {
+  const ControlDef({
+    required super.key,
+    required super.schemaVersion,
+    required super.uix,
+    required this.name,
+    required this.dataTypes,
+    this.properties,
+  });
+
+  final String name;
+  final List<String> dataTypes;
+  final Map<String, dynamic>? properties;
+
+  @override
+  List<String> validate([Map<String, UIDef>? registry]) {
+    final errors = <String>[];
+    if (uix.placement != 'control') {
+      errors.add('$key: UIX ${uix.code} is not a control type');
+    }
+    if (dataTypes.isEmpty) {
+      errors.add('$key: At least one data type must be supported');
+    }
+    return errors;
+  }
+
+  factory ControlDef.fromJson(Map<String, dynamic> json) {
+    final key = _requireString(json, 'key');
+    final schemaVersion = _requireInt(json, 'schemaVersion');
+    if (schemaVersion != 1) {
+      throw FormatException('$key: Only schemaVersion 1 is supported');
+    }
+    final uixId = _requireInt(json, 'uix');
+    final uix = UIX.byId(uixId);
+    if (uix == null) {
+      throw FormatException('$key: Unknown UIX ID $uixId');
+    }
+    final name = _requireString(json, 'name');
+    final dataTypesList = _requireList(json, 'dataTypes');
+    final dataTypes = <String>[];
+    for (final item in dataTypesList) {
+      if (item is! String) {
+        throw FormatException('$key.dataTypes: Expected string values');
+      }
+      dataTypes.add(item);
+    }
+    final properties = json['properties'] as Map<String, dynamic>?;
+    return ControlDef(
+      key: key,
+      schemaVersion: schemaVersion,
+      uix: uix,
+      name: name,
+      dataTypes: dataTypes,
+      properties: properties,
     );
   }
 }
