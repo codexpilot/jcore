@@ -11,7 +11,7 @@
 /// - QueryX: Query operations (mx.queryx)
 /// - ParamX: Query parameters (mx.paramx)
 /// - SqlX: SQL implementations (mx.sqlx)
-library metax;
+library;
 
 export 'src/metax/domainx.dart';
 export 'src/metax/typeg.dart';

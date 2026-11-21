@@ -1,4 +1,3 @@
-import '../data/query_service.dart';
 import 'view_model.dart';
 
 /// Generic collection ViewModel for JUX framework - works with any dynamic schema.
@@ -46,9 +45,7 @@ import 'view_model.dart';
 /// ```
 class JuxCollectionViewModel extends ViewModel {
   // Dependencies
-  final dynamic _queryService;
   final Map<String, dynamic> _jux; // JUX view definition
-  final Map<String, dynamic> _model; // MetaX model schema
   final Map<String, Map<String, dynamic>> _columnMap; // MetaX columns
 
   // State
@@ -56,7 +53,7 @@ class JuxCollectionViewModel extends ViewModel {
   Map<String, dynamic>? _selectedItem;
   String? _searchQuery;
   int _currentPage = 1;
-  int _pageSize = 20;
+  final int _pageSize = 20;
   final Map<String, dynamic> _filters = {};
 
   /// Immutable list of loaded items.
@@ -92,16 +89,9 @@ class JuxCollectionViewModel extends ViewModel {
   /// - [columns]: List of MetaX column definitions for display formatting
   /// - [pageSize]: Number of items per page (default 20)
   JuxCollectionViewModel({
-    required dynamic queryService,
-    required Map<String, dynamic> jux,
-    required Map<String, dynamic> model,
+    required this._jux,
     required List<Map<String, dynamic>> columns,
-    int pageSize = 20,
-  })  : _queryService = queryService,
-        _jux = jux,
-        _model = model,
-        _columnMap = {for (var col in columns) col['c'] as String: col},
-        _pageSize = pageSize;
+  }) : _columnMap = {for (var col in columns) col['c'] as String: col};
 
   @override
   Future<void> load() async {
@@ -116,14 +106,6 @@ class JuxCollectionViewModel extends ViewModel {
     setError(null);
 
     try {
-      // Build query parameters
-      final params = <String, dynamic>{
-        'limit': _pageSize,
-        'offset': (_currentPage - 1) * _pageSize,
-        if (_searchQuery != null && _searchQuery!.isNotEmpty) 'search': _searchQuery,
-        ..._filters,
-      };
-
       // Execute query list operation
       // TODO: Replace with actual QueryService call
       final result = <Map<String, dynamic>>[];

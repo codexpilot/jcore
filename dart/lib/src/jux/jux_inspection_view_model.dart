@@ -1,4 +1,3 @@
-import '../data/query_service.dart';
 import 'view_model.dart';
 
 /// Generic inspection ViewModel for JUX framework - read-only detail views.
@@ -41,9 +40,7 @@ import 'view_model.dart';
 /// ```
 class JuxInspectionViewModel extends ViewModel {
   // Dependencies
-  final dynamic _queryService;
   final Map<String, dynamic> _jux; // JUX view definition
-  final Map<String, dynamic> _model; // MetaX model schema
   final Map<String, Map<String, dynamic>> _columnMap; // MetaX columns
 
   // State
@@ -70,14 +67,9 @@ class JuxInspectionViewModel extends ViewModel {
   /// - [model]: MetaX model schema
   /// - [columns]: List of MetaX column definitions for display formatting
   JuxInspectionViewModel({
-    required dynamic queryService,
-    required Map<String, dynamic> jux,
-    required Map<String, dynamic> model,
+    required this._jux,
     required List<Map<String, dynamic>> columns,
-  })  : _queryService = queryService,
-        _jux = jux,
-        _model = model,
-        _columnMap = {for (var col in columns) col['c'] as String: col};
+  }) : _columnMap = {for (var col in columns) col['c'] as String: col};
 
   @override
   Future<void> load({int? recordId}) async {
