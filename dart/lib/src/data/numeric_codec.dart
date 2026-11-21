@@ -8,9 +8,11 @@ import 'jx_schema.dart';
 import 'numeric.dart';
 import 'data_type_registry.dart';
 
-/// INT64 range constants
-const int64Min = -9223372036854775808;
-const int64Max = 9223372036854775807;
+/// INT64 exact BigInt bounds for validation
+/// These are parsed to avoid JavaScript number precision loss.
+/// INT64 range: -9223372036854775808 to 9223372036854775807
+final _int64MinBigInt = BigInt.parse('-9223372036854775808');
+final _int64MaxBigInt = BigInt.parse('9223372036854775807');
 
 final _jsonNumber = RegExp(
   r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?',
@@ -46,10 +48,11 @@ class NumericCodec {
           return value;
         }
 
-        // Validate INT64 range
-        if (bigIntValue < BigInt.from(int64Min) || bigIntValue > BigInt.from(int64Max)) {
+        // Validate INT64 range using exact BigInt bounds
+        if (bigIntValue < _int64MinBigInt || bigIntValue > _int64MaxBigInt) {
           throw RangeError(
-            'INT64 value out of range: $bigIntValue (valid: $int64Min to $int64Max)',
+            'INT64 value out of range: $bigIntValue '
+            '(valid: ${_int64MinBigInt} to ${_int64MaxBigInt})',
           );
         }
 

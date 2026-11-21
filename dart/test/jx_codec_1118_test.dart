@@ -54,7 +54,7 @@ void main() {
 
       // INT64 exact
       expect(decodedRows[0][0], isA<int>());
-      expect(decodedRows[0][0], equals(9223372036854775807));
+      expect(decodedRows[0][0], equals(BigInt.parse('9223372036854775807').toInt()));
 
       // NUMERIC exact
       expect(decodedRows[0][1], isA<Numeric>());
@@ -189,7 +189,7 @@ void main() {
         schema: schema2,
       );
 
-      expect(body.data[0][0], equals(9223372036854775807));
+      expect(body.data[0][0], equals(BigInt.parse('9223372036854775807').toInt()));
     });
 
     test('validates INT64 range - min boundary', () {
@@ -207,7 +207,7 @@ void main() {
         schema: schema2,
       );
 
-      expect(body.data[0][0], equals(-9223372036854775808));
+      expect(body.data[0][0], equals(BigInt.parse('-9223372036854775808').toInt()));
     });
 
     test('rejects INT64 overflow - positive', () {
