@@ -2,9 +2,9 @@ import 'package:test/test.dart';
 import 'package:jcore/jcore.dart';
 
 void main() {
-  group('JnldEncoding', () {
+  group('JxEncoding', () {
     test('parses default encoding 8000', () {
-      final enc = JnldEncoding.parse(8000);
+      final enc = JxEncoding.parse(8000);
       expect(enc.j, equals(8));
       expect(enc.n, equals(0));
       expect(enc.l, equals(0));
@@ -13,7 +13,7 @@ void main() {
     });
 
     test('parses encoding 8018', () {
-      final enc = JnldEncoding.parse(8018);
+      final enc = JxEncoding.parse(8018);
       expect(enc.j, equals(8));
       expect(enc.n, equals(0));
       expect(enc.l, equals(1));
@@ -21,51 +21,51 @@ void main() {
     });
 
     test('parses compact encoding 1000', () {
-      final enc = JnldEncoding.parse(1000);
+      final enc = JxEncoding.parse(1000);
       expect(enc.j, equals(1));
       expect(enc.isCompact, isTrue);
       expect(enc.hasMetadata, isFalse);
     });
 
     test('parses compact with metadata 2000', () {
-      final enc = JnldEncoding.parse(2000);
+      final enc = JxEncoding.parse(2000);
       expect(enc.j, equals(2));
       expect(enc.isCompact, isTrue);
       expect(enc.hasMetadata, isTrue);
     });
 
     test('validates J values', () {
-      expect(() => JnldEncoding.parse(5000), throwsFormatException);
-      expect(() => JnldEncoding.parse(6000), throwsFormatException);
-      expect(() => JnldEncoding.parse(7000), throwsFormatException);
+      expect(() => JxEncoding.parse(5000), throwsFormatException);
+      expect(() => JxEncoding.parse(6000), throwsFormatException);
+      expect(() => JxEncoding.parse(7000), throwsFormatException);
     });
 
     test('validates N values', () {
-      expect(() => JnldEncoding.parse(8200), throwsFormatException);
-      expect(() => JnldEncoding.parse(8900), throwsFormatException);
+      expect(() => JxEncoding.parse(8200), throwsFormatException);
+      expect(() => JxEncoding.parse(8900), throwsFormatException);
     });
 
     test('validates L values', () {
-      expect(() => JnldEncoding.parse(8020), throwsFormatException);
-      expect(() => JnldEncoding.parse(8090), throwsFormatException);
+      expect(() => JxEncoding.parse(8020), throwsFormatException);
+      expect(() => JxEncoding.parse(8090), throwsFormatException);
     });
 
     test('validates D values', () {
-      expect(() => JnldEncoding.parse(8003), throwsFormatException);
-      expect(() => JnldEncoding.parse(8009), throwsFormatException);
+      expect(() => JxEncoding.parse(8003), throwsFormatException);
+      expect(() => JxEncoding.parse(8009), throwsFormatException);
     });
 
     test('validates range', () {
-      expect(() => JnldEncoding.parse(-1), throwsFormatException);
-      expect(() => JnldEncoding.parse(10000), throwsFormatException);
+      expect(() => JxEncoding.parse(-1), throwsFormatException);
+      expect(() => JxEncoding.parse(10000), throwsFormatException);
     });
   });
 
-  group('JnldSchema', () {
+  group('JxSchema', () {
     test('creates schema with fields', () {
-      final schema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      final schema = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       expect(schema.fieldCount, equals(2));
@@ -74,27 +74,27 @@ void main() {
     });
 
     test('validates unique names', () {
-      final schema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
+      final schema = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       expect(() => schema.validateUniqueNames(), throwsFormatException);
     });
 
     test('validates unique codes', () {
-      final schema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      final schema = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       expect(() => schema.validateUniqueCodes(), throwsFormatException);
     });
   });
 
-  group('JnldBody', () {
+  group('JxBody', () {
     test('creates body with data only', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         [1, 'John']
       ]);
 
@@ -103,7 +103,7 @@ void main() {
     });
 
     test('creates body with metadata', () {
-      final body = JnldBody(
+      final body = JxBody(
         meta: [
           ['id', 'INT64'],
           ['name', 'TEXT']
@@ -118,7 +118,7 @@ void main() {
     });
 
     test('converts to JSON', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         [1, 'John']
       ]);
 
@@ -129,7 +129,7 @@ void main() {
 
     test('parses from JSON string', () {
       final jsonStr = '{"data":[[1,"John"]]}';
-      final body = JnldBody.parse(jsonStr);
+      final body = JxBody.parse(jsonStr);
 
       expect(body.data, hasLength(1));
       expect(body.data[0][0], equals(1));
@@ -137,11 +137,11 @@ void main() {
     });
   });
 
-  group('JnldCodec - 8000 encoding (default)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-      JnldField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+  group('JxCodec - 8000 encoding (default)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
     ]);
 
     test('encodes full objects with code keys', () {
@@ -149,7 +149,7 @@ void main() {
         [BigInt.from(9223372036854775807), Numeric('1234.50'), 1704067200123],
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       expect(body.data, hasLength(1));
       expect(body.meta, isNull);
@@ -162,15 +162,15 @@ void main() {
     });
 
     test('encodes scalar as one row with one cell', () {
-      final scalarSchema = JnldSchema([
-        JnldField(i: 1, c: 'count', n: 'Count', typeId: 40000, typeName: 'INT64'),
+      final scalarSchema = JxSchema([
+        JxField(i: 1, c: 'count', n: 'Count', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final rows = [
         [BigInt.from(42)]
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: scalarSchema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: scalarSchema);
 
       expect(body.data, hasLength(1));
       final row = body.data[0] as Map;
@@ -178,18 +178,18 @@ void main() {
     });
 
     test('encodes empty result', () {
-      final body = JnldCodec.encode(encoding: 8000, rows: [], schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: [], schema: schema);
 
       expect(body.data, isEmpty);
       expect(body.meta, isNull);
     });
 
     test('decodes full objects with code keys', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         {'id': '9223372036854775807', 'amount': '1234.50', 'observed_at': '2024-01-01T00:00:00.123Z'}
       ]);
 
-      final rows = JnldCodec.decode(encoding: 8000, body: body, schema: schema);
+      final rows = JxCodec.decode(encoding: 8000, body: body, schema: schema);
 
       expect(rows, hasLength(1));
       expect(rows[0][0], isA<BigInt>());
@@ -200,11 +200,11 @@ void main() {
     });
   });
 
-  group('JnldCodec - 8018 encoding (native client)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-      JnldField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+  group('JxCodec - 8018 encoding (native client)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
     ]);
 
     test('encodes INT64 as JSON integers', () {
@@ -212,7 +212,7 @@ void main() {
         [BigInt.from(42), Numeric('1234.50'), 1704067200123],
       ];
 
-      final body = JnldCodec.encode(encoding: 8018, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8018, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['id'], equals(42));
@@ -224,7 +224,7 @@ void main() {
         [BigInt.from(42), Numeric('1234.50'), 1704067200123],
       ];
 
-      final body = JnldCodec.encode(encoding: 8018, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8018, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['amount'], equals('1234.50'));
@@ -236,7 +236,7 @@ void main() {
         [BigInt.from(42), Numeric('1234.50'), 1704067200123],
       ];
 
-      final body = JnldCodec.encode(encoding: 8018, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8018, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['observed_at'], equals(1704067200123));
@@ -244,10 +244,10 @@ void main() {
     });
   });
 
-  group('JnldCodec - 9000 encoding (objects by name)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+  group('JxCodec - 9000 encoding (objects by name)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
     ]);
 
     test('encodes full objects with name keys', () {
@@ -255,7 +255,7 @@ void main() {
         [BigInt.from(1), 'John'],
       ];
 
-      final body = JnldCodec.encode(encoding: 9000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 9000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['ID'], equals('1'));
@@ -265,9 +265,9 @@ void main() {
     });
 
     test('rejects duplicate field names', () {
-      final badSchema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
+      final badSchema = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       final rows = [
@@ -275,16 +275,16 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 9000, rows: rows, schema: badSchema),
+        () => JxCodec.encode(encoding: 9000, rows: rows, schema: badSchema),
         throwsFormatException,
       );
     });
   });
 
-  group('JnldCodec - 1000 encoding (compact positional)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+  group('JxCodec - 1000 encoding (compact positional)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
     ]);
 
     test('encodes compact positional rows', () {
@@ -293,7 +293,7 @@ void main() {
         [BigInt.from(2), 'Jane'],
       ];
 
-      final body = JnldCodec.encode(encoding: 1000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 1000, rows: rows, schema: schema);
 
       expect(body.data, hasLength(2));
       expect(body.meta, isNull);
@@ -307,18 +307,18 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 1000, rows: rows, schema: schema),
+        () => JxCodec.encode(encoding: 1000, rows: rows, schema: schema),
         throwsFormatException,
       );
     });
 
     test('decodes compact positional rows', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         ['1', 'John'],
         ['2', 'Jane'],
       ]);
 
-      final rows = JnldCodec.decode(encoding: 1000, body: body, schema: schema);
+      final rows = JxCodec.decode(encoding: 1000, body: body, schema: schema);
 
       expect(rows, hasLength(2));
       expect(rows[0][0], isA<BigInt>());
@@ -327,21 +327,21 @@ void main() {
     });
 
     test('requires schema for decoding', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         ['1', 'John']
       ]);
 
       expect(
-        () => JnldCodec.decode(encoding: 1000, body: body),
+        () => JxCodec.decode(encoding: 1000, body: body),
         throwsArgumentError,
       );
     });
   });
 
-  group('JnldCodec - 2000 encoding (compact with meta by ID)', () {
-    final schema = JnldSchema([
-      JnldField(i: 101, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 102, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+  group('JxCodec - 2000 encoding (compact with meta by ID)', () {
+    final schema = JxSchema([
+      JxField(i: 101, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 102, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field ID and type ID', () {
@@ -349,7 +349,7 @@ void main() {
         [BigInt.from(1), 'John']
       ];
 
-      final body = JnldCodec.encode(encoding: 2000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 2000, rows: rows, schema: schema);
 
       expect(body.meta, hasLength(2));
       expect(body.meta![0], equals([101, 40000]));
@@ -358,10 +358,10 @@ void main() {
     });
   });
 
-  group('JnldCodec - 3000 encoding (compact with meta by code)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+  group('JxCodec - 3000 encoding (compact with meta by code)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field code and type name', () {
@@ -369,7 +369,7 @@ void main() {
         [BigInt.from(1), 'John']
       ];
 
-      final body = JnldCodec.encode(encoding: 3000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 3000, rows: rows, schema: schema);
 
       expect(body.meta, hasLength(2));
       expect(body.meta![0], equals(['id', 'INT64']));
@@ -378,9 +378,9 @@ void main() {
     });
 
     test('rejects duplicate field codes', () {
-      final badSchema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      final badSchema = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       final rows = [
@@ -388,16 +388,16 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 3000, rows: rows, schema: badSchema),
+        () => JxCodec.encode(encoding: 3000, rows: rows, schema: badSchema),
         throwsFormatException,
       );
     });
   });
 
-  group('JnldCodec - 4000 encoding (compact with meta by name)', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+  group('JxCodec - 4000 encoding (compact with meta by name)', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field name and type name', () {
@@ -405,7 +405,7 @@ void main() {
         [BigInt.from(1), 'John']
       ];
 
-      final body = JnldCodec.encode(encoding: 4000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 4000, rows: rows, schema: schema);
 
       expect(body.meta, hasLength(2));
       expect(body.meta![0], equals(['ID', 'INT64']));
@@ -414,9 +414,9 @@ void main() {
     });
   });
 
-  group('JnldCodec - TIME handling', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'wake_time', n: 'Wake Time', typeId: 40002, typeName: 'TIME'),
+  group('JxCodec - TIME handling', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'wake_time', n: 'Wake Time', typeId: 40002, typeName: 'TIME'),
     ]);
 
     test('encodes TIME as HH:mm:ss.SSS (D=0)', () {
@@ -424,7 +424,7 @@ void main() {
         [32523456] // 09:02:03.456
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['wake_time'], equals('09:02:03.456'));
@@ -435,7 +435,7 @@ void main() {
         [32523456]
       ];
 
-      final body = JnldCodec.encode(encoding: 8008, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8008, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['wake_time'], equals(32523456));
@@ -447,38 +447,38 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 8000, rows: rows, schema: schema),
+        () => JxCodec.encode(encoding: 8000, rows: rows, schema: schema),
         throwsFormatException,
       );
     });
 
     test('decodes TIME from HH:mm:ss.SSS', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         {'wake_time': '09:02:03.456'}
       ]);
 
-      final rows = JnldCodec.decode(encoding: 8000, body: body, schema: schema);
+      final rows = JxCodec.decode(encoding: 8000, body: body, schema: schema);
 
       expect(rows[0][0], equals(32523456));
     });
 
     test('decodes TIME from milliseconds', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         {'wake_time': 32523456}
       ]);
 
-      final rows = JnldCodec.decode(encoding: 8008, body: body, schema: schema);
+      final rows = JxCodec.decode(encoding: 8008, body: body, schema: schema);
 
       expect(rows[0][0], equals(32523456));
     });
 
     test('validates TIME format', () {
-      final body = JnldBody(data: [
+      final body = JxBody(data: [
         {'wake_time': '25:00:00.000'}
       ]);
 
       expect(
-        () => JnldCodec.decode(encoding: 8000, body: body, schema: schema),
+        () => JxCodec.decode(encoding: 8000, body: body, schema: schema),
         throwsFormatException,
       );
     });
@@ -488,7 +488,7 @@ void main() {
         [0]
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['wake_time'], equals('00:00:00.000'));
@@ -499,16 +499,16 @@ void main() {
         [86399999]
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['wake_time'], equals('23:59:59.999'));
     });
   });
 
-  group('JnldCodec - NUMERIC exact values', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'price', n: 'Price', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+  group('JxCodec - NUMERIC exact values', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'price', n: 'Price', typeId: 61002, typeName: 'NUMERIC(10,2)'),
     ]);
 
     test('preserves exact NUMERIC as string (N=0)', () {
@@ -516,7 +516,7 @@ void main() {
         [Numeric('1234567890.12')]
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['price'], equals('1234567890.12'));
@@ -528,7 +528,7 @@ void main() {
         [Numeric('1234.56')]
       ];
 
-      final body = JnldCodec.encode(encoding: 8100, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8100, rows: rows, schema: schema);
 
       // Check the JSON output has unquoted number
       final jsonString = body.encode();
@@ -536,18 +536,18 @@ void main() {
       expect(jsonString, isNot(contains('"1234.56"'))); // Not a string
 
       // Verify decoding works correctly
-      final decoded = JnldCodec.decode(
+      final decoded = JxCodec.decode(
         encoding: 8100,
-        body: JnldBody.parse(jsonString),
+        body: JxBody.parse(jsonString),
         schema: schema,
       );
       expect(decoded[0][0], isA<Numeric>());
     });
   });
 
-  group('JnldCodec - INT64 exact values', () {
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+  group('JxCodec - INT64 exact values', () {
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
     ]);
 
     test('preserves exact INT64 as string (L=0)', () {
@@ -555,7 +555,7 @@ void main() {
         [BigInt.parse('9223372036854775807')]
       ];
 
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8000, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['id'], equals('9223372036854775807'));
@@ -567,7 +567,7 @@ void main() {
         [BigInt.from(42)]
       ];
 
-      final body = JnldCodec.encode(encoding: 8010, rows: rows, schema: schema);
+      final body = JxCodec.encode(encoding: 8010, rows: rows, schema: schema);
 
       final row = body.data[0] as Map;
       expect(row['id'], equals(42));

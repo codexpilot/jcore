@@ -6,10 +6,10 @@ import 'package:jcore/jcore.dart';
 void main() {
   group('JNLD Codec - Encoding 1118 (J=1, N=1, L=1, D=8)', () {
     // Encoding 1118: compact positional, raw NUMERIC, raw INT64, epoch milliseconds
-    final schema = JnldSchema([
-      JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JnldField(i: 2, c: 'amount', n: 'Amount', typeId: 61903, typeName: 'NUMERIC(19,3)'),
-      JnldField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+    final schema = JxSchema([
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61903, typeName: 'NUMERIC(19,3)'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
     ]);
 
     test('end-to-end wire format with exact NUMERIC precision', () {
@@ -23,7 +23,7 @@ void main() {
       ];
 
       // Encode to body
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema,
@@ -42,7 +42,7 @@ void main() {
       expect(jsonString, contains('[[9223372036854775807,9007199254740993.125,1704067200123]]'));
 
       // Decode using precision-preserving method
-      final decodedRows = JnldCodec.decodeFromJsonString(
+      final decodedRows = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema,
@@ -65,7 +65,7 @@ void main() {
       expect(decodedRows[0][2], equals(1704067200123));
 
       // Re-encode and verify stability
-      final reEncoded = JnldCodec.encode(
+      final reEncoded = JxCodec.encode(
         encoding: 1118,
         rows: decodedRows,
         schema: schema,
@@ -77,8 +77,8 @@ void main() {
     });
 
     test('preserves trailing zeros in NUMERIC', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'price', n: 'Price', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'price', n: 'Price', typeId: 61002, typeName: 'NUMERIC(10,2)'),
       ]);
 
       final rows = [
@@ -87,7 +87,7 @@ void main() {
         [Numeric('25.01')], // No trailing zeros
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -101,7 +101,7 @@ void main() {
       expect(jsonString, contains('25.01'));
 
       // Decode and verify
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -113,15 +113,15 @@ void main() {
     });
 
     test('handles base NUMERIC (60000)', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'value', n: 'Value', typeId: 60000, typeName: 'NUMERIC'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'value', n: 'Value', typeId: 60000, typeName: 'NUMERIC'),
       ]);
 
       final rows = [
         [Numeric('123456789012345678901234567890.123456789')],
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -132,7 +132,7 @@ void main() {
       // Verify exact decimal is preserved
       expect(jsonString, contains('123456789012345678901234567890.123456789'));
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -142,15 +142,15 @@ void main() {
     });
 
     test('handles scale-zero NUMERIC', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'count', n: 'Count', typeId: 61000, typeName: 'NUMERIC(10,0)'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'count', n: 'Count', typeId: 61000, typeName: 'NUMERIC(10,0)'),
       ]);
 
       final rows = [
         [Numeric('1234567890')],
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -162,7 +162,7 @@ void main() {
       expect(jsonString, contains('1234567890'));
       expect(jsonString, isNot(contains('1234567890.')));
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -175,15 +175,15 @@ void main() {
     });
 
     test('validates INT64 range - max boundary', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final rows = [
         [BigInt.parse('9223372036854775807')], // Max INT64
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -193,15 +193,15 @@ void main() {
     });
 
     test('validates INT64 range - min boundary', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final rows = [
         [BigInt.parse('-9223372036854775808')], // Min INT64
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -211,8 +211,8 @@ void main() {
     });
 
     test('rejects INT64 overflow - positive', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -220,14 +220,14 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 1118, rows: rows, schema: schema2),
+        () => JxCodec.encode(encoding: 1118, rows: rows, schema: schema2),
         throwsRangeError,
       );
     });
 
     test('rejects INT64 overflow - negative', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -235,20 +235,20 @@ void main() {
       ];
 
       expect(
-        () => JnldCodec.encode(encoding: 1118, rows: rows, schema: schema2),
+        () => JxCodec.encode(encoding: 1118, rows: rows, schema: schema2),
         throwsRangeError,
       );
     });
 
     test('validates compact row width - too many cells', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
       ]);
 
       final jsonString = '{"data":[[1,2]]}'; // Two cells, schema expects one
 
       expect(
-        () => JnldCodec.decodeFromJsonString(
+        () => JxCodec.decodeFromJsonString(
           encoding: 1118,
           jsonString: jsonString,
           schema: schema2,
@@ -258,15 +258,15 @@ void main() {
     });
 
     test('validates compact row width - too few cells', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
       ]);
 
       final jsonString = '{"data":[[1]]}'; // One cell, schema expects two
 
       expect(
-        () => JnldCodec.decodeFromJsonString(
+        () => JxCodec.decodeFromJsonString(
           encoding: 1118,
           jsonString: jsonString,
           schema: schema2,
@@ -278,7 +278,7 @@ void main() {
     test('allows empty result with correct data structure', () {
       final jsonString = '{"data":[]}';
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema,
@@ -288,15 +288,15 @@ void main() {
     });
 
     test('handles parameterized NUMERIC outside 61xxx range', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'value', n: 'Value', typeId: 60201, typeName: 'NUMERIC(2,1)'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'value', n: 'Value', typeId: 60201, typeName: 'NUMERIC(2,1)'),
       ]);
 
       final rows = [
         [Numeric('9.5')],
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -305,7 +305,7 @@ void main() {
       final jsonString = body.encode();
       expect(jsonString, contains('9.5'));
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -315,8 +315,8 @@ void main() {
     });
 
     test('preserves NUMERIC precision for large values', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'balance', n: 'Balance', typeId: 61903, typeName: 'NUMERIC(19,3)'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'balance', n: 'Balance', typeId: 61903, typeName: 'NUMERIC(19,3)'),
       ]);
 
       // Value that loses precision in double
@@ -326,7 +326,7 @@ void main() {
         [Numeric('9007199254740994.750')],
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -334,7 +334,7 @@ void main() {
 
       final jsonString = body.encode();
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -346,11 +346,11 @@ void main() {
     });
 
     test('handles mixed types correctly', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
-        JnldField(i: 3, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-        JnldField(i: 4, c: 'active', n: 'Active', typeId: 10000, typeName: 'BOOLEAN'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 3, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+        JxField(i: 4, c: 'active', n: 'Active', typeId: 10000, typeName: 'BOOLEAN'),
       ]);
 
       final rows = [
@@ -358,7 +358,7 @@ void main() {
         [BigInt.from(43), 'Product B', Numeric('149.99'), false],
       ];
 
-      final body = JnldCodec.encode(
+      final body = JxCodec.encode(
         encoding: 1118,
         rows: rows,
         schema: schema2,
@@ -366,7 +366,7 @@ void main() {
 
       final jsonString = body.encode();
 
-      final decoded = JnldCodec.decodeFromJsonString(
+      final decoded = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: jsonString,
         schema: schema2,
@@ -384,26 +384,26 @@ void main() {
     });
 
     test('uses compact cell positions across nulls and digits in text', () {
-      final mixedSchema = JnldSchema([
-        JnldField(
+      final mixedSchema = JxSchema([
+        JxField(
           i: 1,
           c: 'active',
           n: 'Active',
           typeId: 10000,
           typeName: 'BOOLEAN',
         ),
-        JnldField(i: 2, c: 'code', n: 'Code', typeId: 70000, typeName: 'TEXT'),
-        JnldField(
+        JxField(i: 2, c: 'code', n: 'Code', typeId: 70000, typeName: 'TEXT'),
+        JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
           typeId: 60000,
           typeName: 'NUMERIC',
         ),
-        JnldField(i: 4, c: 'tail', n: 'Tail', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 4, c: 'tail', n: 'Tail', typeId: 40000, typeName: 'INT64'),
       ]);
 
-      final rows = JnldCodec.decodeFromJsonString(
+      final rows = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: '{"data":[[null,"x9z8p6",100.00,7],[true,"plain",9007199254740993.125,8]]}',
         schema: mixedSchema,
@@ -415,16 +415,16 @@ void main() {
     });
 
     test('keeps compact NUMERIC after JSON-looking text and nested JSONB', () {
-      final mixedSchema = JnldSchema([
-        JnldField(i: 1, c: 'note', n: 'Note', typeId: 70000, typeName: 'TEXT'),
-        JnldField(
+      final mixedSchema = JxSchema([
+        JxField(i: 1, c: 'note', n: 'Note', typeId: 70000, typeName: 'TEXT'),
+        JxField(
           i: 2,
           c: 'detail',
           n: 'Detail',
           typeId: 80001,
           typeName: 'JSONB',
         ),
-        JnldField(
+        JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
@@ -433,7 +433,7 @@ void main() {
         ),
       ]);
 
-      final rows = JnldCodec.decodeFromJsonString(
+      final rows = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: r'''{"data":[
           ["[9, \"data\"]",{"items":[1,{"amount":2}]},50.10],
@@ -465,22 +465,22 @@ void main() {
 
     test('matches full-object NUMERIC by decoded top-level key', () {
       const escapedKey = 'net["a"].*';
-      final objectSchema = JnldSchema([
-        JnldField(
+      final objectSchema = JxSchema([
+        JxField(
           i: 1,
           c: 'detail',
           n: 'Detail',
           typeId: 80001,
           typeName: 'JSONB',
         ),
-        JnldField(
+        JxField(
           i: 2,
           c: escapedKey,
           n: 'Net',
           typeId: 60000,
           typeName: 'NUMERIC',
         ),
-        JnldField(
+        JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
@@ -489,7 +489,7 @@ void main() {
         ),
       ]);
 
-      final rows = JnldCodec.decodeFromJsonString(
+      final rows = JxCodec.decodeFromJsonString(
         encoding: 8108,
         jsonString: r'''{"data":[{
           "detail":{"net[\"a\"].*":17,"amount":13},
@@ -508,8 +508,8 @@ void main() {
     });
 
     test('rejects malformed raw NUMERIC tokens', () {
-      final amountSchema = JnldSchema([
-        JnldField(
+      final amountSchema = JxSchema([
+        JxField(
           i: 1,
           c: 'amount',
           n: 'Amount',
@@ -520,7 +520,7 @@ void main() {
 
       for (final value in ['01', '1.2.3', 'NaN', '+1', '1e', '12.']) {
         expect(
-          () => JnldCodec.encode(
+          () => JxCodec.encode(
             encoding: 1118,
             rows: [
               [value],
@@ -531,7 +531,7 @@ void main() {
           reason: value,
         );
         expect(
-          () => JnldCodec.decodeFromJsonString(
+          () => JxCodec.decodeFromJsonString(
             encoding: 1118,
             jsonString: '{"data":[[$value]]}',
             schema: amountSchema,
@@ -544,15 +544,15 @@ void main() {
 
     test('escapes nested JSON map keys when writing raw NUMERIC', () {
       const key = 'quote"backslash\\newline\n';
-      final mixedSchema = JnldSchema([
-        JnldField(
+      final mixedSchema = JxSchema([
+        JxField(
           i: 1,
           c: 'detail',
           n: 'Detail',
           typeId: 80001,
           typeName: 'JSONB',
         ),
-        JnldField(
+        JxField(
           i: 2,
           c: 'amount',
           n: 'Amount',
@@ -561,7 +561,7 @@ void main() {
         ),
       ]);
 
-      final json = JnldCodec.encode(
+      final json = JxCodec.encode(
         encoding: 1118,
         rows: [
           [
@@ -584,12 +584,12 @@ void main() {
     });
 
     test('round-trip stability for all edge cases', () {
-      final schema2 = JnldSchema([
-        JnldField(i: 1, c: 'int_max', n: 'Int Max', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'int_min', n: 'Int Min', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 3, c: 'num_precise', n: 'Num Precise', typeId: 61903, typeName: 'NUMERIC(19,3)'),
-        JnldField(i: 4, c: 'num_trailing', n: 'Num Trailing', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-        JnldField(i: 5, c: 'timestamp', n: 'Timestamp', typeId: 40001, typeName: 'DATETIME'),
+      final schema2 = JxSchema([
+        JxField(i: 1, c: 'int_max', n: 'Int Max', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 2, c: 'int_min', n: 'Int Min', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 3, c: 'num_precise', n: 'Num Precise', typeId: 61903, typeName: 'NUMERIC(19,3)'),
+        JxField(i: 4, c: 'num_trailing', n: 'Num Trailing', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+        JxField(i: 5, c: 'timestamp', n: 'Timestamp', typeId: 40001, typeName: 'DATETIME'),
       ]);
 
       final rows = [
@@ -603,22 +603,22 @@ void main() {
       ];
 
       // First encode
-      final body1 = JnldCodec.encode(encoding: 1118, rows: rows, schema: schema2);
+      final body1 = JxCodec.encode(encoding: 1118, rows: rows, schema: schema2);
       final json1 = body1.encode();
 
       // First decode
-      final decoded1 = JnldCodec.decodeFromJsonString(
+      final decoded1 = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: json1,
         schema: schema2,
       );
 
       // Second encode
-      final body2 = JnldCodec.encode(encoding: 1118, rows: decoded1, schema: schema2);
+      final body2 = JxCodec.encode(encoding: 1118, rows: decoded1, schema: schema2);
       final json2 = body2.encode();
 
       // Second decode
-      final decoded2 = JnldCodec.decodeFromJsonString(
+      final decoded2 = JxCodec.decodeFromJsonString(
         encoding: 1118,
         jsonString: json2,
         schema: schema2,
