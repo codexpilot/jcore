@@ -256,7 +256,7 @@ void main() {
       expect(saveCount, 2);
     });
 
-    test('load and save operations tracked independently', () async {
+    test('prevents load during save to avoid race condition', () async {
       var saveCount = 0;
       var loadCount = 0;
       final mockService = _MockQueryService(
@@ -293,16 +293,20 @@ void main() {
       // Start save (will take 100ms)
       final save1 = vm.saveDraft(2001);
 
-      // While save is pending, load completes (50ms)
-      await vm.load(listOperationId: 2000);
-      expect(loadCount, 1);
+      // Try to load while save is pending - should throw to prevent race condition
+      expect(() => vm.load(listOperationId: 2000), throwsStateError);
+      expect(loadCount, 0, reason: 'Load should not execute during save');
 
-      // Try to save again while first save is still pending - should throw
+      // Try to save again while first save is still pending - should also throw
       expect(() => vm.saveDraft(2001), throwsStateError);
 
       // Wait for first save to complete
       await save1;
       expect(saveCount, 1, reason: 'Only one save should have executed');
+
+      // Now load should work
+      await vm.load(listOperationId: 2000);
+      expect(loadCount, 1, reason: 'Load should work after save completes');
     });
 
     test('prevents selection changes during save', () async {
@@ -339,6 +343,43 @@ void main() {
       expect(() => vm.clearSelection(), throwsStateError);
       expect(() => vm.startEdit(), throwsStateError);
       expect(() => vm.cancelEdit(), throwsStateError);
+
+      await save;
+    });
+    test('prevents load during save', () async {
+      final mockService = _MockQueryService(
+        onSave: () async {
+          await Future.delayed(Duration(milliseconds: 50));
+          return {'i': 1, 'name': 'Saved'};
+        },
+        onLoad: () async {
+          return [{'i': 1, 'name': 'Record 1'}];
+        },
+      );
+
+      final fullView = jux.FullViewDef(
+        key: 'test',
+        schemaVersion: 1,
+        uix: jux.UIX.recordWorkspace,
+        title: 'Test',
+        supportedWorkspaces: [1],
+        viewModelBinding: 'composed',
+      );
+
+      final vm = jux.ComposedViewModel(
+        queryService: mockService,
+        fullView: fullView,
+      );
+
+      vm.selectRecord({'i': 1, 'name': 'Original'});
+      vm.startEdit();
+      vm.updateDraft('name', 'Modified');
+
+      // Start save
+      final save = vm.saveDraft(2001);
+
+      // Try to load during save - should throw
+      expect(() => vm.load(listOperationId: 2000), throwsStateError);
 
       await save;
     });

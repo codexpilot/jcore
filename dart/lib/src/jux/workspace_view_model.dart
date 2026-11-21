@@ -124,6 +124,9 @@ class ComposedViewModel extends ViewModel {
     if (_isReading) {
       throw StateError('Load already in progress');
     }
+    if (_isWriting) {
+      throw StateError('Cannot load during save');
+    }
     _isReading = true;
     notifyListeners();
     try {

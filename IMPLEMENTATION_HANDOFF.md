@@ -2,21 +2,98 @@
 
 ## Summary
 
-Implementation of JCore JUX framework and MJUX Material UI integration complete with all Codex re-review fixes applied and verified.
+Implementation of JCore JUX framework and MJUX Material UI integration complete with all Codex re-review fixes and verification issues resolved.
 
 ## Package Status
 
 ### JCore (dart/)
 - **Static Analysis**: `dart analyze --fatal-infos` — ✅ **CLEAN** (0 issues)
-- **Tests**: `dart test` — ✅ **146/146 PASSING**
+- **Tests**: `dart test` — ✅ **147/147 PASSING**
 - **Version**: 4.4.0
 
 ### MJUX (/)  
 - **Static Analysis**: `flutter analyze --fatal-infos` — ✅ **CLEAN** (0 issues)
-- **Tests**: `flutter test` — ✅ **27/29 passing** (2 non-widget tests timeout, not affecting functionality)
+- **Tests**: `flutter test` — ✅ **29/29 PASSING** (all tests pass, including previously stalled tests)
 - **Version**: 0.2.0
 
-## Codex Re-Review Fixes Applied
+## Verification Fixes Applied (Round 2)
+
+### JCore Fix
+
+#### ✅ Load During Save Race Condition
+**Issue**: A refresh that finishes after Save can overwrite the Collection row with stale data.
+
+**Scenario**:
+1. User saves (saveDraft starts)
+2. User refreshes (load starts, gets old data from server)
+3. Save completes, updates _records[index] with new data
+4. Refresh completes, replaces entire _records array with old data
+
+**Fix**: Added check in `load()` to prevent loading during save:
+```dart
+if (_isWriting) {
+  throw StateError('Cannot load during save');
+}
+```
+
+**Test**: Updated "prevents load during save to avoid race condition" test to verify StateError is thrown when load is called during save, and that load works after save completes.
+
+**Result**: Prevents refresh from overwriting saved data. Collection and Inspection now stay in sync.
+
+### MJUX Fixes
+
+#### ✅ AdaptiveWorkspace Calling onBack at Mount
+**Issue**: Line 192 had `canPop: !_handleBackButton()` which called the method during build, triggering onBack callback immediately.
+
+**Fix**: Changed to `canPop: _panelHistory.length <= 1` to check state without side effects.
+
+**Result**: onBack callback only fires on actual back button press, not at mount.
+
+#### ✅ AdaptiveWorkspace Not Displaying Loaded Records
+**Issue**: Widget didn't listen to view model changes, so records loaded but UI didn't update.
+
+**Fix**: Added view model listener in State:
+```dart
+@override
+void initState() {
+  super.initState();
+  widget.viewModel.addListener(_onViewModelChanged);
+  // ... rest of init
+}
+
+void _onViewModelChanged() {
+  if (mounted) {
+    setState(() {});
+  }
+}
+
+@override
+void dispose() {
+  widget.viewModel.removeListener(_onViewModelChanged);
+  super.dispose();
+}
+```
+
+**Result**: Widget rebuilds when view model loads data, records display correctly.
+
+#### ✅ Fixture Loader Missing JSON Assets
+**Issue**: `rootBundle.loadString()` failed because JSON files in `example/fixtures/` weren't registered as assets.
+
+**Fix**: Added to `pubspec.yaml`:
+```yaml
+flutter:
+  assets:
+    - example/fixtures/
+```
+
+**Result**: Fixture loader can now load JSON definitions from bundle.
+
+#### ✅ Tests Stalling
+**Issue**: "handles failed save with retry" and "prevents duplicate saves" tests used `testWidgets` but never built widgets, causing timeouts with Future.delayed.
+
+**Fix**: Converted from `testWidgets((tester) async {...})` to `test(() async {...})` since they're pure view model unit tests.
+
+**Result**: All 29 tests complete without timeout.
 
 ### JCore Fixes
 
