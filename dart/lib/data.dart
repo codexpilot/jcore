@@ -11,6 +11,7 @@ export 'src/data/numeric_value_validation.dart';
 
 // jsonc data interchange and schema registry.
 export 'src/data/jsonc.dart';
+export 'src/data/jnld_codec.dart';
 export 'src/data/jconverter.dart';
 export 'src/data/jbase.dart';
 
