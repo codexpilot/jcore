@@ -1,0 +1,288 @@
+{
+  "fixtureVersion": 1,
+  "columns": [
+    "observed_at",
+    "id",
+    "time",
+    "amount"
+  ],
+  "schema": {
+    "observed_at": 40001,
+    "id": 40000,
+    "time": 40002,
+    "amount": 60000
+  },
+  "modeCases": [
+    {
+      "expectedBase": 2,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        42,
+        86399999,
+        12.5
+      ]
+    },
+    {
+      "jnf": 0,
+      "expectedBase": 0,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        "42",
+        86399999,
+        "12.5"
+      ]
+    },
+    {
+      "jnf": 1,
+      "expectedBase": 1,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        42,
+        86399999,
+        12.5
+      ]
+    },
+    {
+      "jnf": 2,
+      "expectedBase": 2,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        42,
+        86399999,
+        12.5
+      ]
+    },
+    {
+      "jnf": 3,
+      "expectedBase": 3,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        "42",
+        86399999,
+        12.5
+      ]
+    },
+    {
+      "jnf": 4,
+      "expectedBase": 4,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        42,
+        86399999,
+        "12.5"
+      ]
+    },
+    {
+      "jnf": 5,
+      "expectedBase": 5,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        -1,
+        "42",
+        86399999,
+        "12.5"
+      ]
+    },
+    {
+      "jnf": 8,
+      "expectedBase": 0,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        "42",
+        "23:59:59.999",
+        "12.5"
+      ]
+    },
+    {
+      "jnf": 9,
+      "expectedBase": 1,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        42,
+        "23:59:59.999",
+        12.5
+      ]
+    },
+    {
+      "jnf": 10,
+      "expectedBase": 2,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        42,
+        "23:59:59.999",
+        12.5
+      ]
+    },
+    {
+      "jnf": 11,
+      "expectedBase": 3,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        "42",
+        "23:59:59.999",
+        12.5
+      ]
+    },
+    {
+      "jnf": 12,
+      "expectedBase": 4,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        42,
+        "23:59:59.999",
+        "12.5"
+      ]
+    },
+    {
+      "jnf": 13,
+      "expectedBase": 5,
+      "canonicalDatetime": -1,
+      "canonicalTime": 86399999,
+      "wireRow": [
+        "1969-12-31T23:59:59.999Z",
+        "42",
+        "23:59:59.999",
+        "12.5"
+      ]
+    }
+  ],
+  "exactRows": [
+    {
+      "jnf": 5,
+      "canonicalDatetime": 1704067200123,
+      "canonicalTime": 45296123,
+      "wireRow": [
+        1704067200123,
+        "9223372036854775807",
+        45296123,
+        "1234.50"
+      ]
+    },
+    {
+      "jnf": 13,
+      "canonicalDatetime": 1704067200123,
+      "canonicalTime": 45296123,
+      "wireRow": [
+        "2024-01-01T00:00:00.123Z",
+        "9223372036854775807",
+        "12:34:56.123",
+        "1234.50"
+      ]
+    }
+  ],
+  "temporalCases": [
+    {
+      "typeId": 40001,
+      "integer": 0,
+      "text": "1970-01-01T00:00:00.000Z"
+    },
+    {
+      "typeId": 40001,
+      "integer": 1709164800123,
+      "text": "2024-02-29T00:00:00.123Z"
+    },
+    {
+      "typeId": 40002,
+      "integer": 0,
+      "text": "00:00:00.000"
+    },
+    {
+      "typeId": 40002,
+      "integer": 86399999,
+      "text": "23:59:59.999"
+    }
+  ],
+  "invalidModes": [
+    -1,
+    6,
+    7,
+    14,
+    15,
+    16,
+    2.5,
+    "8"
+  ],
+  "invalidTemporalCells": [
+    {
+      "jnf": 13,
+      "typeId": 40001,
+      "value": "2023-02-29T00:00:00.000Z"
+    },
+    {
+      "jnf": 13,
+      "typeId": 40001,
+      "value": "2024-01-01T00:00:00.123+00:00"
+    },
+    {
+      "jnf": 13,
+      "typeId": 40001,
+      "value": "2024-01-01T00:00:00Z"
+    },
+    {
+      "jnf": 13,
+      "typeId": 40001,
+      "value": "2016-12-31T23:59:60.000Z"
+    },
+    {
+      "jnf": 13,
+      "typeId": 40002,
+      "value": "24:00:00.000"
+    },
+    {
+      "jnf": 5,
+      "typeId": 40002,
+      "value": 86400000
+    }
+  ],
+  "referenceResponse": {
+    "frameworkVersion": "2026.11.21.1",
+    "appVersion": "0.1.0+1",
+    "uxSchemaVersion": 1,
+    "jv": 1795219200,
+    "jid": 5011,
+    "jnf": 13,
+    "columns": [
+      "observed_at",
+      "id",
+      "time",
+      "amount"
+    ],
+    "schema": {
+      "observed_at": 40001,
+      "id": 40000,
+      "time": 40002,
+      "amount": 60000
+    },
+    "data": [
+      [
+        "2024-01-01T00:00:00.123Z",
+        "9007199254740993",
+        "12:34:56.123",
+        "1234.56789"
+      ]
+    ]
+  }
+}

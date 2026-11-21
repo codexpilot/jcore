@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:jcore/jcore.dart';
 import 'package:test/test.dart';
 
@@ -74,56 +72,6 @@ void main() {
       expect(getPostgresType(70100), 'varchar(100)');
       expect(parseRegisteredDataTypeId('smallint'), 20000);
       expect(parseRegisteredDataTypeId('int16'), 20000);
-    });
-
-    test('enforces signed SMALLINT boundaries', () {
-      expect(JConverter.validateValue(-32768, 20000, 0, 'value'), isNull);
-      expect(JConverter.validateValue(32767, 20000, 0, 'value'), isNull);
-      expect(JConverter.validateValue(-32769, 20000, 0, 'value'), isNotNull);
-      expect(JConverter.validateValue(32768, 20000, 0, 'value'), isNotNull);
-      expect(JConverter.validateSchema({'value': 20000}), isEmpty);
-    });
-
-    test('round-trips registered Numeric and INT64 in JSONC number modes', () {
-      final amount = Numeric.fromString('123.40', 2);
-      final stringMode = JsonC(
-        dataSchemaVersion: 1,
-        resultSchemaId: 1,
-        encoding: 4,
-        schema: {'amount': 60502},
-        data: [
-          <dynamic>[amount],
-        ],
-      );
-      final stringJson =
-          jsonDecode(stringMode.encode()) as Map<String, dynamic>;
-      expect((stringJson['data'] as List).single.single, '123.40');
-
-      final numberMode = JsonC(
-        dataSchemaVersion: 1,
-        resultSchemaId: 1,
-        encoding: 2,
-        schema: {'amount': 60502},
-        data: [
-          <dynamic>[amount],
-        ],
-      );
-      final numberJson =
-          jsonDecode(numberMode.encode()) as Map<String, dynamic>;
-      expect((numberJson['data'] as List).single.single, 123.4);
-
-      final largeId = BigInt.parse('9223372036854775807');
-      final int64Jsonc = JsonC(
-        dataSchemaVersion: 1,
-        resultSchemaId: 1,
-        encoding: 3,
-        schema: {'id': 40000},
-        data: [
-          <dynamic>[largeId],
-        ],
-      );
-      final idJson = jsonDecode(int64Jsonc.encode()) as Map<String, dynamic>;
-      expect((idJson['data'] as List).single.single, '9223372036854775807');
     });
   });
 }

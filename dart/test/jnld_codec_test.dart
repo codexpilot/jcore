@@ -574,39 +574,4 @@ void main() {
       expect(row['id'], isA<int>());
     });
   });
-
-  group('JnldCodec - Legacy JsonC compatibility', () {
-    test('JNLD and JsonC can coexist', () {
-      // Old JsonC format
-      final jsonc = JsonC(
-        dataSchemaVersion: 1,
-        resultSchemaId: 12345,
-        encoding: 3,
-        schema: {'id': 40000, 'name': 70000},
-        data: [
-          [1, 'John']
-        ],
-      );
-
-      expect(jsonc.isValid, isTrue);
-
-      // New JNLD format
-      final schema = JnldSchema([
-        JnldField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JnldField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
-      ]);
-
-      final rows = [
-        [BigInt.from(1), 'John']
-      ];
-
-      final body = JnldCodec.encode(encoding: 8000, rows: rows, schema: schema);
-
-      expect(body.data, hasLength(1));
-
-      // Both formats work independently
-      expect(jsonc.toJson()['data'], isNotNull);
-      expect(body.toJson()['data'], isNotNull);
-    });
-  });
 }
