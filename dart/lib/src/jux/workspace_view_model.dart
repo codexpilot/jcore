@@ -89,6 +89,7 @@ class ComposedViewModel extends ViewModel {
   String? _activePanel;
   bool _isReading = false;
   bool _isWriting = false;
+  DateTime? _lastSaveCompletedAt;
 
   /// Full view definition.
   FullViewDef get fullView => _fullView;
@@ -127,12 +128,22 @@ class ComposedViewModel extends ViewModel {
     if (_isWriting) {
       throw StateError('Cannot load during save');
     }
+    final loadStartedAt = DateTime.now();
     _isReading = true;
     notifyListeners();
     try {
       final result = await _queryService.executeQuery(listOperationId, {});
       // Handle both mutable and immutable list results
       final resultList = result as List;
+
+      // Discard stale data if a save completed during this load
+      if (_lastSaveCompletedAt != null &&
+          _lastSaveCompletedAt!.isAfter(loadStartedAt)) {
+        _isReading = false;
+        notifyListeners();
+        return; // Keep fresh data from save, discard stale load results
+      }
+
       _records = resultList is List<Map<String, dynamic>>
           ? List<Map<String, dynamic>>.from(resultList)
           : resultList.cast<Map<String, dynamic>>();
@@ -223,6 +234,7 @@ class ComposedViewModel extends ViewModel {
 
       _draftRecord = null;
       _isWriting = false;
+      _lastSaveCompletedAt = DateTime.now();
       clearError();
       notifyListeners();
       return saved;
