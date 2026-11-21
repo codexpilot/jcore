@@ -1,14 +1,14 @@
-# JNLD body encoding
+# JX body encoding
 
 Draft for the JCore codec used by Context Studio and Dataset. JCore is a shared library within the query architecture. The Database, Backend, and FrontEnd responsibilities and HTTP headers are defined in the AIX developer note at `docs/apihub/architecture/query-response-developer-note.md`.
 
 ## Codec inputs and body
 
-The caller supplies the effective encoding and, for data-only compact results, the exact result schema. The body is `{"data": [...]}` or `{"meta": [...], "data": [...]}` according to the selected JNLD structure.
+The caller supplies the effective encoding and, for data-only compact results, the exact result schema. The body is `{"data": [...]}` or `{"meta": [...], "data": [...]}` according to the selected JX structure.
 
 A scalar is one row with one cell. A single record is one row. Multiple records are multiple rows. For compact encodings, a scalar such as `42` is `{"data": [[42]]}`. For full JSON, it is `{"data": [{"count": 42}]}` using the operation's declared field code or name. An empty result is `"data": []`.
 
-## JNLD encoding
+## JX encoding
 
 The codec takes a four-digit `encoding` value. The default is `8000`, which selects full objects keyed by code, NUMERIC and INT64 strings, and ISO UTC timestamps.
 
@@ -71,4 +71,4 @@ For a native client, `encoding: 8018` keeps the same object keys, encodes NUMERI
 
 - Verify scalar, single-row, multirow, and empty results all use the `data` array, and only metadata encodings add the ordered `meta` array.
 - Verify `8000` and `8018` preserve the expected exact NUMERIC and INT64 representations. Verify timezone offsets, duplicate object keys, and the required schema for compact data-only results.
-- JNLD replaces the earlier base-plus-eight proposal for this shared route. Update the encoder, decoder, and fixtures together.
+- JX replaces the earlier base-plus-eight proposal for this shared route. Update the encoder, decoder, and fixtures together.

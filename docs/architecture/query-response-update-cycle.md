@@ -1,6 +1,6 @@
 # JCore query response update cycle
 
-> **⚠️ LEGACY DOCUMENTATION**: This document describes the JsonC format and base-plus-eight encoding scheme (`jnf = base + 8 * dateMode`) which has been removed from JCore. The current implementation uses JNLD with four-digit encoding (`encoding = J × 1000 + N × 100 + L × 10 + D`). See [JNLD body encoding](query-request-and-jsonc-encoding.md) for current architecture.
+> **⚠️ LEGACY DOCUMENTATION**: This document describes the JsonC format and base-plus-eight encoding scheme (`jnf = base + 8 * dateMode`) which has been removed from JCore. The current implementation uses JX with four-digit encoding (`encoding = J × 1000 + N × 100 + L × 10 + D`). See [JX body encoding](query-request-and-jsonc-encoding.md) for current architecture.
 
 ## Scope and baseline
 
