@@ -257,31 +257,32 @@ class ComposedViewModel extends ViewModel {
   }
 }
 
-  /// Build sparse payload for save: only changed fields, no server-managed ones.
+  /// Build sparse payload for save: only changed fields, no immutable ones.
   ///
-  /// Never sends: d (timestamp), e (editor), c (code), f (provenance), txis (system array)
+  /// Immutable fields (never send): i (ID on update), d (timestamp), e (editor), c (code)
+  /// All other fields are editable and sent when changed
   Map<String, dynamic> _buildSparsePayload(
     Map<String, dynamic> draft,
     Map<String, dynamic>? original,
   ) {
-    const neverSend = {'d', 'e', 'c', 'f', 'txis'};
+    const immutable = {'d', 'e', 'c'};
     final payload = <String, dynamic>{};
     final isUpdate = original != null && draft['i'] != null;
 
     if (isUpdate) {
-      // Updates: ID + changed fields only
+      // Updates: ID + changed editable fields only
       payload['i'] = draft['i'];
       for (final entry in draft.entries) {
         final key = entry.key;
-        if (neverSend.contains(key) || key == 'i') continue;
+        if (immutable.contains(key) || key == 'i') continue;
         if (entry.value != original[key]) {
           payload[key] = entry.value;
         }
       }
     } else {
-      // Creates: all fields except never-send
+      // Creates: all fields except immutable ones
       for (final entry in draft.entries) {
-        if (!neverSend.contains(entry.key)) {
+        if (!immutable.contains(entry.key)) {
           payload[entry.key] = entry.value;
         }
       }
