@@ -261,17 +261,15 @@ class ComposedViewModel extends ViewModel {
   }
 }
 
-  /// Build sparse payload for save: only changed fields, no immutable/forbidden ones.
+  /// Build sparse payload for save: only changed fields, no immutable ones.
   ///
-  /// Never sends:
-  /// - d (timestamp), e (editor), c (code) - immutable/server-managed
-  /// - txis, tables - managed through MapX, not direct ModelX updates
-  /// - ttx - set on TableX, not ModelX
+  /// Immutable fields (never send): d (timestamp), e (editor), c (code)
+  /// All other fields are editable and sent when changed
   Map<String, dynamic> _buildSparsePayload(
     Map<String, dynamic> draft,
     Map<String, dynamic>? original,
   ) {
-    const neverSend = {'d', 'e', 'c', 'txis', 'tables', 'ttx'};
+    const neverSend = {'d', 'e', 'c'};
     final payload = <String, dynamic>{};
     final isUpdate = original != null && draft['i'] != null;
 
