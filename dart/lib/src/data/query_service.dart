@@ -76,7 +76,7 @@ abstract class QueryService {
   /// - [params]: Operation parameters
   ///   - For list operations: filters, pagination (offset, limit)
   ///   - For get operations: record ID (i)
-  ///   - For save operations: complete record data
+  ///   - For save operations: record data (complete for INSERT, may be sparse for UPDATE)
   ///   - For delete operations: record ID (i)
   ///
   /// Returns:
