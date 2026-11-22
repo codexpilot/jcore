@@ -219,9 +219,13 @@ class ComposedViewModel extends ViewModel {
     _isWriting = true;
     notifyListeners();
     try {
+      // Build sparse update payload: only changed fields + ID
+      // Never send server-managed fields (d, e) or immutable fields (c, f, txis)
+      final payload = _buildSparsePayload(_draftRecord!, _selectedRecord);
+
       final saved = await _queryService.executeQuery(
         saveOperationId,
-        _draftRecord!,
+        payload,
       ) as Map<String, dynamic>;
 
       // Update selected record and collection atomically
@@ -252,3 +256,35 @@ class ComposedViewModel extends ViewModel {
     notifyListeners();
   }
 }
+
+  /// Build sparse payload for save: only changed fields, no server-managed ones.
+  ///
+  /// Never sends: d (timestamp), e (editor), c (code), f (provenance), txis (system array)
+  Map<String, dynamic> _buildSparsePayload(
+    Map<String, dynamic> draft,
+    Map<String, dynamic>? original,
+  ) {
+    const neverSend = {'d', 'e', 'c', 'f', 'txis'};
+    final payload = <String, dynamic>{};
+    final isUpdate = original != null && draft['i'] != null;
+
+    if (isUpdate) {
+      // Updates: ID + changed fields only
+      payload['i'] = draft['i'];
+      for (final entry in draft.entries) {
+        final key = entry.key;
+        if (neverSend.contains(key) || key == 'i') continue;
+        if (entry.value != original[key]) {
+          payload[key] = entry.value;
+        }
+      }
+    } else {
+      // Creates: all fields except never-send
+      for (final entry in draft.entries) {
+        if (!neverSend.contains(entry.key)) {
+          payload[entry.key] = entry.value;
+        }
+      }
+    }
+    return payload;
+  }
