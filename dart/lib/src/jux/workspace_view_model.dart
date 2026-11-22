@@ -223,6 +223,10 @@ class ComposedViewModel extends ViewModel {
       // Never send server-managed fields (d, e) or immutable fields (c, f, txis)
       final payload = _buildSparsePayload(_draftRecord!, _selectedRecord);
 
+      // DEBUG: Log payload being sent
+      print('DEBUG saveDraft: payload keys = ${payload.keys.toList()}');
+      print('DEBUG saveDraft: payload = $payload');
+
       final saved = await _queryService.executeQuery(
         saveOperationId,
         payload,
