@@ -7,9 +7,9 @@ void main() {
   group('JNLD Codec - Encoding 1118 (J=1, N=1, L=1, D=8)', () {
     // Encoding 1118: compact positional, raw NUMERIC, raw INT64, epoch milliseconds
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61903, typeName: 'NUMERIC(19,3)'),
-      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 4, typeName: 'DATETIME'),
     ]);
 
     test('end-to-end wire format with exact NUMERIC precision', () {
@@ -112,9 +112,9 @@ void main() {
       expect(decoded[2][0].toString(), equals('25.01'));
     });
 
-    test('handles base NUMERIC (60000)', () {
+    test('handles base NUMERIC (20000)', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'value', n: 'Value', typeId: 60000, typeName: 'NUMERIC'),
+        JxField(i: 1, c: 'value', n: 'Value', typeId: 20000, typeName: 'NUMERIC'),
       ]);
 
       final rows = [
@@ -176,7 +176,7 @@ void main() {
 
     test('validates INT64 range - max boundary', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -194,7 +194,7 @@ void main() {
 
     test('validates INT64 range - min boundary', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -212,7 +212,7 @@ void main() {
 
     test('rejects INT64 overflow - positive', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -227,7 +227,7 @@ void main() {
 
     test('rejects INT64 overflow - negative', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -242,7 +242,7 @@ void main() {
 
     test('validates compact row width - too many cells', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       ]);
 
       final jsonString = '{"data":[[1,2]]}'; // Two cells, schema expects one
@@ -259,8 +259,8 @@ void main() {
 
     test('validates compact row width - too few cells', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       final jsonString = '{"data":[[1]]}'; // One cell, schema expects two
@@ -347,8 +347,8 @@ void main() {
 
     test('handles mixed types correctly', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
         JxField(i: 3, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
         JxField(i: 4, c: 'active', n: 'Active', typeId: 10000, typeName: 'BOOLEAN'),
       ]);
@@ -392,15 +392,15 @@ void main() {
           typeId: 10000,
           typeName: 'BOOLEAN',
         ),
-        JxField(i: 2, c: 'code', n: 'Code', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 2, c: 'code', n: 'Code', typeId: 10000, typeName: 'TEXT'),
         JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
-        JxField(i: 4, c: 'tail', n: 'Tail', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 4, c: 'tail', n: 'Tail', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = JxCodec.decodeFromJsonString(
@@ -416,19 +416,19 @@ void main() {
 
     test('keeps compact NUMERIC after JSON-looking text and nested JSONB', () {
       final mixedSchema = JxSchema([
-        JxField(i: 1, c: 'note', n: 'Note', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'note', n: 'Note', typeId: 10000, typeName: 'TEXT'),
         JxField(
           i: 2,
           c: 'detail',
           n: 'Detail',
-          typeId: 80001,
+          typeId: 7,
           typeName: 'JSONB',
         ),
         JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
       ]);
@@ -470,21 +470,21 @@ void main() {
           i: 1,
           c: 'detail',
           n: 'Detail',
-          typeId: 80001,
+          typeId: 7,
           typeName: 'JSONB',
         ),
         JxField(
           i: 2,
           c: escapedKey,
           n: 'Net',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
         JxField(
           i: 3,
           c: 'amount',
           n: 'Amount',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
       ]);
@@ -513,7 +513,7 @@ void main() {
           i: 1,
           c: 'amount',
           n: 'Amount',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
       ]);
@@ -549,14 +549,14 @@ void main() {
           i: 1,
           c: 'detail',
           n: 'Detail',
-          typeId: 80001,
+          typeId: 7,
           typeName: 'JSONB',
         ),
         JxField(
           i: 2,
           c: 'amount',
           n: 'Amount',
-          typeId: 60000,
+          typeId: 20000,
           typeName: 'NUMERIC',
         ),
       ]);
@@ -585,11 +585,11 @@ void main() {
 
     test('round-trip stability for all edge cases', () {
       final schema2 = JxSchema([
-        JxField(i: 1, c: 'int_max', n: 'Int Max', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'int_min', n: 'Int Min', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'int_max', n: 'Int Max', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'int_min', n: 'Int Min', typeId: 3, typeName: 'INT64'),
         JxField(i: 3, c: 'num_precise', n: 'Num Precise', typeId: 61903, typeName: 'NUMERIC(19,3)'),
         JxField(i: 4, c: 'num_trailing', n: 'Num Trailing', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-        JxField(i: 5, c: 'timestamp', n: 'Timestamp', typeId: 40001, typeName: 'DATETIME'),
+        JxField(i: 5, c: 'timestamp', n: 'Timestamp', typeId: 4, typeName: 'DATETIME'),
       ]);
 
       final rows = [

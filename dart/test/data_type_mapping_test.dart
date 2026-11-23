@@ -4,34 +4,35 @@ import 'package:jcore/jcore.dart';
 void main() {
   group('getPostgresType', () {
     test('maps base types to PostgreSQL names', () {
-      expect(getPostgresType(60000), equals('numeric'));
-      expect(getPostgresType(10000), equals('boolean'));
-      expect(getPostgresType(30000), equals('integer'));
-      expect(getPostgresType(40000), equals('bigint'));
+      expect(getPostgresType(0), equals('boolean'));
+      expect(getPostgresType(1), equals('smallint'));
+      expect(getPostgresType(2), equals('integer'));
+      expect(getPostgresType(3), equals('bigint'));
       expect(
-        getPostgresType(40001),
+        getPostgresType(4),
         equals('bigint'),
       ); // DATETIME stored as bigint
       expect(
-        getPostgresType(40002),
+        getPostgresType(5),
         equals('bigint'),
       ); // TIME stored as bigint
-      expect(getPostgresType(50000), equals('uuid'));
-      expect(getPostgresType(70000), equals('text'));
-      expect(getPostgresType(80001), equals('jsonb'));
+      expect(getPostgresType(6), equals('uuid'));
+      expect(getPostgresType(7), equals('jsonb'));
+      expect(getPostgresType(10000), equals('text'));
+      expect(getPostgresType(20000), equals('numeric'));
     });
 
     test('maps sized NUMERIC to PostgreSQL declarations', () {
-      expect(getPostgresType(61002), equals('numeric(10,2)')); // 60000 + 10*100 + 2
-      expect(getPostgresType(60100), equals('numeric(1,0)')); // 60000 + 1*100 + 0
-      expect(getPostgresType(69999), equals('numeric(99,99)')); // 60000 + 99*100 + 99
-      expect(getPostgresType(65037), equals('numeric(50,37)')); // 60000 + 50*100 + 37
+      expect(getPostgresType(21002), equals('numeric(10,2)')); // 20000 + 10*100 + 2
+      expect(getPostgresType(20100), equals('numeric(1,0)')); // 20000 + 1*100 + 0
+      expect(getPostgresType(29999), equals('numeric(99,99)')); // 20000 + 99*100 + 99
+      expect(getPostgresType(25037), equals('numeric(50,37)')); // 20000 + 50*100 + 37
     });
 
     test('maps sized TEXT to declarations', () {
-      expect(getPostgresType(70100), equals('varchar(100)')); // 70000 + 100
-      expect(getPostgresType(70001), equals('varchar(1)')); // 70000 + 1
-      expect(getPostgresType(79999), equals('varchar(9999)')); // 70000 + 9999
+      expect(getPostgresType(10100), equals('varchar(100)')); // 10000 + 100
+      expect(getPostgresType(10001), equals('varchar(1)')); // 10000 + 1
+      expect(getPostgresType(19999), equals('varchar(9999)')); // 10000 + 9999
     });
 
     test('returns null for invalid types', () {
@@ -43,27 +44,26 @@ void main() {
 
   group('parseDataTypeId', () {
     test('parses base type names', () {
-      expect(parseDataTypeId('integer'), equals(30000));
-      expect(parseDataTypeId('bigint'), equals(40000));
-      expect(parseDataTypeId('boolean'), equals(10000));
-      expect(parseDataTypeId('numeric'), equals(60000));
-      expect(parseDataTypeId('uuid'), equals(50000));
-      expect(parseDataTypeId('jsonb'), equals(80001));
-      final textId = parseDataTypeId('text');
-      expect(textId, equals(70000));
+      expect(parseDataTypeId('integer'), equals(2));
+      expect(parseDataTypeId('bigint'), equals(3));
+      expect(parseDataTypeId('boolean'), equals(0));
+      expect(parseDataTypeId('smallint'), equals(1));
+      expect(parseDataTypeId('numeric'), equals(20000));
+      expect(parseDataTypeId('uuid'), equals(6));
+      expect(parseDataTypeId('jsonb'), equals(7));
+      expect(parseDataTypeId('text'), equals(10000));
       expect(parseDataTypeId('CUID'), isNull);
     });
 
     test('is case-insensitive', () {
-      expect(parseDataTypeId('INTEGER'), equals(30000));
-      expect(parseDataTypeId('Integer'), equals(30000));
-      expect(parseDataTypeId('BIGINT'), equals(40000));
+      expect(parseDataTypeId('INTEGER'), equals(2));
+      expect(parseDataTypeId('Integer'), equals(2));
+      expect(parseDataTypeId('BIGINT'), equals(3));
     });
 
     test('handles whitespace', () {
-      expect(parseDataTypeId(' integer '), equals(30000));
-      final textId = parseDataTypeId('\ttext\n');
-      expect(textId, equals(70000));
+      expect(parseDataTypeId(' integer '), equals(2));
+      expect(parseDataTypeId('\ttext\n'), equals(10000));
     });
 
     test('returns null for unknown types', () {
@@ -103,49 +103,49 @@ void main() {
 
   group('getRequiredDataType', () {
     test('returns INT32 for status column', () {
-      expect(getRequiredDataType(200008), equals(30000));
+      expect(getRequiredDataType(200402), equals(2));
     });
 
     test('returns INT32 for version column', () {
-      expect(getRequiredDataType(200010), equals(30000));
+      expect(getRequiredDataType(200302), equals(2));
     });
 
     test('returns null for other column types', () {
-      expect(getRequiredDataType(200001), isNull); // system_column_i
-      expect(getRequiredDataType(200005), isNull); // system_column_n
+      expect(getRequiredDataType(200011), isNull); // system_column_id
+      expect(getRequiredDataType(200004), isNull); // system_column_name
       expect(getRequiredDataType(200000), isNull); // user_column
     });
   });
 
   group('isValidColumnDataType', () {
     test('validates status column requires INT32', () {
-      expect(isValidColumnDataType(200008, 30000), isTrue); // status + INT32
-      expect(isValidColumnDataType(200008, 40000), isFalse); // status + INT64
+      expect(isValidColumnDataType(200402, 2), isTrue); // status + INT32
+      expect(isValidColumnDataType(200402, 3), isFalse); // status + INT64
       expect(
-        isValidColumnDataType(200008, 60000),
+        isValidColumnDataType(200402, 20000),
         isFalse,
       ); // status + NUMERIC
     });
 
     test('validates version column requires INT32', () {
-      expect(isValidColumnDataType(200010, 30000), isTrue); // version + INT32
-      expect(isValidColumnDataType(200010, 40000), isFalse); // version + INT64
+      expect(isValidColumnDataType(200302, 2), isTrue); // version + INT32
+      expect(isValidColumnDataType(200302, 3), isFalse); // version + INT64
       expect(
-        isValidColumnDataType(200010, 60000),
+        isValidColumnDataType(200302, 20000),
         isFalse,
       ); // version + NUMERIC
     });
 
     test('validates other columns accept any valid data type', () {
-      expect(isValidColumnDataType(200001, 30000), isTrue); // id + INT32
-      expect(isValidColumnDataType(200001, 40000), isTrue); // id + INT64
-      expect(isValidColumnDataType(200005, 70000), isTrue); // name + TEXT
-      expect(isValidColumnDataType(200005, 70100), isTrue); // name + TEXT(100)
+      expect(isValidColumnDataType(200011, 2), isTrue); // id + INT32
+      expect(isValidColumnDataType(200011, 3), isTrue); // id + INT64
+      expect(isValidColumnDataType(200004, 10000), isTrue); // name + TEXT
+      expect(isValidColumnDataType(200004, 10100), isTrue); // name + TEXT(100)
     });
 
     test('rejects invalid data types', () {
-      expect(isValidColumnDataType(200005, 999999), isFalse);
-      expect(isValidColumnDataType(200005, 60025), isFalse); // invalid NUMERIC
+      expect(isValidColumnDataType(200004, 999999), isFalse);
+      expect(isValidColumnDataType(200004, 20025), isFalse); // invalid NUMERIC (scale > precision)
     });
   });
 }

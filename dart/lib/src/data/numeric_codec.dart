@@ -29,7 +29,7 @@ class NumericCodec {
   ) {
     if (value == null) return null;
 
-    // INT64 (40000)
+    // INT64 (3)
     if (typeId == DataType.int64.id) {
       if (enc.int64AsString) {
         if (value is BigInt) return value.toString();
@@ -60,7 +60,7 @@ class NumericCodec {
       }
     }
 
-    // NUMERIC (base 60000 and parameterized 60100-69999)
+    // NUMERIC (base 20000 and parameterized 20100-29999)
     if (DataTypeRegistry.isValidNumeric(typeId)) {
       if (enc.numericAsString) {
         if (value is Numeric) return value.toString();
@@ -78,12 +78,12 @@ class NumericCodec {
       }
     }
 
-    // DATETIME (40001)
+    // DATETIME (4)
     if (typeId == DataType.datetime.id) {
       return encodeDatetime(value, enc.d, timezone);
     }
 
-    // TIME (40002)
+    // TIME (5)
     if (typeId == DataType.time.id) {
       return encodeTime(value, enc.d);
     }
@@ -101,7 +101,7 @@ class NumericCodec {
   ) {
     if (value == null) return null;
 
-    // INT64 (40000)
+    // INT64 (3)
     if (typeId == DataType.int64.id) {
       if (enc.int64AsString) {
         if (value is String) return BigInt.parse(value);
@@ -112,7 +112,7 @@ class NumericCodec {
       }
     }
 
-    // NUMERIC (base 60000 and parameterized 60100-69999)
+    // NUMERIC (base 20000 and parameterized 20100-29999)
     if (DataTypeRegistry.isValidNumeric(typeId)) {
       if (enc.numericAsString) {
         if (value is String) return Numeric.parse(value);
@@ -124,12 +124,12 @@ class NumericCodec {
       }
     }
 
-    // DATETIME (40001)
+    // DATETIME (4)
     if (typeId == DataType.datetime.id) {
       return decodeDatetime(value, enc.d, timezone);
     }
 
-    // TIME (40002)
+    // TIME (5)
     if (typeId == DataType.time.id) {
       return decodeTime(value, enc.d);
     }

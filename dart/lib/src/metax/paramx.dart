@@ -28,7 +28,7 @@ class ParamX {
   final String c;
 
   /// Data type (TypeX Group 3)
-  final int dtx;
+  final int dt;
 
   /// Required flag
   final bool req;
@@ -46,7 +46,7 @@ class ParamX {
     required this.qxi,
     required this.n,
     required this.c,
-    required this.dtx,
+    required this.dt,
     this.req = false,
     this.fp = 0,
   });
@@ -62,7 +62,7 @@ class ParamX {
       qxi: json['qxi'] as int,
       n: json['n'] as String,
       c: json['c'] as String,
-      dtx: json['dtx'] as int,
+      dt: json['dt'] as int,
       req: json['req'] as bool? ?? false,
       fp: json['fp'] as int? ?? 0,
     );
@@ -78,7 +78,7 @@ class ParamX {
     'qxi': qxi,
     'n': n,
     'c': c,
-    'dtx': dtx,
+    'dt': dt,
     'req': req,
     'fp': fp,
   };

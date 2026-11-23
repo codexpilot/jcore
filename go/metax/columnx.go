@@ -15,7 +15,7 @@ type ColumnX struct {
 	C   *string `json:"c,omitempty"`   // Code
 	TXI *int    `json:"txi,omitempty"` // Table ID (references tablex.i)
 	CTX *int    `json:"ctx,omitempty"` // Column type (TypeX Group 5)
-	DTX *int    `json:"dtx,omitempty"` // Data type (TypeX Group 3)
+	DT *int    `json:"dt,omitempty"` // Data type (TypeX Group 3)
 }
 
 // MarshalJSON implements custom JSON marshaling
@@ -42,8 +42,8 @@ func (c *ColumnX) MarshalJSON() ([]byte, error) {
 	if c.CTX != nil {
 		data["ctx"] = *c.CTX
 	}
-	if c.DTX != nil {
-		data["dtx"] = *c.DTX
+	if c.DT != nil {
+		data["dt"] = *c.DT
 	}
 	return json.Marshal(data)
 }

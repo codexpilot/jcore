@@ -80,7 +80,7 @@ func TestFieldX_JSON(t *testing.T) {
 		MXI:  500,
 		CXIS: []int{10, 20},
 		CTX:  200001,
-		DTX:  300001,
+		DT:  300001,
 		C:    "username",
 		FTX:  400000,
 		FP:   0,

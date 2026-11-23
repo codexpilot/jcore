@@ -13,7 +13,7 @@ type ParamX struct {
 	QXI int    `json:"qxi"` // Query ID (references queryx.i)
 	N   string `json:"n"`   // Display name
 	C   string `json:"c"`   // Code (unique within query)
-	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
+	DT int    `json:"dt"` // Data type (TypeX Group 3)
 	Req bool   `json:"req"` // Required flag
 	FP  int    `json:"fp"`  // Optional recursive parent identifier
 }

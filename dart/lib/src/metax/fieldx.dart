@@ -31,7 +31,7 @@ class FieldX {
   final int ctx;
 
   /// Data type (TypeX Group 3)
-  final int dtx;
+  final int dt;
 
   /// Code (unique)
   final String c;
@@ -54,7 +54,7 @@ class FieldX {
     required this.mxi,
     this.cxis = const [],
     required this.ctx,
-    required this.dtx,
+    required this.dt,
     required this.c,
     this.ftx = 400000,
     this.fp = 0,
@@ -92,7 +92,7 @@ class FieldX {
       mxi: json['mxi'] as int,
       cxis: (json['cxis'] as List<dynamic>?)?.cast<int>() ?? const [],
       ctx: json['ctx'] as int,
-      dtx: json['dtx'] as int,
+      dt: json['dt'] as int,
       c: json['c'] as String,
       ftx: json['ftx'] as int? ?? 400000,
       fp: json['fp'] as int? ?? 0,
@@ -110,7 +110,7 @@ class FieldX {
     'mxi': mxi,
     'cxis': cxis,
     'ctx': ctx,
-    'dtx': dtx,
+    'dt': dt,
     'c': c,
     'ftx': ftx,
     'fp': fp,

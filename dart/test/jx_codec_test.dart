@@ -5,7 +5,7 @@ void main() {
   group('JxEncoding', () {
     test('parses default encoding 8000', () {
       final enc = JxEncoding.parse(8000);
-      expect(enc.j, equals(8));
+      expect(enc.j, equals(7));
       expect(enc.n, equals(0));
       expect(enc.l, equals(0));
       expect(enc.d, equals(0));
@@ -14,10 +14,10 @@ void main() {
 
     test('parses encoding 8018', () {
       final enc = JxEncoding.parse(8018);
-      expect(enc.j, equals(8));
+      expect(enc.j, equals(7));
       expect(enc.n, equals(0));
       expect(enc.l, equals(1));
-      expect(enc.d, equals(8));
+      expect(enc.d, equals(7));
     });
 
     test('parses compact encoding 1000', () {
@@ -64,8 +64,8 @@ void main() {
   group('JxSchema', () {
     test('creates schema with fields', () {
       final schema = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       expect(schema.fieldCount, equals(2));
@@ -75,8 +75,8 @@ void main() {
 
     test('validates unique names', () {
       final schema = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'ID', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       expect(() => schema.validateUniqueNames(), throwsFormatException);
@@ -84,8 +84,8 @@ void main() {
 
     test('validates unique codes', () {
       final schema = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'id', n: 'Name', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       expect(() => schema.validateUniqueCodes(), throwsFormatException);
@@ -139,9 +139,9 @@ void main() {
 
   group('JxCodec - 8000 encoding (default)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 4, typeName: 'DATETIME'),
     ]);
 
     test('encodes full objects with code keys', () {
@@ -163,7 +163,7 @@ void main() {
 
     test('encodes scalar as one row with one cell', () {
       final scalarSchema = JxSchema([
-        JxField(i: 1, c: 'count', n: 'Count', typeId: 40000, typeName: 'INT64'),
+        JxField(i: 1, c: 'count', n: 'Count', typeId: 3, typeName: 'INT64'),
       ]);
 
       final rows = [
@@ -202,9 +202,9 @@ void main() {
 
   group('JxCodec - 8018 encoding (native client)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
-      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 40001, typeName: 'DATETIME'),
+      JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 4, typeName: 'DATETIME'),
     ]);
 
     test('encodes INT64 as JSON integers', () {
@@ -246,8 +246,8 @@ void main() {
 
   group('JxCodec - 9000 encoding (objects by name)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
     ]);
 
     test('encodes full objects with name keys', () {
@@ -266,8 +266,8 @@ void main() {
 
     test('rejects duplicate field names', () {
       final badSchema = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'name', n: 'ID', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'name', n: 'ID', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       final rows = [
@@ -283,8 +283,8 @@ void main() {
 
   group('JxCodec - 1000 encoding (compact positional)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
     ]);
 
     test('encodes compact positional rows', () {
@@ -340,8 +340,8 @@ void main() {
 
   group('JxCodec - 2000 encoding (compact with meta by ID)', () {
     final schema = JxSchema([
-      JxField(i: 101, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JxField(i: 102, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      JxField(i: 101, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 102, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field ID and type ID', () {
@@ -352,16 +352,16 @@ void main() {
       final body = JxCodec.encode(encoding: 2000, rows: rows, schema: schema);
 
       expect(body.meta, hasLength(2));
-      expect(body.meta![0], equals([101, 40000]));
-      expect(body.meta![1], equals([102, 70000]));
+      expect(body.meta![0], equals([101, 3]));
+      expect(body.meta![1], equals([102, 10000]));
       expect(body.data[0], equals(['1', 'John']));
     });
   });
 
   group('JxCodec - 3000 encoding (compact with meta by code)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field code and type name', () {
@@ -379,8 +379,8 @@ void main() {
 
     test('rejects duplicate field codes', () {
       final badSchema = JxSchema([
-        JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-        JxField(i: 2, c: 'id', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+        JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+        JxField(i: 2, c: 'id', n: 'Name', typeId: 10000, typeName: 'TEXT'),
       ]);
 
       final rows = [
@@ -396,8 +396,8 @@ void main() {
 
   group('JxCodec - 4000 encoding (compact with meta by name)', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
-      JxField(i: 2, c: 'name', n: 'Name', typeId: 70000, typeName: 'TEXT'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 2, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
     ]);
 
     test('includes metadata with field name and type name', () {
@@ -416,7 +416,7 @@ void main() {
 
   group('JxCodec - TIME handling', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'wake_time', n: 'Wake Time', typeId: 40002, typeName: 'TIME'),
+      JxField(i: 1, c: 'wake_time', n: 'Wake Time', typeId: 5, typeName: 'TIME'),
     ]);
 
     test('encodes TIME as HH:mm:ss.SSS (D=0)', () {
@@ -547,7 +547,7 @@ void main() {
 
   group('JxCodec - INT64 exact values', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'id', n: 'ID', typeId: 40000, typeName: 'INT64'),
+      JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
     ]);
 
     test('preserves exact INT64 as string (L=0)', () {

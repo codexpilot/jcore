@@ -22,7 +22,8 @@ class TableX {
   final int f;
 
   /// Table type (TypeX Group 4 catalog ID)
-  /// Default: 100014 (Private · Log Off · Auto Increment · BIGINT)
+  /// Format digit is DataTypeX ID (2=INT32, 3=INT64, 6=UUID)
+  /// Default: 100013 (Private · Log Off · Auto Increment · INT64)
   final int ttx;
 
   /// Code (unique within domain)
@@ -42,7 +43,7 @@ class TableX {
     required this.dxi,
     required this.n,
     required this.f,
-    this.ttx = 100014,
+    this.ttx = 100013,
     required this.c,
     this.px = 0,
     this.fp = 0,
@@ -60,7 +61,7 @@ class TableX {
       dxi: json['dxi'] as int,
       n: json['n'] as String,
       f: json['f'] as int,
-      ttx: json['ttx'] as int? ?? 100014,
+      ttx: json['ttx'] as int? ?? 100013,
       c: json['c'] as String,
       px: json['px'] as int? ?? 0,
       fp: json['fp'] as int? ?? 0,
@@ -154,16 +155,23 @@ class TableTypeDecoded {
 
   String get formatName {
     switch (format) {
+      case 2:
+        return 'INT32';
       case 3:
-        return 'INTEGER';
-      case 4:
-        return 'BIGINT';
-      case 5:
+        return 'INT64';
+      case 6:
         return 'UUID';
       default:
         return 'Unknown';
     }
   }
+
+  /// Get DataTypeX ID from format code
+  /// Format codes ARE DataTypeX IDs:
+  /// - 2: INT32
+  /// - 3: INT64
+  /// - 6: UUID
+  int get dataTypeId => format;
 
   @override
   String toString() =>

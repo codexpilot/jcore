@@ -128,7 +128,7 @@ void main() {
         dxi: 1,
         n: 'Test Table',
         f: 0,
-        ttx: 100014, // Private, Log Off, Auto Increment, BIGINT
+        ttx: 100013, // Private, Log Off, Auto Increment, INT64 (DataTypeX 3)
         c: 'test_table',
       );
 

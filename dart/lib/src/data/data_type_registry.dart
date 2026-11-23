@@ -1,44 +1,62 @@
-/// Data type catalog and registry.
+/// Data type catalog and registry (DataTypeX).
 ///
-/// The first digit identifies an ordered storage-size class. It is not always
-/// a literal byte count: class 3 contains four-byte values. These IDs and
-/// formulas are intended to be shared by language ports.
+/// DataTypeX uses direct IDs for base types (0-7) and range-based encoding
+/// for parameterized types:
+///
+/// - Base types: 0-7 (8 types)
+///   - 0: BOOLEAN, 1: SMALLINT, 2: INT32, 3: INT64
+///   - 4: DATETIME, 5: TIME, 6: UUID, 7: JSONB
+///
+/// - TEXT range: 10000-19999
+///   - 10000: unlimited TEXT
+///   - 10001-19999: TEXT(1) through TEXT(9999)
+///   - Formula: 10000 + length
+///
+/// - NUMERIC range: 20000-29999
+///   - 20000: unlimited NUMERIC
+///   - 20100-29999: NUMERIC(precision, scale)
+///   - Formula: 20000 + precision * 100 + scale
+///   - Constraints: 1 <= precision <= 99, 0 <= scale <= precision
+///
+/// These IDs and formulas are shared across language ports (Dart, Go, etc.)
+/// and align with the AIX database catalog (cox.datatypex).
 library;
 
-/// Canonical data types in the current registry.
+/// Canonical data types in the current registry (DataTypeX).
+///
+/// Base types: 0-7
+/// TEXT range: 10000-19999 (10000 = unlimited)
+/// NUMERIC range: 20000-29999 (20000 = unlimited)
 enum DataType {
   /// Boolean.
-  boolean(10000, 'BOOLEAN', 'boolean'),
+  boolean(0, 'BOOLEAN', 'boolean'),
 
   /// Signed 16-bit integer; also known as INT16.
-  smallint(20000, 'SMALLINT', 'smallint'),
+  smallint(1, 'SMALLINT', 'smallint'),
 
   /// Signed 32-bit integer.
-  int32(30000, 'INT32', 'integer'),
+  int32(2, 'INT32', 'integer'),
 
   /// Signed 64-bit integer.
-  int64(40000, 'INT64', 'bigint'),
+  int64(3, 'INT64', 'bigint'),
 
   /// UTC datetime stored in the 64-bit class.
-  datetime(40001, 'DATETIME', 'bigint'),
+  datetime(4, 'DATETIME', 'bigint'),
 
   /// Time value stored in the 64-bit class.
-  time(40002, 'TIME', 'bigint'),
+  time(5, 'TIME', 'bigint'),
 
   /// UUID.
-  uuid(50000, 'UUID', 'uuid'),
+  uuid(6, 'UUID', 'uuid'),
 
-  /// Unlimited precision decimal.
-  numeric(60000, 'NUMERIC', 'numeric'),
+  /// JSONB document (binary JSON).
+  jsonb(7, 'JSONB', 'jsonb'),
 
-  /// Unlimited text.
-  text(70000, 'TEXT', 'text'),
+  /// Unlimited precision decimal (base type for NUMERIC range).
+  numeric(20000, 'NUMERIC', 'numeric'),
 
-  /// JSON document.
-  json(80000, 'JSON', 'json'),
-
-  /// JSONB document.
-  jsonb(80001, 'JSONB', 'jsonb');
+  /// Unlimited text (base type for TEXT range).
+  text(10000, 'TEXT', 'text');
 
   /// Creates a data type catalog entry.
   const DataType(this.id, this.name, this.postgresType);
@@ -88,11 +106,11 @@ enum DataType {
 
 /// Lookup, encoding, decoding, and validation for the current catalog.
 abstract final class DataTypeRegistry {
-  /// First assigned registry ID.
-  static const int firstId = 10000;
+  /// First assigned registry ID (base types start at 0).
+  static const int firstId = 0;
 
-  /// Last assigned registry ID.
-  static const int lastId = 80001;
+  /// Last assigned base type ID (0-7, then TEXT/NUMERIC ranges).
+  static const int lastId = 7;
 
   /// All base types in catalog order.
   static List<DataType> get types => List.unmodifiable(DataType.values);
@@ -117,7 +135,7 @@ abstract final class DataTypeRegistry {
   /// Checks whether an ID identifies unlimited or parameterized NUMERIC.
   static bool isValidNumeric(int typeId) {
     if (typeId == DataType.numeric.id) return true;
-    if (typeId < 60100 || typeId > 69999) return false;
+    if (typeId < 20100 || typeId > 29999) return false;
 
     final offset = typeId - DataType.numeric.id;
     final precision = offset ~/ 100;
@@ -125,7 +143,7 @@ abstract final class DataTypeRegistry {
     return precision >= 1 && precision <= 99 && scale <= precision;
   }
 
-  /// Encodes NUMERIC as 60000 + precision * 100 + scale.
+  /// Encodes NUMERIC as 20000 + precision * 100 + scale.
   static int encodeNumeric({int? precision, int? scale}) {
     if (precision == null && scale == null) return DataType.numeric.id;
     if (precision == null) {
@@ -154,9 +172,9 @@ abstract final class DataTypeRegistry {
 
   /// Checks whether an ID identifies unlimited or length-parameterized TEXT.
   static bool isValidText(int typeId) =>
-      typeId == DataType.text.id || (typeId >= 70001 && typeId <= 79999);
+      typeId == DataType.text.id || (typeId >= 10001 && typeId <= 19999);
 
-  /// Encodes TEXT as 70000 + length.
+  /// Encodes TEXT as 10000 + length.
   static int encodeText({int? length}) {
     if (length == null) return DataType.text.id;
     if (length < 1 || length > 9999) {

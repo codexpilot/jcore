@@ -36,7 +36,7 @@ type FieldX struct {
 	MXI  int   `json:"mxi"`  // Model ID (references modelx.i)
 	CXIS []int `json:"cxis"` // System-managed preview: ColumnX IDs from MapX 973000
 	CTX int    `json:"ctx"` // Column type (TypeX Group 5)
-	DTX int    `json:"dtx"` // Data type (TypeX Group 3)
+	DT int    `json:"dt"` // Data type (TypeX Group 3)
 	C   string `json:"c"`   // Code (unique)
 	FTX int    `json:"ftx"` // Field type (TypeX Group 7: 400000-400002)
 	FP  int    `json:"fp"`  // Optional recursive parent identifier

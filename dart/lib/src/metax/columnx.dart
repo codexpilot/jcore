@@ -32,7 +32,7 @@ class ColumnX {
   final int ctx;
 
   /// Data type (TypeX Group 3: JCore types)
-  final int dtx;
+  final int dt;
 
   /// Optional recursive parent identifier; existence is not guaranteed.
   final int fp;
@@ -48,7 +48,7 @@ class ColumnX {
     required this.c,
     required this.txi,
     required this.ctx,
-    required this.dtx,
+    required this.dt,
     this.fp = 0,
   });
 
@@ -101,7 +101,7 @@ class ColumnX {
       c: json['c'] as String,
       txi: json['txi'] as int,
       ctx: json['ctx'] as int,
-      dtx: json['dtx'] as int,
+      dt: json['dt'] as int,
       fp: json['fp'] as int? ?? 0,
     );
   }
@@ -117,7 +117,7 @@ class ColumnX {
     'c': c,
     'txi': txi,
     'ctx': ctx,
-    'dtx': dtx,
+    'dt': dt,
     'fp': fp,
   };
 
