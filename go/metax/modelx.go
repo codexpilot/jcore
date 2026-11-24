@@ -18,20 +18,6 @@ type ModelX struct {
 	MTX        *int    `json:"mtx,omitempty"`        // Model type
 }
 
-// Orientation returns the model orientation from MTX field
-// 0=independent, 1=model-after-table, 2=table-after-model
-func (m *ModelX) Orientation() int {
-	if m.MTX == nil {
-		return 1
-	}
-	return (*m.MTX / 10000) % 10
-}
-
-// RequiresPhysicalBases returns whether the model requires physical bases
-func (m *ModelX) RequiresPhysicalBases() bool {
-	return m.Orientation() != 0
-}
-
 // MarshalJSON implements custom JSON marshaling
 func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	data := make(map[string]interface{})

@@ -128,13 +128,14 @@ void main() {
         dxi: 1,
         n: 'Test Table',
         f: 0,
-        ttx: 100013, // Private, Log Off, Auto Increment, INT64 (DataTypeX 3)
+        ttx: 100040, // Private, Auto-increment BIGINT, Flat with log off
         c: 'test_table',
       );
 
       final decoded = table.tableType;
       expect(decoded.sync, 0); // Private
-      expect(decoded.log, 0); // Off
+      expect(decoded.logging, 0); // Off
+      expect(decoded.recursion, 0); // Flat
       expect(decoded.algorithm, 1); // Auto Increment
       expect(decoded.format, 4); // BIGINT
     });

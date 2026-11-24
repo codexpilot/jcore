@@ -31,6 +31,7 @@ class ModelX {
   final String c;
 
   /// Model type (TypeX Group 6: 300000-399999)
+  /// Table-First only: 300000 (No Map), 310000 (Single Table), 330000 (Multiple Tables), 390000 (System)
   final int mtx;
 
   /// Optional recursive parent identifier; existence is not guaranteed.
@@ -47,15 +48,16 @@ class ModelX {
     this.ps = const [],
     this.txis = const [],
     required this.c,
-    this.mtx = 320001,
+    this.mtx = 300000,
     this.fp = 0,
   });
 
-  /// Model type category
+  /// Model type category (Table-First only)
   ModelTypeCategory get category {
-    if (mtx >= 300000 && mtx <= 300004) return ModelTypeCategory.operationOnly;
-    if (mtx >= 310001 && mtx <= 310004) return ModelTypeCategory.storageMapped;
-    if (mtx >= 320001 && mtx <= 320004) return ModelTypeCategory.modelFirst;
+    if (mtx == 300000) return ModelTypeCategory.noMap;
+    if (mtx == 310000) return ModelTypeCategory.singleTable;
+    if (mtx == 330000) return ModelTypeCategory.multipleTables;
+    if (mtx == 390000) return ModelTypeCategory.system;
     return ModelTypeCategory.unknown;
   }
 
@@ -71,7 +73,7 @@ class ModelX {
       ps: (json['ps'] as List<dynamic>?)?.cast<int>() ?? const [],
       txis: (json['txis'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
-      mtx: json['mtx'] as int? ?? 320001,
+      mtx: json['mtx'] as int? ?? 300000,
       fp: json['fp'] as int? ?? 0,
     );
   }
@@ -105,8 +107,9 @@ class ModelX {
 }
 
 enum ModelTypeCategory {
-  operationOnly, // 300000-300004: No storage
-  storageMapped, // 310001-310004: Direct table mapping
-  modelFirst, // 320001-320004: Composed from multiple tables
+  noMap, // 300000: No usable direct table link
+  singleTable, // 310000: Links to one distinct table
+  multipleTables, // 330000: Links to two or more distinct tables
+  system, // 390000: System-managed mapping
   unknown,
 }

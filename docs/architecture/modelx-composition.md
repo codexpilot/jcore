@@ -6,7 +6,16 @@ A ModelX describes one logical record. Its FieldX rows define its scalar propert
 
 ## Model type
 
-`ModelX.mtx` remains a TypeX Group 6 reference with the existing IDs and default `320000`. Its claim type digit identifies the ownership relationship: unclaimed (`30xxxx`), table-claimed-model (`31xxxx`), model-claimed-table (`32xxxx`), tables-claimed-model (`33xxxx`), model-claimed-tables (`34xxxx`), or system (`39xxxx`). An active `951400` rule with the model as `x1` makes the model structured. A model with zero such rules is flat, including when a getter joins several tables. QueryX defines the operation and whether its result is a single record, a list, or a page. `ModelX.ps` stores parent-model IDs and the signed `ModelX.f` stores provenance. [Model type specification](../reference/model-types.md)
+`ModelX.mtx` is a TypeX Group 6 reference in the range 300000-399999 with default `300000`. **Table-First is the only supported authority for sealed TableX ↔ ModelX mappings.** The effective mapping type is derived from distinct, active, usable direct TableX links in MapX:
+
+| Type | Description |
+|---:|---|
+| `300000` | No usable direct table link |
+| `310000` | Links directly to one distinct table |
+| `330000` | Links directly to two or more distinct tables |
+| `390000` | System-managed mapping |
+
+An active `951400` rule with the model as `x1` makes the model structured. A model with zero such rules is flat, including when a getter joins several tables. QueryX defines the operation and whether its result is a single record, a list, or a page. `ModelX.ps` stores parent-model IDs and the signed `ModelX.f` stores provenance. [Model type specification](../reference/model-types.md)
 
 ## MapX responsibilities
 

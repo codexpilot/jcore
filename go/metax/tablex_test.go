@@ -11,35 +11,39 @@ func TestDecodeTableType(t *testing.T) {
 		tt             int
 		wantAlgorithm  int
 		wantSyncPolicy int
-		wantLogEnabled bool
+		wantLogging    int
+		wantRecursion  int
 		wantIDFormat   int
 		wantErr        bool
 	}{
 		{
-			name:           "Protected Auto-increment INT",
-			tt:             101013,
+			name:           "Private Auto-increment BIGINT flat log-off (default)",
+			tt:             100040,
 			wantAlgorithm:  1,
-			wantSyncPolicy: 1,
-			wantLogEnabled: false,
-			wantIDFormat:   3,
-			wantErr:        false,
-		},
-		{
-			name:           "Synced-Origin-Main with logging BIGINT Increment",
-			tt:             103114,
-			wantAlgorithm:  1,
-			wantSyncPolicy: 3,
-			wantLogEnabled: true,
+			wantSyncPolicy: 0,
+			wantLogging:    0,
+			wantRecursion:  0,
 			wantIDFormat:   4,
 			wantErr:        false,
 		},
 		{
-			name:           "Synced-Origin Epoch Server Serial UUID",
-			tt:             102025,
-			wantAlgorithm:  2,
-			wantSyncPolicy: 2,
-			wantLogEnabled: false,
-			wantIDFormat:   5,
+			name:           "Main Auto-increment BIGINT flat log-on",
+			tt:             100342,
+			wantAlgorithm:  1,
+			wantSyncPolicy: 3,
+			wantLogging:    1,
+			wantRecursion:  0,
+			wantIDFormat:   4,
+			wantErr:        false,
+		},
+		{
+			name:           "Private Custom BIGINT flat log-off (inherited ID)",
+			tt:             100010,
+			wantAlgorithm:  0,
+			wantSyncPolicy: 0,
+			wantLogging:    0,
+			wantRecursion:  0,
+			wantIDFormat:   4,
 			wantErr:        false,
 		},
 		{
@@ -67,8 +71,11 @@ func TestDecodeTableType(t *testing.T) {
 			if tableType.SyncPolicy != tt.wantSyncPolicy {
 				t.Errorf("SyncPolicy = %v, want %v", tableType.SyncPolicy, tt.wantSyncPolicy)
 			}
-			if tableType.LogEnabled != tt.wantLogEnabled {
-				t.Errorf("LogEnabled = %v, want %v", tableType.LogEnabled, tt.wantLogEnabled)
+			if tableType.Logging != tt.wantLogging {
+				t.Errorf("Logging = %v, want %v", tableType.Logging, tt.wantLogging)
+			}
+			if tableType.Recursion != tt.wantRecursion {
+				t.Errorf("Recursion = %v, want %v", tableType.Recursion, tt.wantRecursion)
 			}
 			if tableType.IDFormat != tt.wantIDFormat {
 				t.Errorf("IDFormat = %v, want %v", tableType.IDFormat, tt.wantIDFormat)
@@ -83,12 +90,12 @@ func TestIsValidTableType(t *testing.T) {
 		tt    int
 		valid bool
 	}{
-		{"Valid: 101013", 101013, true},
-		{"Valid: 103114", 103114, true},
-		{"Valid: 102025", 102025, true},
+		{"Valid: 100040 (default)", 100040, true},
+		{"Valid: 100342 (Main with logging)", 100342, true},
+		{"Valid: 100010 (Custom BIGINT)", 100010, true},
 		{"Invalid: too low", 99999, false},
 		{"Invalid: too high", 110000, false},
-		{"Invalid: sync 3 without logging", 103014, false},
+		{"Invalid: Main without logging", 100340, false},
 	}
 
 	for _, tt := range tests {

@@ -22,8 +22,9 @@ class TableX {
   final int f;
 
   /// Table type (TypeX Group 4 catalog ID)
-  /// Format digit is DataTypeX ID (2=INT32, 3=INT64, 6=UUID)
-  /// Default: 100013 (Private · Log Off · Auto Increment · INT64)
+  /// SXB format: 100000 + 100×S + 10×X + B
+  /// S = Sync policy (0-3), X = 3×algorithm+(format-3), B = 2×logging+recursion
+  /// Default: 100040 (Private · Auto-increment BIGINT · Flat with log off)
   final int ttx;
 
   /// Code (unique within domain)
@@ -43,7 +44,7 @@ class TableX {
     required this.dxi,
     required this.n,
     required this.f,
-    this.ttx = 100013,
+    this.ttx = 100040,
     required this.c,
     this.px = 0,
     this.fp = 0,
@@ -61,7 +62,7 @@ class TableX {
       dxi: json['dxi'] as int,
       n: json['n'] as String,
       f: json['f'] as int,
-      ttx: json['ttx'] as int? ?? 100013,
+      ttx: json['ttx'] as int? ?? 100040,
       c: json['c'] as String,
       px: json['px'] as int? ?? 0,
       fp: json['fp'] as int? ?? 0,
@@ -94,33 +95,52 @@ class TableX {
   int get hashCode => i.hashCode;
 }
 
-/// Decoded table type components
+/// Decoded table type components (SXB format)
 class TableTypeDecoded {
-  final int
-  sync; // 0=Private, 1=Protected, 2=Synced-Origin, 3=Synced-Origin-Main
-  final int log; // 0=Off, 1=On
-  final int algorithm; // 0=Custom, 1=Auto Increment, 2=Epoch Server Serial
+  final int sync; // 0=Private, 1=Protected, 2=Synced, 3=Main
+  final int algorithm; // 0=Custom/supplied, 1=Auto-increment, 2=Epoch Server Serial
   final int format; // 3=INTEGER, 4=BIGINT, 5=UUID
+  final int recursion; // 0=flat, 1=recursive
+  final int logging; // 0=off, 1=on
 
   const TableTypeDecoded({
     required this.sync,
-    required this.log,
     required this.algorithm,
     required this.format,
+    required this.recursion,
+    required this.logging,
   });
 
+  /// Decode from SXB format: 100000 + 100×S + 10×X + B
+  /// where X = 3×algorithm + (format-3), B = 2×logging + recursion
   factory TableTypeDecoded.decode(int tt) {
     final key = tt - 100000;
+    final s = (key ~/ 100) % 10;
+    final x = (key ~/ 10) % 10;
+    final b = key % 10;
+
+    // Decode X: X = 3×algorithm + (format-3)
+    final algorithm = x ~/ 3;
+    final format = 3 + (x % 3);
+
+    // Decode B: B = 2×logging + recursion
+    final logging = b ~/ 2;
+    final recursion = b % 2;
+
     return TableTypeDecoded(
-      sync: (key ~/ 1000) % 10,
-      log: (key ~/ 100) % 10,
-      algorithm: (key ~/ 10) % 10,
-      format: key % 10,
+      sync: s,
+      algorithm: algorithm,
+      format: format,
+      recursion: recursion,
+      logging: logging,
     );
   }
 
+  /// Encode to SXB format
   int encode() {
-    return 100000 + (sync * 1000) + (log * 100) + (algorithm * 10) + format;
+    final x = 3 * algorithm + (format - 3);
+    final b = 2 * logging + recursion;
+    return 100000 + (sync * 100) + (x * 10) + b;
   }
 
   String get syncName {
@@ -130,15 +150,13 @@ class TableTypeDecoded {
       case 1:
         return 'Protected';
       case 2:
-        return 'Synced-Origin';
+        return 'Synced';
       case 3:
-        return 'Synced-Origin-Main';
+        return 'Main';
       default:
         return 'Unknown';
     }
   }
-
-  String get logName => log == 1 ? 'On' : 'Off';
 
   String get algorithmName {
     switch (algorithm) {
@@ -155,11 +173,11 @@ class TableTypeDecoded {
 
   String get formatName {
     switch (format) {
-      case 2:
-        return 'INT32';
       case 3:
-        return 'INT64';
-      case 6:
+        return 'INTEGER';
+      case 4:
+        return 'BIGINT';
+      case 5:
         return 'UUID';
       default:
         return 'Unknown';
@@ -167,13 +185,23 @@ class TableTypeDecoded {
   }
 
   /// Get DataTypeX ID from format code
-  /// Format codes ARE DataTypeX IDs:
-  /// - 2: INT32
-  /// - 3: INT64
-  /// - 6: UUID
-  int get dataTypeId => format;
+  /// Format 3=INTEGER maps to DataTypeX 2 (INT32)
+  /// Format 4=BIGINT maps to DataTypeX 3 (INT64)
+  /// Format 5=UUID maps to DataTypeX 6 (UUID)
+  int get dataTypeId {
+    switch (format) {
+      case 3:
+        return 2; // INT32
+      case 4:
+        return 3; // INT64
+      case 5:
+        return 6; // UUID
+      default:
+        return format;
+    }
+  }
 
   @override
   String toString() =>
-      'TableType(sync=$syncName, log=$logName, algorithm=$algorithmName, format=$formatName)';
+      'TableType(sync=$syncName, algorithm=$algorithmName, format=$formatName, logging=${logging == 1 ? "On" : "Off"}, recursion=${recursion == 1 ? "Yes" : "No"})';
 }

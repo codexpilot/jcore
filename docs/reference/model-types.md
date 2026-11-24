@@ -1,33 +1,87 @@
-# ModelX types
+# ModelX Types Reference
 
-`ModelX.mtx` references a TypeX Group 6 entry in `300000–399999`. The stored value is an integer, the TypeX key is `mtx - 300000`, and the default is `320000`. New assignments reference active Group 6 entries. [ModelX schema](../../../db/aix/tables/modelx.sql) · [TypeX seed](../../../db/aix/seed/seed.sql)
+**Version:** 3.0 (Table-First Only)  
+**Last Updated:** 2026-11-24  
+**Type Range:** 300000-399999 (TypeX Group 6)
 
-## Claim type encoding
+ModelX types describe how a model maps to tables. **Table-First is the only supported authority for a sealed TableX ↔ ModelX mapping.** The effective mapping type is derived from distinct, active, usable direct TableX links in MapX.
 
-The encoding is `3xnnnnn`. The claim type digit `x` is the only semantic dimension, describing the ownership relationship between models and tables. The `nnnnn` portion is sequential numbering (00000-09999) with no additional semantic meaning.
+---
 
-| `x` | Family | Claim relationship |
+## Table-First Authority
+
+1. Create TableX and ModelX independently, in either order
+2. Match definitions through MapX (Scope 7: table associations and column-to-field mappings)
+3. Seal the configuration as **Table-First** once validated
+4. TableX supplies the physical schema contract; ModelX follows that contract
+
+---
+
+## ModelX Type Catalog
+
+| Type ID | Model Type | Meaning |
 | ---: | --- | --- |
-| 0 | `30xxxx` | Unclaimed model. No table ownership claim. |
-| 1 | `31xxxx` | Table-claimed-model. Table owns/claims the model. |
-| 2 | `32xxxx` | Model-claimed-table. Model owns/claims the table. |
-| 3 | `33xxxx` | Tables-claimed-model. Multiple tables claim the model. |
-| 4 | `34xxxx` | Model-claimed-tables. Model claims multiple tables. |
-| 9 | `39xxxx` | System model. System/framework models. |
+| `300000` | No Map | The model has no usable direct table link. It may still have inherited sources. |
+| `310000` | Single Table Mapped | The model links directly to one distinct table. |
+| `330000` | Multiple Tables Mapped | The model links directly to two or more distinct tables. |
+| `390000` | System Mapped | The model has an explicitly system-managed mapping. Its table count is still available separately. |
 
-QueryX's explicit type and bindings determine operation direction. Automatic model-first storage supports `320000`. [ModelX validation](../../../db/aix/functions/modelx_mt_validation.sql) · [ModelX CRUD](../../../db/aix/functions/modelx_crud.sql) · [Query types](query-types.md)
+The effective type is **read-only** and derived from MapX associations. An explicit system-managed marker (390000) takes precedence over the table count. The table list is available in `ModelX.txis` preview field.
 
-The getter and its MapX rules determine the number of table sources. Active `951400` rules determine whether a ModelX has named sections. Each rule specifies the section cardinality. QueryX defines the operation and the top-level result multiplicity. [ModelX composition and read mapping](../architecture/modelx-composition.md)
+---
 
-## Seeded claim type examples
+## Retired Types
 
-| `mtx` | TypeX name | TypeX code | Claim type |
-| ---: | --- | --- | --- |
-| 300000 | Unclaimed Model | `claim_0` | 0 |
-| 310000 | Table Claimed Model | `claim_1` | 1 |
-| 320000 | Model Claimed Table | `claim_2` | 2 |
-| 330000 | Tables Claimed Model | `claim_3` | 3 |
-| 340000 | Model Claimed Tables | `claim_4` | 4 |
-| 390000 | System Model | `claim_9` | 9 |
+**Model-First workflow has been retired.** The following types are no longer supported:
 
-The TypeX names are the seeded display labels. ModelX type validation checks catalog membership and activity. MapX and the selected QueryX determine storage associations, sections, and result shape. [Type validation](../../../db/aix/functions/modelx_mt_validation.sql) · [ModelX composition](../architecture/modelx-composition.md)
+- `320000` - Model Claimed Table (deprecated)
+- `340000` - Model Claimed Tables (deprecated)
+
+All mappings use **Table-First authority** where TableX defines the physical schema contract.
+
+---
+
+## DNA Linkage
+
+MapX records inheritance and coalition as DNA mapping kinds:
+
+| Kind | Child Key Rule | Meaning |
+| --- | --- | --- |
+| Inheritance | `child.i` references `parent.i` | Direct cloning of identity. Child receives exact parent ID. |
+| Coalition | Child's business `f` is unique and references `parent.i` | Parent can resolve to concrete variant through `f`. |
+| Ordinary 1:1 | Child has own identity, mapped reference is unique | Relation with at most one matching child. |
+| Ordinary 1:N | Child has own identity, multiple children may share reference | Relation with multiple possible children. |
+
+Inheritance and coalition apply within families:
+- TableX ↔ TableX uses MapX scope 4
+- ModelX ↔ ModelX uses MapX scope 5
+
+---
+
+## Chain Roots and Generations
+
+- A chain has one root at generation 0
+- Each DNA parent link adds one step
+- Maximum: **8 steps per chain** (9 generations including root)
+- A member has at most one designated parent per chain
+- Cycles in DNA parent links are rejected
+- When table chain and model chain have root-to-root mapping, the table root supplies authority at seal
+
+---
+
+## Local Extensions
+
+A domain can import a model with its mapping, then create a native child that:
+- Inherits from the protected parent
+- Maps directly to its own native table
+- Shows effective type **Single Table Mapped**
+- Preserves parent's fields, type, and transferred mappings
+
+The native child owns its own DNA link, columns/fields, and MapX rules in the destination domain.
+
+---
+
+**Related Documentation:**
+- [Table Types](table-types.md)
+- [MapX Design](mapx-design.md)
+- [TypeX Catalog](typex-catalog.md)

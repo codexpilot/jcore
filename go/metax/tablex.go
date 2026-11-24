@@ -20,12 +20,13 @@ type TableX struct {
 	PX  *int    `json:"px,omitempty"`  // Partition index
 }
 
-// TableType represents a decoded table type
+// TableType represents a decoded table type (SXB format)
 type TableType struct {
 	Value         int
 	Algorithm     int
 	SyncPolicy    int
-	LogEnabled    bool
+	Logging       int
+	Recursion     int
 	IDFormat      int
 	AlgorithmName string
 	PolicyName    string
@@ -33,24 +34,33 @@ type TableType struct {
 	Description   string
 }
 
-// DecodeTableType decodes a table type value
+// DecodeTableType decodes a table type value using SXB format
+// SXB format: 100000 + 100×S + 10×X + B
+// where S = sync policy, X = 3×algorithm+(format-3), B = 2×logging+recursion
 func DecodeTableType(tt int) (*TableType, error) {
 	if !IsValidTableType(tt) {
 		return nil, ErrInvalidTableType
 	}
 
 	key := tt - 100000
-	format := key % 10
-	algorithm := (key / 10) % 10
-	logEnabled := (key/100)%10 == 1
-	policy := (key / 1000) % 10
+	s := (key / 100) % 10
+	x := (key / 10) % 10
+	b := key % 10
+
+	// Decode X: X = 3×algorithm + (format-3)
+	algorithm := x / 3
+	format := 3 + (x % 3)
+
+	// Decode B: B = 2×logging + recursion
+	logging := b / 2
+	recursion := b % 2
 
 	var algorithmName string
 	switch algorithm {
 	case 0:
-		algorithmName = "Custom Function"
+		algorithmName = "Custom/Supplied"
 	case 1:
-		algorithmName = "Increment"
+		algorithmName = "Auto-increment"
 	case 2:
 		algorithmName = "Epoch Server Serial"
 	default:
@@ -58,15 +68,15 @@ func DecodeTableType(tt int) (*TableType, error) {
 	}
 
 	var policyName string
-	switch policy {
+	switch s {
 	case 0:
 		policyName = "Private"
 	case 1:
 		policyName = "Protected"
 	case 2:
-		policyName = "Synced-Origin"
+		policyName = "Synced"
 	case 3:
-		policyName = "Synced-Origin-Main"
+		policyName = "Main"
 	default:
 		policyName = "Unknown"
 	}
@@ -74,7 +84,7 @@ func DecodeTableType(tt int) (*TableType, error) {
 	var formatName string
 	switch format {
 	case 3:
-		formatName = "INT"
+		formatName = "INTEGER"
 	case 4:
 		formatName = "BIGINT"
 	case 5:
@@ -86,29 +96,35 @@ func DecodeTableType(tt int) (*TableType, error) {
 	var allocation string
 	switch {
 	case algorithm == 0:
-		allocation = "Caller-supplied ID"
-	case algorithm == 1 && policy >= 2:
-		allocation = "Partitioned increment"
+		allocation = "Custom/supplied ID"
+	case algorithm == 1 && s >= 2:
+		allocation = "Partitioned auto-increment"
 	case algorithm == 1:
 		allocation = "Auto-increment"
 	case algorithm == 2 && (format == 4 || format == 5):
 		allocation = "Epoch/server/serial"
 	default:
-		allocation = "Epoch/server/serial (not yet available)"
+		allocation = "Invalid combination"
 	}
 
-	logStatus := "Log Off"
-	if logEnabled {
-		logStatus = "Log On"
+	logStatus := "Log off"
+	if logging == 1 {
+		logStatus = "Log on"
 	}
 
-	description := policyName + " • " + logStatus + " • " + formatName + " • " + allocation
+	recursionStatus := ""
+	if recursion == 1 {
+		recursionStatus = " • Recursive"
+	}
+
+	description := policyName + " • " + logStatus + recursionStatus + " • " + formatName + " • " + allocation
 
 	return &TableType{
 		Value:         tt,
 		Algorithm:     algorithm,
-		SyncPolicy:    policy,
-		LogEnabled:    logEnabled,
+		SyncPolicy:    s,
+		Logging:       logging,
+		Recursion:     recursion,
 		IDFormat:      format,
 		AlgorithmName: algorithmName,
 		PolicyName:    policyName,
@@ -117,45 +133,64 @@ func DecodeTableType(tt int) (*TableType, error) {
 	}, nil
 }
 
-// IsValidTableType checks if a table type value is valid
+// IsValidTableType checks if a table type value is valid (SXB format)
 func IsValidTableType(tt int) bool {
 	if tt < 100000 || tt >= 110000 {
 		return false
 	}
 	key := tt - 100000
-	syncPolicy := (key / 1000) % 10
-	log := (key / 100) % 10
-	algorithm := (key / 10) % 10
-	idFormat := key % 10
+	s := (key / 100) % 10
+	x := (key / 10) % 10
+	b := key % 10
 
-	return IsValidVersion1Combination(syncPolicy, log, algorithm, idFormat)
+	// Decode components
+	algorithm := x / 3
+	format := 3 + (x % 3)
+	logging := b / 2
+	recursion := b % 2
+
+	return IsValidSXBCombination(s, algorithm, format, logging, recursion)
 }
 
-// IsValidVersion1Combination validates all table type dimensions
-func IsValidVersion1Combination(syncPolicy, log, algorithm, idFormat int) bool {
-	if log < 0 || log > 1 || (syncPolicy == 3 && log != 1) {
+// IsValidSXBCombination validates SXB table type components
+func IsValidSXBCombination(syncPolicy, algorithm, format, logging, recursion int) bool {
+	// Valid ranges
+	if syncPolicy < 0 || syncPolicy > 3 {
 		return false
 	}
-	return IsValidCombination(algorithm, syncPolicy, idFormat)
-}
+	if algorithm < 0 || algorithm > 2 {
+		return false
+	}
+	if format < 3 || format > 5 {
+		return false
+	}
+	if logging < 0 || logging > 1 {
+		return false
+	}
+	if recursion < 0 || recursion > 1 {
+		return false
+	}
 
-// IsValidCombination validates table type dimensions without logging
-func IsValidCombination(algorithm, syncPolicy, idFormat int) bool {
-	if algorithm < 0 || algorithm > 2 || syncPolicy < 0 || syncPolicy > 3 {
+	// Main requires logging
+	if syncPolicy == 3 && logging != 1 {
 		return false
 	}
-	if idFormat != 3 && idFormat != 4 && idFormat != 5 {
+
+	// Synced/Main require BIGINT or UUID (not INTEGER)
+	if syncPolicy >= 2 && format == 3 {
 		return false
 	}
-	if syncPolicy >= 2 && idFormat == 3 {
+
+	// Auto-increment requires INTEGER or BIGINT (not UUID)
+	if algorithm == 1 && format == 5 {
 		return false
 	}
-	if algorithm == 1 && idFormat != 3 && idFormat != 4 {
+
+	// Epoch Server Serial requires BIGINT or UUID (not INTEGER)
+	if algorithm == 2 && format == 3 {
 		return false
 	}
-	if algorithm == 2 && idFormat == 3 {
-		return false
-	}
+
 	return true
 }
 

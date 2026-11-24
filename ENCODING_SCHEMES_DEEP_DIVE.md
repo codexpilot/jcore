@@ -145,30 +145,38 @@ NUMERIC Range: 20000-29999
   Valid encoding but wrong column (not Status)
 ```
 
-### TableType SDALF Encoding (100000-199999)
+### TableType SXB Encoding (100000-199999)
 
-**Formula: 100000 + k, where k = S×1000 + DA×100 + L×10 + F**
+**Formula: ttx = 100000 + 100×S + 10×X + B**
 
 **Where:**
 - **S = Sync (0-3):** Synchronization policy
-- **DA = Direction×Algorithm (0-8):** Packed encoding
-- **L = Log (0-3):** Logging features
-- **F = Format (3, 4, 5):** THE LAST DIGIT = ID format!
+- **X = 3×algorithm + (format-3):** ID algorithm and format packed together
+- **B = 2×logging + recursion:** Logging and recursion packed
 
-**THE LAST DIGIT (F) IS THE FORMAT!**
-- **Format 3:** INT (maps to DataTypeX ID 2 = INT32)
-- **Format 4:** BIGINT (maps to DataTypeX ID 3 = INT64)
-- **Format 5:** UUID (maps to DataTypeX ID 6 = UUID)
+**X Encoding (ID Algorithm and Format):**
+- algorithm: 0=Custom/supplied, 1=Auto-increment, 2=Epoch Server Serial
+- format: 3=INTEGER, 4=BIGINT, 5=UUID
+- X = 3×algorithm + (format-3), range 0-8
+
+**B Encoding (Logging and Recursion):**
+- logging: 0=off, 1=on
+- recursion: 0=flat, 1=recursive
+- B = 2×logging + recursion, range 0-3
 
 **Example:**
 ```
-100104: Private · Unclaimed · Auto-inc · Flat · BIGINT
-  k = 104
+100040: Private · Auto-increment BIGINT · Flat, log off
   S = 0 (Private)
-  DA = 1 (Unclaimed, Auto-inc)
-  L = 0 (Flat)
-  F = 4 (BIGINT → DataTypeX ID 3)
+  algorithm = 1, format = 4 (BIGINT)
+  X = 3×1 + (4-3) = 4
+  logging = 0, recursion = 0
+  B = 2×0 + 0 = 0
+  ttx = 100000 + 100×0 + 10×4 + 0 = 100040
 ```
+
+**Direction Digit Removed:**
+The old SDALF encoding included a Direction digit for Model-First vs Table-First authority. The new SXB format removes Direction entirely because **Table-First is now the only supported authority**.
 
 ## Migration Summary
 
@@ -221,7 +229,7 @@ OLD → NEW (from seed.sql)
 1. **Last Digit Logic:**
    - OLD catalog: Last digit = variant within storage class
    - ColumnType: Last digit = Scheme (Z in XYZ)
-   - TableType: Last digit = Format (F in SDALF)
+   - TableType SXB: Last digit = B (2×logging + recursion)
 
 2. **NEW system eliminates first-digit classification:**
    - No more "storage class" grouping
@@ -232,7 +240,7 @@ OLD → NEW (from seed.sql)
    - TEXT: Simple addition (10000 + length)
    - NUMERIC: Clear formula (20000 + p×100 + s)
    - ColumnType: XYZ dimensional (X×100 + Y×10 + Z)
-   - TableType: SDALF packed encoding
+   - TableType: SXB packed encoding (100×S + 10×X + B)
 
 ## Alignment Verification
 

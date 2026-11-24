@@ -322,25 +322,25 @@ Where:
 
 Model types in range 300000-399999:
 
-### Standard Model Types
+### Table-First Authority (Current)
 
-| ID | Name | Claim Type | Description |
-|---:|---|---|---|
-| 300000 | Unclaimed Model | 0 | Independent model |
-| 310000 | Table Claimed Model | 1 | Table owns model |
-| 320000 | Model Claimed Table | 2 | Model owns table |
-| 330000 | Tables Claimed Model | 3 | Multiple tables claim model |
-| 340000 | Model Claimed Tables | 4 | Model claims multiple tables |
-| 390000 | System Model | 9 | System/framework model |
+**Table-First is the only supported authority for sealed TableX ↔ ModelX mappings.**
 
-### Claim Type Categories
+| ID | Name | Description |
+|---:|---|---|
+| 300000 | No Map | The model has no usable direct table link |
+| 310000 | Single Table Mapped | The model links directly to one distinct table |
+| 330000 | Multiple Tables Mapped | The model links directly to two or more distinct tables |
+| 390000 | System Mapped | System-managed mapping |
 
-- **300000:** Unclaimed (claim type 0)
-- **310000:** Table-claimed-model (claim type 1)
-- **320000:** Model-claimed-table (claim type 2)
-- **330000:** Tables-claimed-model (claim type 3)
-- **340000:** Model-claimed-tables (claim type 4)
-- **390000:** System (claim type 9)
+The effective mapping type is derived from distinct, active, usable direct TableX links in MapX. TableX supplies the physical schema contract and ModelX follows that contract once sealed.
+
+### Retired Types
+
+The Model-First workflow has been retired. The following types are no longer supported:
+
+- **320000:** Model-claimed-table (deprecated)
+- **340000:** Model-claimed-tables (deprecated)
 
 ---
 
