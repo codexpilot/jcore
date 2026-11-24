@@ -65,12 +65,15 @@ void main() {
       expect(DataTypeRegistry.isValid(20001), isFalse);
       expect(DataTypeRegistry.isValid(80002), isFalse);
       expect(DataTypeRegistry.contains(7), isTrue);
-      expect(DataTypeRegistry.contains(8), isFalse);
+      expect(DataTypeRegistry.contains(8), isTrue); // BINARY type added
+      expect(DataTypeRegistry.contains(9), isFalse); // Type 9 doesn't exist
       expect(getPostgresType(2), 'integer');
+      expect(getPostgresType(8), 'bytea'); // BINARY → bytea
       expect(getPostgresType(21002), 'numeric(10,2)');
       expect(getPostgresType(10100), 'varchar(100)');
       expect(parseRegisteredDataTypeId('smallint'), 1);
       expect(parseRegisteredDataTypeId('int16'), 1);
+      expect(parseRegisteredDataTypeId('BINARY'), 8); // BINARY type lookup
     });
   });
 }

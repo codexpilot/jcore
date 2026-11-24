@@ -1,11 +1,11 @@
 /// Data type catalog and registry (DataTypeX).
 ///
-/// DataTypeX uses direct IDs for base types (0-7) and range-based encoding
+/// DataTypeX uses direct IDs for base types (0-8) and range-based encoding
 /// for parameterized types:
 ///
-/// - Base types: 0-7 (8 types)
+/// - Base types: 0-8 (9 types)
 ///   - 0: BOOLEAN, 1: SMALLINT, 2: INT32, 3: INT64
-///   - 4: DATETIME, 5: TIME, 6: UUID, 7: JSONB
+///   - 4: DATETIME, 5: TIME, 6: UUID, 7: JSONB, 8: BINARY
 ///
 /// - TEXT range: 10000-19999
 ///   - 10000: unlimited TEXT
@@ -24,7 +24,7 @@ library;
 
 /// Canonical data types in the current registry (DataTypeX).
 ///
-/// Base types: 0-7
+/// Base types: 0-8
 /// TEXT range: 10000-19999 (10000 = unlimited)
 /// NUMERIC range: 20000-29999 (20000 = unlimited)
 enum DataType {
@@ -51,6 +51,9 @@ enum DataType {
 
   /// JSONB document (binary JSON).
   jsonb(7, 'JSONB', 'jsonb'),
+
+  /// Binary data (BYTEA) for file storage up to 10MB.
+  binary(8, 'BINARY', 'bytea'),
 
   /// Unlimited precision decimal (base type for NUMERIC range).
   numeric(20000, 'NUMERIC', 'numeric'),
@@ -109,8 +112,8 @@ abstract final class DataTypeRegistry {
   /// First assigned registry ID (base types start at 0).
   static const int firstId = 0;
 
-  /// Last assigned base type ID (0-7, then TEXT/NUMERIC ranges).
-  static const int lastId = 7;
+  /// Last assigned base type ID (0-8, then TEXT/NUMERIC ranges).
+  static const int lastId = 8;
 
   /// All base types in catalog order.
   static List<DataType> get types => List.unmodifiable(DataType.values);
