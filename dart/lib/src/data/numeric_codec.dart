@@ -60,10 +60,15 @@ class NumericCodec {
       }
     }
 
-    // NUMERIC (base 20000 and parameterized 20100-29999)
+    // NUMERIC (DataTypeX range: 20000-29999)
     if (DataTypeRegistry.isValidNumeric(typeId)) {
       if (enc.numericAsString) {
-        if (value is Numeric) return value.toString();
+        if (value is Numeric) {
+          // For scale=0, use scaledValue to avoid trailing dot
+          return value.scale == 0
+              ? value.scaledValue.toString()
+              : value.toString();
+        }
         if (value is num) return value.toString();
         if (value is String) return value; // Already a string
       } else {

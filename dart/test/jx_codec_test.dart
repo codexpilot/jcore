@@ -140,7 +140,7 @@ void main() {
   group('JxCodec - 8000 encoding (default)', () {
     final schema = JxSchema([
       JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
-      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 21002, typeName: 'NUMERIC(10,2)'),
       JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 4, typeName: 'DATETIME'),
     ]);
 
@@ -203,7 +203,7 @@ void main() {
   group('JxCodec - 8018 encoding (native client)', () {
     final schema = JxSchema([
       JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
-      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      JxField(i: 2, c: 'amount', n: 'Amount', typeId: 21002, typeName: 'NUMERIC(10,2)'),
       JxField(i: 3, c: 'observed_at', n: 'Observed At', typeId: 4, typeName: 'DATETIME'),
     ]);
 
@@ -508,7 +508,7 @@ void main() {
 
   group('JxCodec - NUMERIC exact values', () {
     final schema = JxSchema([
-      JxField(i: 1, c: 'price', n: 'Price', typeId: 61002, typeName: 'NUMERIC(10,2)'),
+      JxField(i: 1, c: 'price', n: 'Price', typeId: 21002, typeName: 'NUMERIC(10,2)'),
     ]);
 
     test('preserves exact NUMERIC as string (N=0)', () {
