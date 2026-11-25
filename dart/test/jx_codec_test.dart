@@ -5,7 +5,7 @@ void main() {
   group('JxEncoding', () {
     test('parses default encoding 8000', () {
       final enc = JxEncoding.parse(8000);
-      expect(enc.j, equals(7));
+      expect(enc.j, equals(8));
       expect(enc.n, equals(0));
       expect(enc.l, equals(0));
       expect(enc.d, equals(0));
@@ -14,10 +14,10 @@ void main() {
 
     test('parses encoding 8018', () {
       final enc = JxEncoding.parse(8018);
-      expect(enc.j, equals(7));
+      expect(enc.j, equals(8));
       expect(enc.n, equals(0));
       expect(enc.l, equals(1));
-      expect(enc.d, equals(7));
+      expect(enc.d, equals(8));
     });
 
     test('parses compact encoding 1000', () {

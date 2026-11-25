@@ -4,8 +4,8 @@ import 'package:test/test.dart';
 import 'package:jcore/jcore.dart';
 
 void main() {
-  group('JNLD Codec - Encoding 1018 (J=1, N=1, L=1, D=8, NUMERIC as strings)', () {
-    // Encoding 1018: compact positional, raw NUMERIC, raw INT64, epoch milliseconds
+  group('JNLD Codec - Encoding 1018 (J=1, N=0, L=1, D=8, NUMERIC as strings)', () {
+    // Encoding 1018: compact positional, NUMERIC as quoted strings, raw INT64, epoch milliseconds
     final schema = JxSchema([
       JxField(i: 1, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
       JxField(i: 2, c: 'amount', n: 'Amount', typeId: 21903, typeName: 'NUMERIC(19,3)'),
@@ -405,7 +405,7 @@ void main() {
 
       final rows = JxCodec.decodeFromJsonString(
         encoding: 1018,
-        jsonString: '{"data":[[null,"x9z8p6",100.00,7],[true,"plain",9007199254740993.125,8]]}',
+        jsonString: '{"data":[[null,"x9z8p6","100.00",7],[true,"plain","9007199254740993.125",8]]}',
         schema: mixedSchema,
       );
 
@@ -436,8 +436,8 @@ void main() {
       final rows = JxCodec.decodeFromJsonString(
         encoding: 1018,
         jsonString: r'''{"data":[
-          ["[9, \"data\"]",{"items":[1,{"amount":2}]},50.10],
-          ["[3,4]",[{"amount":900},[5,6]],9007199254740993.125]
+          ["[9, \"data\"]",{"items":[1,{"amount":2}]},"50.10"],
+          ["[3,4]",[{"amount":900},[5,6]],"9007199254740993.125"]
         ]}''',
         schema: mixedSchema,
       );
@@ -576,11 +576,11 @@ void main() {
         'data': [
           [
             {key: 'value'},
-            50.1,
+            '50.10',
           ],
         ],
       });
-      expect(json, contains(',50.10]]'));
+      expect(json, contains(',"50.10"]]'));
     });
 
     test('round-trip stability for all edge cases', () {

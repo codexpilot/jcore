@@ -70,7 +70,19 @@ class NumericCodec {
               : value.toString();
         }
         if (value is num) return value.toString();
-        if (value is String) return value; // Already a string
+        if (value is String) {
+          // Validate string format: must be valid decimal number
+          // No leading zeros (except '0'), no trailing dot, no plus sign
+          final validDecimal = RegExp(r'^-?(0|[1-9][0-9]*)(\.[0-9]+)?$');
+          if (!validDecimal.hasMatch(value)) {
+            throw FormatException('Invalid NUMERIC format: $value');
+          }
+          // Parse and normalize
+          final numeric = Numeric.parse(value);
+          return numeric.scale == 0
+              ? numeric.scaledValue.toString()
+              : numeric.toString();
+        }
       } else {
         if (value is Numeric) {
           final token = value.scale == 0
@@ -112,8 +124,15 @@ class NumericCodec {
         if (value is String) return BigInt.parse(value);
         if (value is int) return BigInt.from(value);
       } else {
+        // L=1: INT64 as unquoted integers
+        // On platforms like Flutter Web, the token extraction quotes large
+        // integers as strings to prevent JavaScript rounding. Parse to BigInt,
+        // then convert to int if it fits safely in the platform's int range.
+        if (value is String) {
+          final bigInt = BigInt.parse(value);
+          return bigInt.isValidInt ? bigInt.toInt() : bigInt;
+        }
         if (value is int) return value;
-        if (value is String) return int.parse(value);
       }
     }
 
@@ -270,6 +289,7 @@ class NumericCodec {
   ///
   /// This method preserves exact NUMERIC precision by extracting raw number tokens
   /// from the JSON string before Dart's jsonDecode converts them to doubles.
+  /// On Flutter Web, it also preserves INT64 values to prevent JavaScript rounding.
   static List<List<dynamic>> decodeFromJsonString({
     required int encoding,
     required String jsonString,
@@ -283,6 +303,8 @@ class NumericCodec {
     }) decoder,
   }) {
     final enc = JxEncoding.parse(encoding);
+
+    // For N=1 (NUMERIC as unquoted numbers), preserve NUMERIC tokens
     if (!enc.numericAsString) {
       final numericColumns = [
         for (final field in schema.fields)
@@ -302,6 +324,29 @@ class NumericCodec {
         );
       }
     }
+
+    // For L=1 (INT64 as unquoted integers), preserve INT64 tokens on platforms
+    // where JSON.parse() might round large integers (e.g., Flutter Web)
+    if (!enc.int64AsString) {
+      final int64Columns = [
+        for (final field in schema.fields)
+          field.typeId == DataType.int64.id,
+      ];
+      if (int64Columns.contains(true)) {
+        final int64Keys = enc.isCompact
+            ? null
+            : {
+                for (var i = 0; i < schema.fieldCount; i++)
+                  if (int64Columns[i])
+                    enc.j == 8 ? schema.fields[i].c : schema.fields[i].n,
+              };
+        jsonString = JsonNumericTokens(jsonString).preserve(
+          int64Columns,
+          int64Keys,
+        );
+      }
+    }
+
     return decoder(
       encoding: encoding,
       body: JxBody.parse(jsonString),
