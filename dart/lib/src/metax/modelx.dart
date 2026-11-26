@@ -27,6 +27,10 @@ class ModelX {
   /// System-managed preview: TableX IDs from MapX 971600
   final List<int> txis;
 
+  /// System-managed preview: Direct child ModelX IDs from MapX 951400
+  /// Sorted, distinct array of child model IDs for composed models
+  final List<int> mxis;
+
   /// Code (unique)
   final String c;
 
@@ -47,6 +51,7 @@ class ModelX {
     required this.f,
     this.ps = const [],
     this.txis = const [],
+    this.mxis = const [],
     required this.c,
     this.mtx = 300000,
     this.fp = 0,
@@ -72,6 +77,7 @@ class ModelX {
       f: json['f'] as int,
       ps: (json['ps'] as List<dynamic>?)?.cast<int>() ?? const [],
       txis: (json['txis'] as List<dynamic>?)?.cast<int>() ?? const [],
+      mxis: (json['mxis'] as List<dynamic>?)?.cast<int>() ?? const [],
       c: json['c'] as String,
       mtx: json['mtx'] as int? ?? 300000,
       fp: json['fp'] as int? ?? 0,
@@ -88,6 +94,7 @@ class ModelX {
     'f': f,
     'ps': ps,
     'txis': txis,
+    'mxis': mxis,
     'c': c,
     'mtx': mtx,
     'fp': fp,
@@ -104,6 +111,12 @@ class ModelX {
 
   @override
   int get hashCode => i.hashCode;
+
+  /// Whether this model is a composed model (contains child models)
+  bool get isComposed => mxis.isNotEmpty;
+
+  /// Whether this model uses the composed model type (370000)
+  bool get isComposedType => mtx == 370000;
 }
 
 enum ModelTypeCategory {

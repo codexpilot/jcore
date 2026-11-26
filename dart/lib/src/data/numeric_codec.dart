@@ -52,7 +52,7 @@ class NumericCodec {
         if (bigIntValue < _int64MinBigInt || bigIntValue > _int64MaxBigInt) {
           throw RangeError(
             'INT64 value out of range: $bigIntValue '
-            '(valid: ${_int64MinBigInt} to ${_int64MaxBigInt})',
+            '(valid: $_int64MinBigInt to $_int64MaxBigInt)',
           );
         }
 

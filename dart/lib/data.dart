@@ -17,3 +17,8 @@ export 'src/data/jx_body.dart';
 
 // Data operations service interface.
 export 'src/data/query_service.dart';
+
+// Database context and row structures.
+export 'src/data/db_context.dart';
+export 'src/data/jx_row.dart';
+export 'src/data/record_x.dart';
