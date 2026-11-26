@@ -15,9 +15,33 @@ type ModelX struct {
 	C          *string `json:"c,omitempty"`          // Code
 	Ps         []int   `json:"ps,omitempty"`         // Parent model IDs
 	TXIS       []int   `json:"txis,omitempty"`       // System-managed preview: TableX IDs from MapX 971600
+	MXIS       []int   `json:"mxis,omitempty"`       // System-managed preview: Direct child ModelX IDs from MapX 951400
 	MTX        *int    `json:"mtx,omitempty"`        // Model type
 }
 
+// Orientation returns the model orientation from MTX field
+// 0=independent, 1=model-after-table, 2=table-after-model
+func (m *ModelX) Orientation() int {
+	if m.MTX == nil {
+		return 1
+	}
+	return (*m.MTX / 10000) % 10
+}
+
+// RequiresPhysicalBases returns whether the model requires physical bases
+func (m *ModelX) RequiresPhysicalBases() bool {
+	return m.Orientation() != 0
+}
+
+// IsComposed returns whether the model has child models
+func (m *ModelX) IsComposed() bool {
+	return len(m.MXIS) > 0
+}
+
+// IsComposedType returns whether the model uses the composed model type (370000)
+func (m *ModelX) IsComposedType() bool {
+	return m.MTX != nil && *m.MTX == 370000
+}
 // MarshalJSON implements custom JSON marshaling
 func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	data := make(map[string]interface{})
@@ -41,6 +65,9 @@ func (mx *ModelX) MarshalJSON() ([]byte, error) {
 	}
 	if mx.TXIS != nil {
 		data["txis"] = mx.TXIS
+	}
+	if mx.MXIS != nil {
+		data["mxis"] = mx.MXIS
 	}
 	if mx.MTX != nil {
 		data["mtx"] = *mx.MTX
