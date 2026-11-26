@@ -33,14 +33,17 @@ func (m *ModelX) RequiresPhysicalBases() bool {
 	return m.Orientation() != 0
 }
 
-// IsComposed returns whether the model has child models
+// IsComposed returns whether the model uses the composed type (370000).
+// Composed models contain one level of non-composed child models.
+// Composition structure is defined through MapX 951400 rules.
 func (m *ModelX) IsComposed() bool {
-	return len(m.MXIS) > 0
+	return m.MTX != nil && *m.MTX == 370000
 }
 
-// IsComposedType returns whether the model uses the composed model type (370000)
-func (m *ModelX) IsComposedType() bool {
-	return m.MTX != nil && *m.MTX == 370000
+// HasChildren returns whether the model has child models in mxis.
+// mxis is a read-only preview derived from MapX 951400 rules.
+func (m *ModelX) HasChildren() bool {
+	return len(m.MXIS) > 0
 }
 // MarshalJSON implements custom JSON marshaling
 func (mx *ModelX) MarshalJSON() ([]byte, error) {

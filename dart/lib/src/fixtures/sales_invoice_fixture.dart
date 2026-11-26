@@ -37,7 +37,7 @@ class SalesInvoiceModels {
     fp: 0,
   );
 
-  /// InvoiceHeader model (non-composed)
+  /// InvoiceHeader model (non-composed, single table)
   static final ModelX invoiceHeader = ModelX(
     i: invoiceHeaderId,
     d: 1737590400000,
@@ -50,11 +50,11 @@ class SalesInvoiceModels {
     txis: const [],
     mxis: const [], // Non-composed
     c: 'invoice_header',
-    mtx: 320000, // Model-claimed-table
+    mtx: 310000, // Single Table Mapped
     fp: 0,
   );
 
-  /// InvoiceLineItem model (non-composed)
+  /// InvoiceLineItem model (non-composed, single table)
   static final ModelX invoiceLineItem = ModelX(
     i: invoiceLineItemId,
     d: 1737590400000,
@@ -67,11 +67,11 @@ class SalesInvoiceModels {
     txis: const [],
     mxis: const [], // Non-composed
     c: 'invoice_line_item',
-    mtx: 320000,
+    mtx: 310000, // Single Table Mapped
     fp: 0,
   );
 
-  /// InvoicePayment model (non-composed)
+  /// InvoicePayment model (non-composed, single table)
   static final ModelX invoicePayment = ModelX(
     i: invoicePaymentId,
     d: 1737590400000,
@@ -84,7 +84,7 @@ class SalesInvoiceModels {
     txis: const [],
     mxis: const [], // Non-composed
     c: 'invoice_payment',
-    mtx: 320000,
+    mtx: 310000, // Single Table Mapped
     fp: 0,
   );
 

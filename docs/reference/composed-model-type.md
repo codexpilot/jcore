@@ -19,7 +19,7 @@
 A composed model type (`mtx = 370000`) defines **one-level composition only**:
 
 - The composed model contains only **non-composed child models**
-- Child models must have `mtx != 300001` (not themselves composed)
+- Child models must have `mtx != 370000` (not themselves composed)
 - No recursive composition allowed at this type level
 - Composition structure is defined through MapX `951400` rules
 
@@ -45,9 +45,9 @@ A composed model type (`mtx = 370000`) defines **one-level composition only**:
 ```
 
 Where child models might be:
-- `501`: InvoiceHeader (mtx: 320000, non-composed)
-- `502`: InvoiceLineItem (mtx: 320000, non-composed)
-- `503`: InvoicePayment (mtx: 320000, non-composed)
+- `501`: InvoiceHeader (mtx: 310000, single-table non-composed)
+- `502`: InvoiceLineItem (mtx: 310000, single-table non-composed)
+- `503`: InvoicePayment (mtx: 310000, single-table non-composed)
 
 ## Validation Rules
 

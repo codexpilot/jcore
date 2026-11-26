@@ -2,6 +2,9 @@
 ///
 /// Decodes composed rows using published section schema from effective QueryX
 /// and resolves sections by published keys and cardinality from MapX.
+///
+/// Wire JSON uses logical field codes (field.c), while named row access
+/// uses schema names (field.n).
 library;
 
 import 'package:jcore/metax.dart';
@@ -33,9 +36,10 @@ JxRow deserializeComposedRow(
   List<SectionMetadata> sections,
 ) {
   // Extract root cells (parent model fields)
+  // Wire JSON uses logical field codes (field.c)
   final cells = <dynamic>[];
   for (final field in schema.fields) {
-    cells.add(result[field.n]);
+    cells.add(result[field.c]);
   }
 
   // If not composed, return simple row
@@ -96,12 +100,13 @@ JxRow deserializeComposedRow(
 
 /// Convert Map to JxRow using schema.
 ///
+/// Wire JSON uses logical field codes (field.c).
 /// Preserves exact INT64 and NUMERIC values as received from backend.
 JxRow _mapToRow(Map<String, dynamic> map, JxSchema schema) {
   final cells = <dynamic>[];
   for (final field in schema.fields) {
-    // Preserve exact values - no conversion
-    cells.add(map[field.n]);
+    // Wire JSON uses field codes - preserve exact values without conversion
+    cells.add(map[field.c]);
   }
   return JxRow(schema: schema, cells: cells);
 }

@@ -258,7 +258,7 @@ void main() {
   });
 
   group('ModelX composition', () {
-    test('isComposed returns true when mxis is not empty', () {
+    test('hasChildren returns true when mxis is not empty', () {
       final model = ModelX(
         i: 1,
         d: 0,
@@ -271,10 +271,10 @@ void main() {
         mxis: [10, 20, 30],
       );
 
-      expect(model.isComposed, isTrue);
+      expect(model.hasChildren, isTrue);
     });
 
-    test('isComposed returns false when mxis is empty', () {
+    test('hasChildren returns false when mxis is empty', () {
       final model = ModelX(
         i: 1,
         d: 0,
@@ -286,10 +286,10 @@ void main() {
         c: 'INV',
       );
 
-      expect(model.isComposed, isFalse);
+      expect(model.hasChildren, isFalse);
     });
 
-    test('isComposedType returns true for mtx 370000', () {
+    test('isComposed returns true for mtx 370000', () {
       final model = ModelX(
         i: 1,
         d: 0,
@@ -302,10 +302,10 @@ void main() {
         mtx: 370000,
       );
 
-      expect(model.isComposedType, isTrue);
+      expect(model.isComposed, isTrue);
     });
 
-    test('isComposedType returns false for other mtx', () {
+    test('isComposed returns false for other mtx', () {
       final model = ModelX(
         i: 1,
         d: 0,
@@ -315,10 +315,10 @@ void main() {
         n: 'Invoice',
         f: 0,
         c: 'INV',
-        mtx: 320000,
+        mtx: 310000, // Single Table Mapped (non-composed)
       );
 
-      expect(model.isComposedType, isFalse);
+      expect(model.isComposed, isFalse);
     });
   });
 }

@@ -237,7 +237,7 @@ func TestModelXComposedFields(t *testing.T) {
 	if !model2.IsComposed() {
 		t.Error("Model with mxis should be composed")
 	}
-	if !model2.IsComposedType() {
+	if !model2.IsComposed() {
 		t.Error("Model with mtx=370000 should be composed type")
 	}
 }

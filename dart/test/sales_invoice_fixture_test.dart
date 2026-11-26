@@ -7,7 +7,7 @@ void main() {
     test('salesInvoice is composed model type', () {
       final model = SalesInvoiceModels.salesInvoice;
       expect(model.mtx, equals(370000));
-      expect(model.isComposedType, isTrue);
+      expect(model.isComposed, isTrue);
       expect(model.isComposed, isTrue);
       expect(model.mxis.length, equals(3));
     });

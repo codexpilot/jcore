@@ -122,11 +122,15 @@ class JxRow {
   /// Get all field names
   List<String> get fieldNames => schema.fields.map((f) => f.n).toList();
 
-  /// Convert row to `Map<String, dynamic>`
+  /// Convert row to map for wire JSON using logical field codes as keys.
+  ///
+  /// Wire JSON uses field codes (field.c), while Dart row access uses
+  /// field names (field.n). This distinction preserves protocol stability
+  /// when field names change but codes remain constant.
   Map<String, dynamic> toMap() {
     return {
       for (var i = 0; i < schema.fields.length; i++)
-        schema.fields[i].n: cells[i]
+        schema.fields[i].c: cells[i]
     };
   }
 

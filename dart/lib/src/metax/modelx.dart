@@ -35,11 +35,25 @@ class ModelX {
   final String c;
 
   /// Model type (TypeX Group 6: 300000-399999)
-  /// Table-First only: 300000 (No Map), 310000 (Single Table), 330000 (Multiple Tables), 390000 (System)
+  /// Table-First types:
+  /// - 300000: No Map
+  /// - 310000: Single Table Mapped
+  /// - 330000: Multiple Tables Mapped
+  /// - 370000: Composed Model (one-level composition)
+  /// - 390000: System Mapped
   final int mtx;
 
   /// Optional recursive parent identifier; existence is not guaranteed.
   final int fp;
+
+  /// Check if this model uses composed type (370000).
+  /// Composed models contain one level of non-composed child models.
+  /// Composition structure is defined through MapX 951400 rules.
+  bool get isComposed => mtx == 370000;
+
+  /// Check if this model has child models in mxis.
+  /// mxis is a read-only preview derived from MapX 951400 rules.
+  bool get hasChildren => mxis.isNotEmpty;
 
   const ModelX({
     required this.i,
@@ -62,6 +76,7 @@ class ModelX {
     if (mtx == 300000) return ModelTypeCategory.noMap;
     if (mtx == 310000) return ModelTypeCategory.singleTable;
     if (mtx == 330000) return ModelTypeCategory.multipleTables;
+    if (mtx == 370000) return ModelTypeCategory.composed;
     if (mtx == 390000) return ModelTypeCategory.system;
     return ModelTypeCategory.unknown;
   }
@@ -111,18 +126,13 @@ class ModelX {
 
   @override
   int get hashCode => i.hashCode;
-
-  /// Whether this model is a composed model (contains child models)
-  bool get isComposed => mxis.isNotEmpty;
-
-  /// Whether this model uses the composed model type (370000)
-  bool get isComposedType => mtx == 370000;
 }
 
 enum ModelTypeCategory {
   noMap, // 300000: No usable direct table link
   singleTable, // 310000: Links to one distinct table
   multipleTables, // 330000: Links to two or more distinct tables
+  composed, // 370000: Composed model (one-level composition)
   system, // 390000: System-managed mapping
   unknown,
 }

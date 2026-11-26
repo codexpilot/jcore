@@ -188,11 +188,14 @@ class InMemoryQueryService implements QueryService {
     return _serializeInvoice(updated);
   }
 
-  /// Convert Map to JxRow using schema
+  /// Convert Map to JxRow using schema.
+  ///
+  /// Wire JSON uses logical field codes (field.c).
   JxRow _mapToRow(Map<String, dynamic> map, JxSchema schema) {
     final cells = <dynamic>[];
     for (final field in schema.fields) {
-      cells.add(map[field.n]);
+      // Wire JSON uses field codes
+      cells.add(map[field.c]);
     }
     return JxRow(schema: schema, cells: cells);
   }
