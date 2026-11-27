@@ -27,21 +27,12 @@ class JcCodec {
       }
     }
 
-    // Build metadata for J=2, 3, 4
     List<List<dynamic>>? meta;
     if (enc.hasMetadata) {
       meta = [];
       for (final field in schema.fields) {
-        if (enc.j == 2) {
-          // J=2: [FieldX.i, TypeX.i]
-          meta.add([field.i, field.typeId]);
-        } else if (enc.j == 3) {
-          // J=3: [FieldX.c, TypeX.n]
-          meta.add([field.c, field.typeName]);
-        } else if (enc.j == 4) {
-          // J=4: [FieldX.n, TypeX.n]
-          meta.add([field.n, field.typeName]);
-        }
+        final (key, type) = _metadataEntry(enc.j, field);
+        meta.add([key, type]);
       }
     }
 
@@ -62,6 +53,11 @@ class JcCodec {
     required JxSchema schema,
     String? timezone,
   }) {
+    final meta = body.meta;
+    if (enc.hasMetadata && meta != null) {
+      _validateMetadata(enc.j, meta, schema);
+    }
+
     final rows = <List<dynamic>>[];
     for (int rowIndex = 0; rowIndex < body.data.length; rowIndex++) {
       final rowData = body.data[rowIndex];
@@ -83,5 +79,39 @@ class JcCodec {
     }
 
     return rows;
+  }
+
+  static (Object, Object) _metadataEntry(int mode, JxField field) =>
+      switch (mode) {
+        2 => (field.i, field.typeId),
+        3 => (field.c, field.typeName),
+        4 => (field.n, field.typeName),
+        _ => throw StateError('Unexpected JX metadata mode $mode'),
+      };
+
+  static void _validateMetadata(
+    int mode,
+    List<List<dynamic>> meta,
+    JxSchema schema,
+  ) {
+    if (meta.length != schema.fieldCount) {
+      throw FormatException(
+        'JX meta has ${meta.length} entries, expected ${schema.fieldCount}',
+      );
+    }
+    for (final (index, entry) in meta.indexed) {
+      final (key, type) = _metadataEntry(mode, schema.fields[index]);
+      if (entry.length != 2) {
+        throw FormatException('Expected a key and type at meta[$index]');
+      }
+      final actualKey = entry[0];
+      final actualType = entry[1];
+      final hasExpectedTypes = mode == 2
+          ? actualKey is int && actualType is int
+          : actualKey is String && actualType is String;
+      if (!hasExpectedTypes || actualKey != key || actualType != type) {
+        throw FormatException('Expected [$key, $type] at meta[$index]');
+      }
+    }
   }
 }

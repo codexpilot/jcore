@@ -33,33 +33,45 @@ class JxRow {
   /// Schema defining field order and names
   final JxSchema schema;
 
-  /// Cell values in schema order
+  /// Immutable list of cell values in schema order.
   final List<dynamic> cells;
 
-  /// Cached name-to-index mapping
-  late final Map<String, int> _nameIndex;
-
-  JxRow({
-    required this.schema,
-    required this.cells,
-  }) {
-    if (cells.length != schema.fieldCount) {
+  JxRow({required this.schema, required List<dynamic> cells})
+    : cells = List.unmodifiable(cells) {
+    if (this.cells.length != schema.fieldCount) {
       throw ArgumentError(
-        'Cell count ${cells.length} does not match schema field count '
+        'Cell count ${this.cells.length} does not match schema field count '
         '${schema.fieldCount}',
       );
     }
-    _nameIndex = {
-      for (var i = 0; i < schema.fields.length; i++) schema.fields[i].n: i
-    };
   }
 
-  /// Index-based access: row[0], row[1], etc.
+  /// Read a cell by its FieldX or ColumnX metadata ID.
+  ///
+  /// Returns null for an absent field or a null cell. Throws [ArgumentError]
+  /// if the ID matches multiple fields.
+  Object? byId(int id) => _valueAtOffset(schema.indexById(id));
+
+  /// Read a cell by its exact code.
+  ///
+  /// Returns null for an absent field or a null cell. Throws [ArgumentError]
+  /// if the code matches multiple fields.
+  Object? byCode(String code) => _valueAtOffset(schema.indexByCode(code));
+
+  /// Read a cell by its exact display name.
+  ///
+  /// Returns null for an absent field or a null cell. Throws [ArgumentError]
+  /// if the name matches multiple fields.
+  Object? byName(String name) => _valueAtOffset(schema.indexByName(name));
+
+  Object? _valueAtOffset(int? offset) => offset == null ? null : cells[offset];
+
+  /// Access a cell by zero-based offset or display name.
   dynamic operator [](dynamic key) {
     if (key is int) {
       return cells[key];
     } else if (key is String) {
-      final index = _nameIndex[key];
+      final index = schema.lastIndexByName(key);
       if (index == null) {
         throw ArgumentError('Field name not found: $key');
       }
@@ -116,7 +128,7 @@ class JxRow {
 
   /// Check if field exists and is non-null
   bool hasValue(String fieldName) {
-    return _nameIndex.containsKey(fieldName) && this[fieldName] != null;
+    return _valueAtOffset(schema.lastIndexByName(fieldName)) != null;
   }
 
   /// Get all field names
@@ -168,15 +180,14 @@ class JxRow {
 /// }
 /// ```
 class JxComposedRow extends JxRow {
-  /// Named sections: 'one' sections contain a single child row or null,
-  /// 'many' sections contain a list of rows or empty list.
+  /// Immutable map of named one and many sections.
   final Map<String, JxSection> sections;
 
   JxComposedRow({
     required super.schema,
     required super.cells,
-    required this.sections,
-  });
+    required Map<String, JxSection> sections,
+  }) : sections = Map.unmodifiable(sections);
 
   /// Get a 'one' section (single child row or null)
   JxRow? getOne(String sectionKey) {
@@ -219,5 +230,7 @@ class JxOneSection extends JxSection {
 class JxManySection extends JxSection {
   final List<JxRow> rows;
 
-  const JxManySection({required this.rows});
+  JxManySection({required List<JxRow> rows}) : rows = List.unmodifiable(rows);
+
+  const JxManySection.empty() : rows = const [];
 }

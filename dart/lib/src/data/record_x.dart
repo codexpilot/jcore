@@ -2,8 +2,8 @@
 ///
 /// RecordX provides a clean editing interface for composed and non-composed
 /// models. It carries the model ID, record identity when available, and
-/// schema version. Editing a RecordX leaves the cached row untouched until
-/// a save succeeds.
+/// the schema revision and record version separately. Editing a RecordX
+/// leaves the cached row untouched.
 library;
 
 import 'jx_row.dart';
@@ -14,7 +14,11 @@ import 'jx_row.dart';
 /// ```dart
 /// // Load and open for editing
 /// final record = await DbContext.instance.fetchRecord(modelId: 500, recordId: 1);
-/// final editable = DbContext.instance.openForEdit(record);
+/// final editable = DbContext.instance.openForEdit(
+///   record,
+///   modelId: 500,
+///   recordId: 1,
+/// );
 ///
 /// // Edit fields
 /// editable.setField('customer_name', 'New Customer');
@@ -46,13 +50,19 @@ class RecordX {
   /// Record ID (null for new records)
   final int? recordId;
 
-  /// Schema version (for optimistic concurrency)
+  /// Version of the schema used by this draft.
   final int schemaVersion;
+
+  /// Version of the persisted record for optimistic concurrency.
+  final int? recordVersion;
 
   /// Original cached row (immutable)
   final JxRow? _cachedRow;
 
-  /// Pending field edits (null means no change, explicit value means change)
+  /// Wire ID code for each section that declares one.
+  final Map<String, String> _sectionIdentityCodes;
+
+  /// Pending field edits, including explicit nulls, keyed by wire code.
   final Map<String, dynamic> _fieldEdits = {};
 
   /// Pending section edits
@@ -65,24 +75,43 @@ class RecordX {
     required this.modelId,
     this.recordId,
     required this.schemaVersion,
+    this.recordVersion,
     this._cachedRow,
-  });
+    Map<String, String> sectionIdentityCodes = const {},
+  }) : _sectionIdentityCodes = Map.unmodifiable(sectionIdentityCodes);
 
   /// Check if record has unsaved changes
   bool get isDirty => _isDirty;
 
-  /// Get field value (returns edited value if changed, otherwise cached value)
+  /// Get a field by its wire code or unambiguous display name.
   dynamic getField(String fieldName) {
-    if (_fieldEdits.containsKey(fieldName)) {
-      return _fieldEdits[fieldName];
+    final row = _cachedRow;
+    final index = _fieldIndex(fieldName);
+    final code = index == null ? fieldName : row!.schema.fields[index].c;
+    if (_fieldEdits.containsKey(code)) {
+      return _fieldEdits[code];
     }
-    return _cachedRow?[fieldName];
+    if (row == null) return null;
+    if (index == null) {
+      throw ArgumentError.value(fieldName, 'fieldName', 'Unknown field');
+    }
+    return row.getAt(index);
   }
 
-  /// Set field value (null clears nullable field)
+  /// Set a field by its wire code or unambiguous display name.
+  /// An explicit null clears a nullable field.
   void setField(String fieldName, dynamic value) {
-    _fieldEdits[fieldName] = value;
+    _validateEditKey(fieldName);
+    final index = _fieldIndex(fieldName);
+    final code = index == null ? fieldName : _cachedRow!.schema.fields[index].c;
+    if (code != fieldName) _validateEditKey(code);
+    _fieldEdits[code] = value;
     _isDirty = true;
+  }
+
+  int? _fieldIndex(String key) {
+    final schema = _cachedRow?.schema;
+    return schema?.indexByCode(key) ?? schema?.indexByName(key);
   }
 
   /// Get section rows (returns edited rows if changed, otherwise cached rows)
@@ -106,75 +135,71 @@ class RecordX {
 
   /// Set entire section rows (replaces all rows)
   void setSectionRows(String sectionKey, List<Map<String, dynamic>> rows) {
-    _sectionEdits[sectionKey] = _SectionEdit.replace(rows);
+    _validateEditKey(sectionKey);
+    _sectionEdits[sectionKey] = _SectionEdit(
+      rows,
+      identityCode: _sectionIdentityCodes[sectionKey],
+    );
     _isDirty = true;
   }
 
   /// Update a specific section row by stable ID
-  void setSectionRowById(String sectionKey, dynamic id, Map<String, dynamic> row) {
-    final edit = _sectionEdits.putIfAbsent(
-      sectionKey,
-      () => _SectionEdit.incremental(getSectionRows(sectionKey)),
-    );
-    edit.updateRowById(id, row);
-    _isDirty = true;
+  void setSectionRowById(
+    String sectionKey,
+    dynamic id,
+    Map<String, dynamic> row,
+  ) {
+    _editSection(sectionKey, (edit) => edit.updateRowById(id, row));
   }
 
-  /// Update a specific section row by index (finds stable ID first)
+  /// Update a specific section row by index.
   void setSectionRow(String sectionKey, int index, Map<String, dynamic> row) {
-    final currentRows = getSectionRows(sectionKey);
-    if (index >= 0 && index < currentRows.length) {
-      final id = _extractRowId(currentRows[index]);
-      setSectionRowById(sectionKey, id, row);
-    }
-  }
-
-  /// Add a new row to a section (assigns temporary ID)
-  void addSectionRow(String sectionKey, Map<String, dynamic> row) {
-    final edit = _sectionEdits.putIfAbsent(
+    _editSection(
       sectionKey,
-      () => _SectionEdit.incremental(getSectionRows(sectionKey)),
+      (edit) => edit.updateRowById(edit.idAt(index), row),
     );
-    edit.addRow(row);
-    _isDirty = true;
   }
 
-  /// Remove a row from a section by index (finds stable ID first)
+  /// Add a new row to a section (assigns an internal ID when needed).
+  void addSectionRow(String sectionKey, Map<String, dynamic> row) {
+    _editSection(sectionKey, (edit) => edit.addRow(row));
+  }
+
+  /// Remove a row from a section by index.
   void removeSectionRow(String sectionKey, int index) {
-    final currentRows = getSectionRows(sectionKey);
-    if (index >= 0 && index < currentRows.length) {
-      final id = _extractRowId(currentRows[index]);
-      removeSectionRowById(sectionKey, id);
-    }
+    _editSection(sectionKey, (edit) => edit.removeRowById(edit.idAt(index)));
   }
 
   /// Remove a row from a section by stable ID
   void removeSectionRowById(String sectionKey, dynamic id) {
-    final edit = _sectionEdits.putIfAbsent(
-      sectionKey,
-      () => _SectionEdit.incremental(getSectionRows(sectionKey)),
-    );
-    edit.removeRowById(id);
-    _isDirty = true;
+    _editSection(sectionKey, (edit) => edit.removeRowById(id));
   }
 
-  /// Extract stable ID from a row (looks for common ID fields)
-  dynamic _extractRowId(Map<String, dynamic> row) {
-    // Try common ID field names
-    for (final key in ['line_id', 'payment_id', 'id', 'i']) {
-      if (row.containsKey(key)) {
-        return row[key];
-      }
+  void _editSection(String key, bool Function(_SectionEdit) apply) {
+    _validateEditKey(key);
+    final edit =
+        _sectionEdits[key] ??
+        _SectionEdit(
+          getSectionRows(key),
+          identityCode: _sectionIdentityCodes[key],
+        );
+    if (apply(edit)) {
+      _sectionEdits[key] = edit;
+      _isDirty = true;
     }
-    // Fall back to row hashcode if no ID field found
-    return row.hashCode;
+  }
+
+  void _validateEditKey(String key) {
+    if (key == 'i' || key == 'v' || key.startsWith('_removed_')) {
+      throw ArgumentError.value(key, 'key', 'Reserved record control key');
+    }
   }
 
   /// Export to JSON for save operation
   ///
   /// Returns a map with:
   /// - i: record ID (0 for new records)
-  /// - v: schema version
+  /// - v: record version, when available
   /// - edited field keys and values
   /// - section keys with their edited rows
   /// - _removed_{sectionKey}: array of removed row IDs
@@ -183,7 +208,7 @@ class RecordX {
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       'i': recordId ?? 0,
-      'v': schemaVersion,
+      if (recordVersion != null) 'v': recordVersion,
     };
 
     // Add edited fields
@@ -214,75 +239,92 @@ class RecordX {
   }
 }
 
-/// Internal class for tracking section edits with stable IDs
+/// Track visible rows in insertion order and persisted IDs removed by the draft.
 class _SectionEdit {
-  final Map<dynamic, Map<String, dynamic>> _rowsById = {};
-  final Set<dynamic> _removedIds = {};
-  final List<dynamic> _insertionOrder = [];
-  int _tempIdCounter = -1;
+  static const _legacyIdentityCodes = ['line_id', 'payment_id', 'id', 'i'];
 
-  _SectionEdit.replace(List<Map<String, dynamic>> rows) {
-    for (final row in rows) {
-      final id = _extractId(row);
-      _rowsById[id] = Map.from(row);
-      _insertionOrder.add(id);
-    }
-  }
+  final String? identityCode;
+  final _rowsById = <Object, Map<String, dynamic>>{};
+  final _persistedIds = <Object>{};
+  final _removedIds = <Object>{};
 
-  _SectionEdit.incremental(List<Map<String, dynamic>> initialRows) {
+  _SectionEdit(
+    List<Map<String, dynamic>> initialRows, {
+    required this.identityCode,
+  }) {
     for (final row in initialRows) {
-      final id = _extractId(row);
-      _rowsById[id] = Map.from(row);
-      _insertionOrder.add(id);
+      final id = _explicitId(row);
+      _insertRow(id ?? Object(), row);
+      if (id != null) _persistedIds.add(id);
     }
   }
 
-  dynamic _extractId(Map<String, dynamic> row) {
-    // Try common ID field names
-    for (final key in ['line_id', 'payment_id', 'id', 'i']) {
-      if (row.containsKey(key)) {
-        return row[key];
-      }
+  String? _identityCodeIn(Map<String, dynamic> row) {
+    if (identityCode != null) return identityCode;
+    for (final code in _legacyIdentityCodes) {
+      if (row.containsKey(code)) return code;
     }
-    // Assign temporary ID for new rows without ID
-    return _tempIdCounter--;
+    return null;
   }
 
-  void updateRowById(dynamic id, Map<String, dynamic> row) {
-    if (_rowsById.containsKey(id) && !_removedIds.contains(id)) {
-      _rowsById[id] = Map.from(row);
-    }
+  Object? _explicitId(Map<String, dynamic> row) {
+    final id = row[_identityCodeIn(row)];
+    return switch (id) {
+      int value when value > 0 => value,
+      String value when value.isNotEmpty && value != '0' => value,
+      _ => null,
+    };
   }
 
-  void addRow(Map<String, dynamic> row) {
-    final id = _extractId(row);
-    // If no ID in row, ensure temporary ID is added
-    if (!row.containsKey('line_id') &&
-        !row.containsKey('payment_id') &&
-        !row.containsKey('id') &&
-        !row.containsKey('i')) {
-      row = Map.from(row);
-      row['_temp_id'] = id;
-    }
-    _rowsById[id] = row;
-    _insertionOrder.add(id);
-  }
-
-  void removeRowById(dynamic id) {
+  void _insertRow(Object id, Map<String, dynamic> row) {
     if (_rowsById.containsKey(id)) {
-      _removedIds.add(id);
+      throw ArgumentError.value(id, 'id', 'Duplicate section row ID');
     }
+    _rowsById[id] = Map.of(row);
+  }
+
+  Object? idAt(int index) => index >= 0 && index < _rowsById.length
+      ? _rowsById.keys.elementAt(index)
+      : null;
+
+  bool updateRowById(Object? id, Map<String, dynamic> row) {
+    if (id == null) return false;
+    final current = _rowsById[id];
+    if (current == null) return false;
+
+    final updated = Map.of(row);
+    final code = _identityCodeIn(current);
+    if (code != null && current.containsKey(code)) {
+      final identity = current[code];
+      if (updated.containsKey(code) && updated[code] != identity) {
+        throw ArgumentError.value(
+          updated[code],
+          code,
+          'Cannot change a section row ID',
+        );
+      }
+      updated[code] = identity;
+    }
+    _rowsById[id] = updated;
+    return true;
+  }
+
+  bool addRow(Map<String, dynamic> row) {
+    final id = _explicitId(row) ?? Object();
+    _insertRow(id, row);
+    _removedIds.remove(id);
+    return true;
+  }
+
+  bool removeRowById(Object? id) {
+    if (id == null || _rowsById.remove(id) == null) return false;
+    if (_persistedIds.contains(id)) _removedIds.add(id);
+    return true;
   }
 
   List<Map<String, dynamic>> getRows() {
-    return [
-      for (final id in _insertionOrder)
-        if (!_removedIds.contains(id) && _rowsById.containsKey(id))
-          _rowsById[id]!
-    ];
+    return [for (final row in _rowsById.values) Map.of(row)];
   }
 
-  List<dynamic> getRemovedIds() {
-    return _removedIds.where((id) => id is! int || id >= 0).toList();
-  }
+  List<Object> getRemovedIds() => _removedIds.toList();
 }

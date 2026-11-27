@@ -62,6 +62,60 @@ count. Parameterized IDs use 60000 + precision * 100 + scale for NUMERIC and
 The existing AIX Group 3 APIs remain available separately. JCore does not
 translate Group 3 IDs to current catalog IDs or migrate persisted schemas.
 
+## Scope record access to a database session
+
+Create a `DbContext(queryService: service)` for each active session and inject
+it into the consumers. Call `activate` with validated models and schemas. For
+composed queries, pass a `JxResultProjection` keyed by the effective QueryX ID
+for each fetch or save. Supply its published version, ordered fields, and
+section tree. Each occurrence has its own schema and cardinality. The host
+supplies this metadata before issuing a query.
+
+Use `context.openForEdit(row, modelId: id)` or
+`context.openForCreate(modelId: id)` for a session-bound draft. An edit uses the
+record identity and version returned by the query. Capture the version as an
+integer in the response's `v` field when the server supports optimistic
+concurrency. Changing the service, replacing metadata, or clearing the context
+invalidates pending results and bound drafts.
+
+Use `context.models.byCode(code)` for stable model lookup and
+`row.byCode(code)` for a wire-keyed column. `row.byId(id)` uses the FieldX or
+ColumnX metadata ID, and `row.byName(name)` uses the exact display name.
+`row[0]` still reads by position. A missing column and an explicit null both
+return null through the named lookup methods. Use the schema's `indexByCode`
+when the distinction matters. The schema and row constructors copy their
+ordered collections.
+
+## Read a flat query as a table
+
+Use `JxQueryService` for a transport that can return a raw tabular JX
+response. In its `executeJxQuery` method, return a `JxQueryResponse` with the
+original response text and the selected JX encoding. Pass the HTTP body text
+through before JSON decoding so the JX codec can preserve exact numbers.
+
+Use `db.fetchTable` to decode and hold one result in a `JxTable`. It owns
+one ordered `JxSchema` and one positional row matrix. Use the schema from the
+active query projection or pass the exact ordered schema for a query without
+one. The caller controls the table's lifetime.
+
+~~~dart
+final table = await db.fetchTable(
+  queryId: queryId,
+  schema: resultSchema,
+  params: {'limit': 100},
+);
+
+for (var row = 0; row < table.rowCount; row++) {
+  final amount = table.byCode(row, 'total_amount');
+  // Render the cell.
+}
+~~~
+
+`cellAt(rowIndex, columnIndex)` reads by position. `byId`, `byCode`, and
+`byName` resolve the column with the shared schema. `rows` exposes a read-only
+view of the matrix. Use `fetchRecord` for individual and composed records and
+for opening an edit draft.
+
 ## Develop and verify JCore
 
 From the repository root:

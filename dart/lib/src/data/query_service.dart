@@ -68,7 +68,7 @@
 /// - 2000-2999: ColumnX operations
 /// - 3000-3999: QueryX operations
 /// - etc.
-abstract class QueryService {
+abstract class QueryService implements QueryTransport {
   /// Execute a query operation with parameters.
   ///
   /// Parameters:
@@ -108,3 +108,25 @@ abstract class QueryService {
   /// ```
   Future<dynamic> executeQuery(int queryId, Map<String, dynamic> params);
 }
+
+/// A tabular JX response returned by a transport before JSON decoding.
+final class JxQueryResponse {
+  const JxQueryResponse({required this.body, required this.encoding});
+
+  /// Original response text, including exact numeric tokens.
+  final String body;
+
+  /// The JX encoding selected for this response.
+  final int encoding;
+}
+
+/// A query service that can return the original JX body for tabular results.
+abstract interface class JxQueryService implements QueryTransport {
+  Future<JxQueryResponse> executeJxQuery(
+    int queryId,
+    Map<String, dynamic> params,
+  );
+}
+
+/// A transport used by DbContext for record queries, tabular JX queries, or both.
+abstract interface class QueryTransport {}

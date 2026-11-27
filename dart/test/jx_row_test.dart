@@ -57,6 +57,86 @@ void main() {
       expect(row['amount'], equals('456.78'));
     });
 
+    test('resolves field ID, code and display name in a shared schema', () {
+      final schema = JxSchema([
+        const JxField(
+          i: 301,
+          c: 'total',
+          n: 'Invoice Total',
+          typeId: 300013,
+          typeName: 'Numeric',
+        ),
+      ]);
+      final row = JxRow(schema: schema, cells: ['9007199254740993.00']);
+      final nullRow = JxRow(schema: schema, cells: [null]);
+
+      expect(schema.indexById(301), 0);
+      expect(schema.indexByCode('total'), 0);
+      expect(schema.indexByName('Invoice Total'), 0);
+      expect(row.byId(301), '9007199254740993.00');
+      expect(row.byCode('total'), '9007199254740993.00');
+      expect(row.byName('Invoice Total'), '9007199254740993.00');
+      expect(row[0], '9007199254740993.00');
+      expect(row['Invoice Total'], '9007199254740993.00');
+
+      expect(row.byId(0), isNull);
+      expect(row.byCode('TOTAL'), isNull);
+      expect(row.byName('total'), isNull);
+      expect(nullRow.byId(301), isNull);
+      expect(nullRow.byCode('total'), isNull);
+      expect(nullRow.byName('Invoice Total'), isNull);
+    });
+
+    test(
+      'reports ambiguous metadata and preserves last-match bracket access',
+      () {
+        final schema = JxSchema([
+          const JxField(
+            i: 1,
+            c: 'party',
+            n: 'Party',
+            typeId: 300011,
+            typeName: 'String',
+          ),
+          const JxField(
+            i: 1,
+            c: 'party',
+            n: 'Party',
+            typeId: 300011,
+            typeName: 'String',
+          ),
+        ]);
+        final row = JxRow(schema: schema, cells: ['Supplier', 'Customer']);
+
+        expect(() => schema.indexById(1), throwsArgumentError);
+        expect(() => schema.indexByCode('party'), throwsArgumentError);
+        expect(() => schema.indexByName('Party'), throwsArgumentError);
+        expect(() => row.byId(1), throwsArgumentError);
+        expect(() => row.byCode('party'), throwsArgumentError);
+        expect(() => row.byName('Party'), throwsArgumentError);
+        expect(row['Party'], 'Customer');
+        expect(row.hasValue('Party'), isTrue);
+      },
+    );
+
+    test('snapshots schema fields and row cells', () {
+      final sourceFields = schema.fields.toList();
+      final snapshot = JxSchema(sourceFields);
+      final sourceCells = <Object?>[123, 'John', '456.78'];
+      final row = JxRow(schema: snapshot, cells: sourceCells);
+      expect(row.byName('name'), 'John');
+
+      sourceFields.removeAt(1);
+      sourceCells[1] = 'Jane';
+
+      expect(snapshot.fieldCount, 3);
+      expect(row.byName('name'), 'John');
+      expect(row.byCode('name'), 'John');
+      expect(row.toMap()['name'], 'John');
+      expect(() => snapshot.fields.clear(), throwsUnsupportedError);
+      expect(() => row.cells[1] = 'Kate', throwsUnsupportedError);
+    });
+
     test('name access throws on invalid field', () {
       final row = JxRow(schema: schema, cells: [123, 'John', '456.78']);
       expect(() => row['invalid'], throwsArgumentError);
@@ -139,6 +219,35 @@ void main() {
       expect(items.length, equals(2));
       expect(items[0], equals(row1));
       expect(items[1], equals(row2));
+    });
+
+    test('snapshots section map and child row list', () {
+      final schema = JxSchema([
+        const JxField(
+          i: 10,
+          c: 'id',
+          n: 'ID',
+          typeId: 300007,
+          typeName: 'Integer',
+        ),
+      ]);
+      final child = JxRow(schema: schema, cells: [1]);
+      final rows = [child];
+      final sections = <String, JxSection>{'items': JxManySection(rows: rows)};
+      final root = JxComposedRow(
+        schema: schema,
+        cells: [100],
+        sections: sections,
+      );
+
+      sections.clear();
+      rows.clear();
+
+      expect(root.getMany('items').single.byId(10), 1);
+      expect(root.byCode('id'), 100);
+      expect(() => root.sections.clear(), throwsUnsupportedError);
+      expect(() => root.getMany('items').clear(), throwsUnsupportedError);
+      expect(const JxManySection.empty().rows, isEmpty);
     });
 
     test('getOne throws on many section', () {

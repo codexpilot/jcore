@@ -4,9 +4,10 @@
 /// Supports get and save operations on the sample invoice.
 library;
 
-import '../data/query_service.dart';
+import '../data/composed_row_decoder.dart';
 import '../data/jx_row.dart';
 import '../data/jx_schema.dart';
+import '../data/query_service.dart';
 import 'sales_invoice_fixture.dart';
 
 /// In-memory query service for Sales Invoice fixture.
@@ -19,7 +20,7 @@ import 'sales_invoice_fixture.dart';
 /// ```dart
 /// {
 ///   'i': 1,                    // Record ID
-///   'v': 1,                    // Schema version
+///   'v': 1,                    // Expected record version
 ///   'customer_name': 'Updated', // Edited fields (omitted = no change, null = clear)
 ///   'invoiceDetails': [...],   // Updated section rows
 ///   '_removed_invoiceDetails': [1, 2],  // Explicit removed row IDs
@@ -69,9 +70,9 @@ class InMemoryQueryService implements QueryService {
     }
 
     switch (queryId) {
-      case 5000: // Get invoice by ID
+      case SalesInvoiceFixture.fetchQueryId:
         return _getInvoice(params);
-      case 5001: // Save invoice
+      case SalesInvoiceFixture.saveQueryId:
         return _saveInvoice(params);
       default:
         throw Exception('Unknown query ID: $queryId');
@@ -108,71 +109,30 @@ class InMemoryQueryService implements QueryService {
       throw Exception('Invoice not found: $id');
     }
 
-    // Apply field updates
-    final updatedCells = List<dynamic>.from(existing.cells);
+    final currentVersion = existing['v'] as int;
+    if (params.containsKey('v') && params['v'] != currentVersion) {
+      throw StateError('Invoice $id record version changed');
+    }
+
     final schema = existing.schema;
-
-    // Update root fields
+    final updatedCells = List.of(existing.cells);
     for (var i = 0; i < schema.fields.length; i++) {
-      final fieldName = schema.fields[i].n;
-      if (params.containsKey(fieldName)) {
-        updatedCells[i] = params[fieldName];
+      final code = schema.fields[i].c;
+      if (code == 'v') {
+        updatedCells[i] = currentVersion + 1;
+      } else if (params.containsKey(code)) {
+        updatedCells[i] = params[code];
       }
     }
 
-    // Update sections
-    final updatedSections = <String, JxSection>{};
-
-    // Process invoiceInfo section (one)
-    if (params.containsKey('invoiceInfo')) {
-      final infoData = params['invoiceInfo'] as List;
-      if (infoData.isNotEmpty) {
-        final infoMap = infoData.first as Map<String, dynamic>;
-        final infoRow = _mapToRow(infoMap, SalesInvoiceSchemas.invoiceHeader);
-        updatedSections['invoiceInfo'] = JxOneSection(row: infoRow);
-      } else {
-        updatedSections['invoiceInfo'] = const JxOneSection(row: null);
+    final updatedSections = Map.of(existing.sections);
+    for (final section in SalesInvoiceFixture.projection.sections) {
+      if (params.containsKey(section.key)) {
+        updatedSections[section.key] = _decodeSectionEdit(
+          params[section.key],
+          section,
+        );
       }
-    } else {
-      // Keep existing
-      updatedSections['invoiceInfo'] = existing.sections['invoiceInfo']!;
-    }
-
-    // Process invoiceDetails section (many)
-    // The payload contains the full list after removals and edits
-    // _removed_invoiceDetails contains explicit removed IDs for validation
-    if (params.containsKey('invoiceDetails')) {
-      final detailsData = params['invoiceDetails'] as List;
-      final detailRows = detailsData
-          .map((d) => _mapToRow(d as Map<String, dynamic>, SalesInvoiceSchemas.lineItem))
-          .toList();
-      updatedSections['invoiceDetails'] = JxManySection(rows: detailRows);
-
-      // Log removed IDs if present (for debugging/validation)
-      if (params.containsKey('_removed_invoiceDetails')) {
-        // In a real implementation, this would validate the removal was authorized
-        // For fixture, we just accept the new state
-      }
-    } else {
-      // Keep existing
-      updatedSections['invoiceDetails'] = existing.sections['invoiceDetails']!;
-    }
-
-    // Process payments section (many)
-    if (params.containsKey('payments')) {
-      final paymentsData = params['payments'] as List;
-      final paymentRows = paymentsData
-          .map((p) => _mapToRow(p as Map<String, dynamic>, SalesInvoiceSchemas.payment))
-          .toList();
-      updatedSections['payments'] = JxManySection(rows: paymentRows);
-
-      // Log removed IDs if present
-      if (params.containsKey('_removed_payments')) {
-        // Validation placeholder
-      }
-    } else {
-      // Keep existing
-      updatedSections['payments'] = existing.sections['payments']!;
     }
 
     // Create updated invoice
@@ -188,38 +148,43 @@ class InMemoryQueryService implements QueryService {
     return _serializeInvoice(updated);
   }
 
-  /// Convert Map to JxRow using schema.
-  ///
-  /// Wire JSON uses logical field codes (field.c).
-  JxRow _mapToRow(Map<String, dynamic> map, JxSchema schema) {
-    final cells = <dynamic>[];
-    for (final field in schema.fields) {
-      // Wire JSON uses field codes
-      cells.add(map[field.c]);
+  JxSection _decodeSectionEdit(Object? value, JxResultSection section) {
+    if (value is! List) {
+      throw ArgumentError('Expected an array for "${section.key}" edits');
     }
-    return JxRow(schema: schema, cells: cells);
+    if (section.cardinality == JxSectionCardinality.one) {
+      if (value.length > 1) {
+        throw ArgumentError('Expected at most one row for "${section.key}"');
+      }
+      return JxOneSection(
+        row: value.isEmpty
+            ? null
+            : _decodeEditRow(value.single, section.schema),
+      );
+    }
+    return JxManySection(
+      rows: [for (final row in value) _decodeEditRow(row, section.schema)],
+    );
   }
 
-  /// Serialize invoice to map format
+  JxRow _decodeEditRow(Object? value, JxSchema schema) {
+    if (value is! Map<String, Object?>) {
+      throw ArgumentError('Expected a section edit object');
+    }
+    return JxRow(
+      schema: schema,
+      cells: [for (final field in schema.fields) value[field.c]],
+    );
+  }
+
   Map<String, dynamic> _serializeInvoice(JxComposedRow invoice) {
     final result = invoice.toMap();
-
-    // Add sections
-    result['invoiceInfo'] = [
-      if (invoice.getOne('invoiceInfo') != null)
-        invoice.getOne('invoiceInfo')!.toMap()
-    ];
-
-    result['invoiceDetails'] = invoice
-        .getMany('invoiceDetails')
-        .map((r) => r.toMap())
-        .toList();
-
-    result['payments'] = invoice
-        .getMany('payments')
-        .map((r) => r.toMap())
-        .toList();
-
+    for (final entry in invoice.sections.entries) {
+      result[entry.key] = switch (entry.value) {
+        JxOneSection(:final row) => row?.toMap(),
+        JxManySection(:final rows) => [for (final row in rows) row.toMap()],
+      };
+    }
     return result;
   }
 

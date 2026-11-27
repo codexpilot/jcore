@@ -33,15 +33,40 @@ class JxBody {
 
   const JxBody({this.meta, required this.data});
 
-  /// Parse from JSON map
-  factory JxBody.fromJson(Map<String, dynamic> json) {
-    final meta = json['meta'] != null
-        ? (json['meta'] as List).map((e) => List<dynamic>.from(e as List)).toList()
-        : null;
+  /// Parse and validate a decoded JSON body.
+  ///
+  /// An explicit null [meta] is treated like omitted metadata.
+  factory JxBody.fromJson(Object? value) => _fromJson(value, copyLists: true);
 
-    final data = List<dynamic>.from(json['data'] as List);
+  static JxBody _fromJson(Object? value, {required bool copyLists}) {
+    if (value is! Map<String, dynamic>) {
+      throw const FormatException('Expected a JX response object');
+    }
 
-    return JxBody(meta: meta, data: data);
+    final data = value['data'];
+    if (data is! List) {
+      throw const FormatException('Expected a data array in the JX response');
+    }
+
+    List<List<dynamic>>? meta;
+    final rawMeta = value['meta'];
+    if (rawMeta != null) {
+      if (rawMeta is! List) {
+        throw const FormatException('Expected a meta array in the JX response');
+      }
+      meta = [
+        for (final (index, entry) in rawMeta.indexed)
+          if (entry is List)
+            copyLists ? List<dynamic>.of(entry) : entry
+          else
+            throw FormatException('Expected an array at meta[$index]'),
+      ];
+    }
+
+    return JxBody(
+      meta: meta,
+      data: copyLists ? List<dynamic>.of(data) : data,
+    );
   }
 
   /// Convert to JSON map
@@ -53,11 +78,9 @@ class JxBody {
     return result;
   }
 
-  /// Parse from JSON string
-  static JxBody parse(String jsonString) {
-    final decoded = json.jsonDecode(jsonString) as Map<String, dynamic>;
-    return JxBody.fromJson(decoded);
-  }
+  /// Parse a JSON body from its wire representation.
+  static JxBody parse(String jsonString) =>
+      _fromJson(json.jsonDecode(jsonString), copyLists: false);
 
   /// Encode to JSON string
   String encode({bool pretty = false}) {

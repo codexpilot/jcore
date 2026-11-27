@@ -7,6 +7,7 @@
 /// - Mixed array access patterns
 library;
 
+import '../data/composed_row_decoder.dart';
 import '../data/db_context.dart';
 import '../data/jx_row.dart';
 import '../data/jx_schema.dart';
@@ -89,11 +90,11 @@ class SalesInvoiceModels {
   );
 
   static List<ModelX> get all => [
-        salesInvoice,
-        invoiceHeader,
-        invoiceLineItem,
-        invoicePayment,
-      ];
+    salesInvoice,
+    invoiceHeader,
+    invoiceLineItem,
+    invoicePayment,
+  ];
 }
 
 /// Sales Invoice schemas for testing.
@@ -139,6 +140,19 @@ class SalesInvoiceSchemas {
       typeId: 300013,
       typeCode: 'numeric',
       typeName: 'Numeric',
+    ),
+  ]);
+
+  /// Fields projected at the root, including the editable record version.
+  static final JxSchema invoice = JxSchema([
+    ...invoiceHeader.fields,
+    const JxField(
+      i: 6,
+      c: 'v',
+      n: 'v',
+      typeId: 300007,
+      typeCode: 'int',
+      typeName: 'Integer',
     ),
   ]);
 
@@ -223,15 +237,44 @@ class SalesInvoiceSchemas {
   ]);
 
   static Map<int, JxSchema> get all => {
-        SalesInvoiceModels.salesInvoiceId: invoiceHeader, // Composed model uses header schema for root
-        SalesInvoiceModels.invoiceHeaderId: invoiceHeader,
-        SalesInvoiceModels.invoiceLineItemId: lineItem,
-        SalesInvoiceModels.invoicePaymentId: payment,
-      };
+    SalesInvoiceModels.salesInvoiceId: invoice,
+    SalesInvoiceModels.invoiceHeaderId: invoiceHeader,
+    SalesInvoiceModels.invoiceLineItemId: lineItem,
+    SalesInvoiceModels.invoicePaymentId: payment,
+  };
 }
 
 /// Sample Sales Invoice data.
 class SalesInvoiceFixture {
+  static const fetchQueryId = 5000;
+  static const saveQueryId = 5001;
+
+  static final JxResultProjection projection = JxResultProjection(
+    modelId: SalesInvoiceModels.salesInvoiceId,
+    version: '1',
+    schema: SalesInvoiceSchemas.invoice,
+    sections: [
+      JxResultSection(
+        key: 'invoiceInfo',
+        cardinality: JxSectionCardinality.one,
+        schema: SalesInvoiceSchemas.invoiceHeader,
+        identityCode: 'invoice_id',
+      ),
+      JxResultSection(
+        key: 'invoiceDetails',
+        cardinality: JxSectionCardinality.many,
+        schema: SalesInvoiceSchemas.lineItem,
+        identityCode: 'line_id',
+      ),
+      JxResultSection(
+        key: 'payments',
+        cardinality: JxSectionCardinality.many,
+        schema: SalesInvoiceSchemas.payment,
+        identityCode: 'payment_id',
+      ),
+    ],
+  );
+
   /// Create a sample sales invoice with all sections.
   ///
   /// Demonstrates:
@@ -239,7 +282,7 @@ class SalesInvoiceFixture {
   /// - invoiceDetails: many section (multiple line items)
   /// - payments: many section (multiple payment records)
   static JxComposedRow createSampleInvoice() {
-    // Header data (root level)
+    // Header fields are shared by the root and invoiceInfo section.
     final headerSchema = SalesInvoiceSchemas.invoiceHeader;
     final headerCells = [
       1, // invoice_id
@@ -250,10 +293,7 @@ class SalesInvoiceFixture {
     ];
 
     // Invoice info section (one)
-    final infoRow = JxRow(
-      schema: headerSchema,
-      cells: headerCells,
-    );
+    final infoRow = JxRow(schema: headerSchema, cells: headerCells);
 
     // Invoice details section (many)
     final lineItemSchema = SalesInvoiceSchemas.lineItem;
@@ -296,8 +336,8 @@ class SalesInvoiceFixture {
 
     // Compose the invoice
     return JxComposedRow(
-      schema: headerSchema,
-      cells: headerCells,
+      schema: SalesInvoiceSchemas.invoice,
+      cells: [...headerCells, 1],
       sections: {
         'invoiceInfo': JxOneSection(row: infoRow),
         'invoiceDetails': JxManySection(rows: lineItems),
@@ -307,10 +347,11 @@ class SalesInvoiceFixture {
   }
 
   /// Activate sample models and schemas in DbContext.
-  static void activate() {
-    DbContext.instance.activate(
+  static void activate([DbContext? context]) {
+    (context ?? DbContext.instance).activate(
       models: SalesInvoiceModels.all,
       schemas: SalesInvoiceSchemas.all,
+      projections: {fetchQueryId: projection, saveQueryId: projection},
     );
   }
 }

@@ -38,14 +38,14 @@ class JfCodec {
   }) {
     final rows = <List<dynamic>>[];
     for (final rowData in body.data) {
-      if (rowData is! Map) {
-        throw FormatException('Expected object for full row, got: ${rowData.runtimeType}');
+      if (rowData is! Map<String, Object?>) {
+        throw FormatException(
+          'Expected object for full row, got: ${rowData.runtimeType}',
+        );
       }
-
-      final obj = rowData as Map<String, dynamic>;
       final row = List<dynamic>.generate(schema.fieldCount, (i) {
         final key = enc.j == 8 ? schema.fields[i].c : schema.fields[i].n;
-        final value = obj[key];
+        final value = rowData[key];
         return NumericCodec.decodeCell(value, schema.fields[i].typeId, enc, timezone);
       });
       rows.add(row);

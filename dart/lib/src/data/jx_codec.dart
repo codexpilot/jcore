@@ -55,10 +55,11 @@ class JxCodec {
   /// Parameters:
   /// - [encoding]: Four-digit JX encoding
   /// - [body]: JX body to decode
-  /// - [schema]: Field metadata (required for J=1, optional for others)
+  /// - [schema]: Ordered field metadata, required for all modes
   /// - [timezone]: Timezone for D=1, D=2
   ///
-  /// Returns decoded rows as positional arrays.
+  /// Returns decoded rows as positional arrays. When J=2, J=3, or J=4
+  /// includes metadata, it must match the supplied schema in column order.
   static List<List<dynamic>> decode({
     required int encoding,
     required JxBody body,

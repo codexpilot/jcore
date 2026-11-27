@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:test/test.dart';
 import 'package:jcore/jcore.dart';
 
@@ -135,6 +137,42 @@ void main() {
       expect(body.data[0][0], equals(1));
       expect(body.data[0][1], equals('John'));
     });
+
+    test('rejects malformed bodies through both parsing entry points', () {
+      for (final invalid in [
+        null,
+        [],
+        {},
+        {'data': null},
+        {'data': {}},
+        {'data': [], 'meta': {}},
+        {'data': [], 'meta': [null]},
+        {'data': [], 'meta': ['not an entry']},
+      ]) {
+        expect(() => JxBody.fromJson(invalid), throwsFormatException);
+        expect(() => JxBody.parse(jsonEncode(invalid)), throwsFormatException);
+      }
+    });
+
+    test('treats null metadata as absent', () {
+      final body = JxBody.parse('{"data":[],"meta":null}');
+      expect(body.data, isEmpty);
+      expect(body.meta, isNull);
+    });
+
+    test('copies caller-provided envelope lists', () {
+      final data = <dynamic>[[1, 'John']];
+      final entry = <dynamic>['id', 'INT64'];
+      final meta = <dynamic>[entry];
+      final body = JxBody.fromJson({'data': data, 'meta': meta});
+
+      data.clear();
+      entry.clear();
+      meta.clear();
+
+      expect(body.data, [[1, 'John']]);
+      expect(body.meta, [['id', 'INT64']]);
+    });
   });
 
   group('JxCodec - 8000 encoding (default)', () {
@@ -197,6 +235,25 @@ void main() {
       expect(rows[0][1], isA<Numeric>());
       expect(rows[0][1].toString(), equals('1234.50'));
       expect(rows[0][2], isA<int>());
+    });
+
+    test('rejects an object row without string keys', () {
+      final body = JxBody(data: [
+        {1: '123'},
+      ]);
+      expect(
+        () => JxCodec.decode(encoding: 8000, body: body, schema: schema),
+        throwsFormatException,
+      );
+    });
+
+    test('preserves sparse object decoding', () {
+      final rows = JxCodec.decodeFromJsonString(
+        encoding: 8000,
+        jsonString: '{"data":[{"id":"42"}]}',
+        schema: schema,
+      );
+      expect(rows.single, [BigInt.from(42), null, null]);
     });
   });
 
@@ -411,6 +468,85 @@ void main() {
       expect(body.meta![0], equals(['ID', 'INT64']));
       expect(body.meta![1], equals(['Name', 'TEXT']));
       expect(body.data[0], equals(['1', 'John']));
+    });
+  });
+
+  group('JxCodec - compact metadata validation', () {
+    final schema = JxSchema([
+      JxField(i: 101, c: 'id', n: 'ID', typeId: 3, typeName: 'INT64'),
+      JxField(i: 102, c: 'name', n: 'Name', typeId: 10000, typeName: 'TEXT'),
+    ]);
+
+    test('requires present metadata to match field and type order', () {
+      final values = [
+        [BigInt.one, 'John'],
+      ];
+      for (final encoding in [2000, 3000, 4000]) {
+        final encoded = JxCodec.encode(
+          encoding: encoding,
+          rows: values,
+          schema: schema,
+        );
+        final meta = encoded.meta!;
+        final malformed = [
+          [meta[1], meta[0]],
+          [meta[0]],
+          [
+            [meta[0][0]],
+            meta[1],
+          ],
+          [
+            [meta[0][0], 'Wrong type'],
+            meta[1],
+          ],
+        ];
+
+        expect(
+          JxCodec.decodeFromJsonString(
+            encoding: encoding,
+            jsonString: encoded.encode(),
+            schema: schema,
+          ),
+          values,
+        );
+        for (final mismatch in malformed) {
+          expect(
+            () => JxCodec.decode(
+              encoding: encoding,
+              body: JxBody(meta: mismatch, data: encoded.data),
+              schema: schema,
+            ),
+            throwsFormatException,
+          );
+        }
+        expect(
+          JxCodec.decode(
+            encoding: encoding,
+            body: JxBody(data: encoded.data),
+            schema: schema,
+          ),
+          values,
+        );
+      }
+    });
+
+    test('preserves exact raw numerics when metadata is present', () {
+      final numericSchema = JxSchema([
+        JxField(
+          i: 1,
+          c: 'amount',
+          n: 'Amount',
+          typeId: 20000,
+          typeName: 'NUMERIC',
+        ),
+      ]);
+      final rows = JxCodec.decodeFromJsonString(
+        encoding: 3100,
+        jsonString: '{"data":[[9007199254740993.123400]],'
+            '"meta":[["amount","NUMERIC"]]}',
+        schema: numericSchema,
+      );
+      expect(rows.single.single.toString(), '9007199254740993.123400');
     });
   });
 

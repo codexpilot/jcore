@@ -17,11 +17,7 @@ void main() {
 
   group('RecordX basic operations', () {
     test('creates editable record with model ID and record ID', () {
-      final record = RecordX(
-        modelId: 500,
-        recordId: 1,
-        schemaVersion: 1,
-      );
+      final record = RecordX(modelId: 500, recordId: 1, schemaVersion: 1);
 
       expect(record.modelId, equals(500));
       expect(record.recordId, equals(1));
@@ -30,11 +26,7 @@ void main() {
     });
 
     test('tracks field edits', () {
-      final record = RecordX(
-        modelId: 500,
-        recordId: 1,
-        schemaVersion: 1,
-      );
+      final record = RecordX(modelId: 500, recordId: 1, schemaVersion: 1);
 
       record.setField('customer_name', 'New Customer');
 
@@ -46,7 +38,8 @@ void main() {
       final record = RecordX(
         modelId: 500,
         recordId: 1,
-        schemaVersion: 1,
+        schemaVersion: 5,
+        recordVersion: 9,
       );
 
       record.setField('customer_name', 'New Customer');
@@ -55,18 +48,14 @@ void main() {
       final json = record.toJson();
 
       expect(json['i'], equals(1));
-      expect(json['v'], equals(1));
+      expect(json['v'], equals(9));
       expect(json['customer_name'], equals('New Customer'));
       expect(json['total_amount'], equals('5000.00'));
       expect(json.containsKey('invoice_number'), isFalse);
     });
 
     test('reset clears all edits', () {
-      final record = RecordX(
-        modelId: 500,
-        recordId: 1,
-        schemaVersion: 1,
-      );
+      final record = RecordX(modelId: 500, recordId: 1, schemaVersion: 1);
 
       record.setField('customer_name', 'New Customer');
       expect(record.isDirty, isTrue);
@@ -74,7 +63,100 @@ void main() {
       record.reset();
 
       expect(record.isDirty, isFalse);
-      expect(record.toJson().keys.length, equals(2)); // Only i and v
+      expect(record.toJson(), {'i': 1});
+    });
+
+    test('uses wire codes for edits and preserves explicit nulls', () {
+      final record = RecordX(
+        modelId: 500,
+        recordId: 1,
+        schemaVersion: 1,
+        cachedRow: JxRow(
+          schema: JxSchema(const [
+            JxField(
+              i: 3,
+              c: 'notes',
+              n: 'Notes',
+              typeId: 300011,
+              typeName: 'String',
+            ),
+          ]),
+          cells: ['Stored value'],
+        ),
+      );
+
+      expect(record.getField('notes'), 'Stored value');
+      expect(record.getField('Notes'), 'Stored value');
+      expect(record.toJson(), {'i': 1});
+
+      record.setField('Notes', null);
+      expect(record.getField('notes'), isNull);
+      expect(record.getField('Notes'), isNull);
+      expect(record.toJson(), {'i': 1, 'notes': null});
+    });
+
+    test('rejects ambiguous display names while accepting unique codes', () {
+      final record = RecordX(
+        modelId: 500,
+        recordId: 1,
+        schemaVersion: 1,
+        cachedRow: JxRow(
+          schema: JxSchema(const [
+            JxField(
+              i: 1,
+              c: 'first',
+              n: 'Notes',
+              typeId: 300011,
+              typeName: 'String',
+            ),
+            JxField(
+              i: 2,
+              c: 'second',
+              n: 'Notes',
+              typeId: 300011,
+              typeName: 'String',
+            ),
+          ]),
+          cells: ['First note', 'Second note'],
+        ),
+      );
+
+      expect(() => record.getField('Notes'), throwsArgumentError);
+      expect(() => record.setField('Notes', 'Changed'), throwsArgumentError);
+      record.setField('first', 'Changed');
+      expect(record.toJson(), {'i': 1, 'first': 'Changed'});
+    });
+
+    test('protects record ID, version, and section removal keys', () {
+      final record = RecordX(
+        modelId: 500,
+        recordId: 1,
+        schemaVersion: 1,
+        recordVersion: 3,
+        cachedRow: JxRow(
+          schema: JxSchema(const [
+            JxField(
+              i: 1,
+              c: 'v',
+              n: 'Version',
+              typeId: 300007,
+              typeName: 'Integer',
+            ),
+          ]),
+          cells: [3],
+        ),
+      );
+
+      for (final key in ['i', 'v', 'Version', '_removed_items']) {
+        expect(() => record.setField(key, 0), throwsArgumentError);
+      }
+      for (final key in ['i', 'v', '_removed_items']) {
+        expect(() => record.setSectionRows(key, []), throwsArgumentError);
+        expect(() => record.addSectionRow(key, {}), throwsArgumentError);
+        expect(() => record.removeSectionRow(key, 0), throwsArgumentError);
+      }
+      expect(record.isDirty, isFalse);
+      expect(record.toJson(), {'i': 1, 'v': 3});
     });
   });
 
@@ -174,7 +256,10 @@ void main() {
       // Should have one row: the edited line_id 2
       expect(json['invoiceDetails'].length, equals(1));
       expect(json['invoiceDetails'][0]['line_id'], equals(2));
-      expect(json['invoiceDetails'][0]['product_name'], equals('Edited Gadget'));
+      expect(
+        json['invoiceDetails'][0]['product_name'],
+        equals('Edited Gadget'),
+      );
       expect(json['invoiceDetails'][0]['quantity'], equals(10));
 
       // Should explicitly track removed ID
@@ -198,17 +283,77 @@ void main() {
           'quantity': 1,
           'unit_price': '1000.00',
           'line_total': '1000.00',
-        }
+        },
       ]);
 
       final details = record.getSectionRows('invoiceDetails');
       expect(details.length, equals(1));
       expect(details[0]['product_name'], equals('Replacement Item'));
     });
+
+    test('edits and removes unsaved rows without sending removal IDs', () {
+      final record = RecordX(modelId: 500, schemaVersion: 1);
+
+      record.addSectionRow('items', {'name': 'Missing ID'});
+      record.addSectionRow('items', {'i': 0, 'name': 'First'});
+      record.addSectionRow('items', {'i': 0, 'name': 'Second'});
+      record.addSectionRow('items', {'id': 42, 'name': 'Proposed ID'});
+      record.setSectionRow('items', 0, {'name': 'Updated missing ID'});
+      record.setSectionRow('items', 2, {'name': 'Updated second'});
+
+      expect(record.getSectionRows('items'), [
+        {'name': 'Updated missing ID'},
+        {'i': 0, 'name': 'First'},
+        {'i': 0, 'name': 'Updated second'},
+        {'id': 42, 'name': 'Proposed ID'},
+      ]);
+
+      record.removeSectionRow('items', 0);
+      record.removeSectionRow('items', 0);
+      record.removeSectionRowById('items', 42);
+      expect(record.toJson(), {
+        'i': 0,
+        'items': [
+          {'i': 0, 'name': 'Updated second'},
+        ],
+      });
+    });
+
+    test('uses declared section ID codes for updates and removals', () {
+      final record = RecordX(
+        modelId: 500,
+        schemaVersion: 1,
+        sectionIdentityCodes: {'items': 'item_key'},
+      );
+      record.setSectionRows('items', [
+        {'item_key': '9007199254740993', 'i': 7, 'name': 'First'},
+        {
+          'item_key': 'c9ccfd13-1a26-48f9-8c63-fd62a89dc44a',
+          'i': 7,
+          'name': 'Second',
+        },
+      ]);
+
+      record.setSectionRowById('items', '9007199254740993', {
+        'name': 'Updated',
+      });
+      record.removeSectionRowById(
+        'items',
+        'c9ccfd13-1a26-48f9-8c63-fd62a89dc44a',
+      );
+
+      expect(record.toJson(), {
+        'i': 0,
+        'items': [
+          {'item_key': '9007199254740993', 'name': 'Updated'},
+        ],
+        '_removed_items': ['c9ccfd13-1a26-48f9-8c63-fd62a89dc44a'],
+      });
+    });
   });
 
   group('DbContext integration', () {
-    test('fetches and caches invoice record', () async {
+    test('fetches invoice record', () async {
       final invoice = await DbContext.instance.fetchRecord(
         modelId: SalesInvoiceModels.salesInvoiceId,
         recordId: 1,
@@ -221,7 +366,10 @@ void main() {
       // Verify composed structure
       expect(invoice, isA<JxComposedRow>());
       final composed = invoice as JxComposedRow;
-      expect(composed.sections.keys, containsAll(['invoiceInfo', 'invoiceDetails', 'payments']));
+      expect(
+        composed.sections.keys,
+        containsAll(['invoiceInfo', 'invoiceDetails', 'payments']),
+      );
     });
 
     test('opens record for editing', () async {
@@ -295,7 +443,7 @@ void main() {
       expect(payments[1]['payment_method'], equals('Bank Transfer'));
     });
 
-    test('failed save leaves cached invoice intact', () async {
+    test('failed save leaves loaded invoice intact', () async {
       // Load invoice
       final invoice = await DbContext.instance.fetchRecord(
         modelId: SalesInvoiceModels.salesInvoiceId,
@@ -320,10 +468,7 @@ void main() {
       queryService.simulateFailure(true);
 
       // Attempt save (should fail)
-      expect(
-        () => DbContext.instance.saveChanges(editable),
-        throwsException,
-      );
+      expect(() => DbContext.instance.saveChanges(editable), throwsException);
 
       // Verify editable record still has edits (for retry)
       expect(editable.isDirty, isTrue);
@@ -342,7 +487,7 @@ void main() {
       expect(reloaded['customer_name'], equals(originalCustomer));
     });
 
-    test('successful save updates cache', () async {
+    test('successful save returns the updated invoice', () async {
       // Load invoice
       final first = await DbContext.instance.fetchRecord(
         modelId: SalesInvoiceModels.salesInvoiceId,
@@ -442,10 +587,7 @@ void main() {
     });
 
     test('throws on unknown query ID', () {
-      expect(
-        () => queryService.executeQuery(9999, {'i': 1}),
-        throwsException,
-      );
+      expect(() => queryService.executeQuery(9999, {'i': 1}), throwsException);
     });
 
     test('reset restores original fixture', () async {
